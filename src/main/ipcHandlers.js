@@ -6,6 +6,7 @@ const { IPC_CHANNELS } = require('../common/constants');
 const windowManager = require('./windowManager');
 const i18n = require('./i18n');
 const trayManager = require('./trayManager');
+const configManager = require('./configManager');
 
 /**
  * 设置所有 IPC 处理器
@@ -38,7 +39,8 @@ function setup() {
   ipcMain.handle(IPC_CHANNELS.GET_INITIAL_STATE, () => {
     return {
       opacity: windowManager.getCurrentOpacity(),
-      isClickThrough: windowManager.isClickThroughEnabled()
+      isClickThrough: windowManager.isClickThroughEnabled(),
+      lastUrl: configManager.get('lastUrl')
     };
   });
 
@@ -67,6 +69,11 @@ function setup() {
       path: process.execPath
     });
     return app.getLoginItemSettings().openAtLogin;
+  });
+
+  // 保存最后访问的 URL
+  ipcMain.on(IPC_CHANNELS.SAVE_LAST_URL, (_event, url) => {
+    configManager.set('lastUrl', url);
   });
 
   console.log(i18n.t('ipc.ready'));

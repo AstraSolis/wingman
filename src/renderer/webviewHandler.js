@@ -23,12 +23,18 @@ function initWebview(webview, elements) {
   // 页面导航成功，更新地址栏
   webview.addEventListener('did-navigate', (event) => {
     urlInput.value = event.url;
+    if (window.wingman && window.wingman.saveLastUrl) {
+      window.wingman.saveLastUrl(event.url);
+    }
   });
 
   // 页面内导航（如 SPA 路由切换）
   webview.addEventListener('did-navigate-in-page', (event) => {
     if (event.isMainFrame) {
       urlInput.value = event.url;
+      if (window.wingman && window.wingman.saveLastUrl) {
+        window.wingman.saveLastUrl(event.url);
+      }
     }
   });
 

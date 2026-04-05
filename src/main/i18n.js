@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const { DEFAULT_LOCALE, SUPPORTED_LOCALES } = require('../common/constants');
 const { createTranslator } = require('../common/i18nUtils');
+const configManager = require('./configManager');
 
 const localesDir = path.join(__dirname, '..', 'locales');
 
@@ -62,6 +63,10 @@ function setLocale(locale) {
     return;
   }
   currentLocale = locale;
+  
+  // 持久化保存
+  configManager.set('locale', currentLocale);
+  
   if (locale === 'zh-CN') {
     translations = fallbackTranslations;
   } else {

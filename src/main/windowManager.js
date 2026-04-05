@@ -12,6 +12,7 @@ const {
   DEFAULT_HEIGHT,
   IPC_CHANNELS
 } = require('../common/constants');
+const configManager = require('./configManager');
 
 let mainWindow = null;
 let currentOpacity = DEFAULT_OPACITY;
@@ -22,6 +23,10 @@ let isClickThrough = false;
  * 透明、无边框、置顶、不在任务栏显示
  */
 function createWindow() {
+  // 在初始化完 configManager 后，再获取持久化的状态
+  currentOpacity = configManager.get('opacity') ?? DEFAULT_OPACITY;
+  isClickThrough = configManager.get('isClickThrough') ?? false;
+
   const { width: screenWidth, height: screenHeight } = screen.getPrimaryDisplay().workAreaSize;
 
   mainWindow = new BrowserWindow({
@@ -46,6 +51,11 @@ function createWindow() {
 
   mainWindow.loadFile(path.join(__dirname, '..', 'renderer', 'index.html'));
 
+  // 恢复穿透状态（如果为 true 时需要显式设置）
+  if (isClickThrough) {
+    mainWindow.setIgnoreMouseEvents(true, { forward: true });
+  }
+
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
@@ -69,6 +79,9 @@ function setWindowOpacity(opacity) {
 
   currentOpacity = Math.max(MIN_OPACITY, Math.min(MAX_OPACITY, opacity));
   mainWindow.setOpacity(currentOpacity);
+
+  // 持久化保存透明度
+  configManager.set('opacity', currentOpacity);
 
   // 通知渲染进程更新 UI
   mainWindow.webContents.send(IPC_CHANNELS.OPACITY_UPDATED, currentOpacity);
@@ -103,6 +116,9 @@ function toggleIgnoreMouse() {
 
   isClickThrough = !isClickThrough;
   mainWindow.setIgnoreMouseEvents(isClickThrough, { forward: true });
+
+  // 持久化保存点击穿透状态
+  configManager.set('isClickThrough', isClickThrough);
 
   // 通知渲染进程更新状态
   mainWindow.webContents.send(IPC_CHANNELS.CLICK_THROUGH_UPDATED, isClickThrough);

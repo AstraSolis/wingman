@@ -51,13 +51,19 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (state.isClickThrough) {
         elements.clickThroughBtn.classList.add('active');
       }
+
+      // 同步上次访问的 URL
+      if (state.lastUrl) {
+        elements.urlInput.value = state.lastUrl;
+        window.WebviewHandler.loadUrl(elements.webview, state.lastUrl);
+      } else {
+        // 如果没有保存记录，则取默认配置
+        elements.urlInput.value = elements.webview.src || 'https://www.bilibili.com';
+      }
     }
   } catch (err) {
     console.error(window.UI.t('renderer.getStateFailed'), err);
   }
-
-  // 设置默认 URL 到地址栏
-  elements.urlInput.value = elements.webview.src || 'https://www.bilibili.com';
 
   console.log(window.UI.t('renderer.initialized'));
 });

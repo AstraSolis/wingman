@@ -40,6 +40,7 @@ module.exports = {
     SET_LOCALE: 'set-locale',
     NAVIGATE_URL: 'navigate-url',
     GET_AUTO_START: 'get-auto-start',
-    SET_AUTO_START: 'set-auto-start'
+    SET_AUTO_START: 'set-auto-start',
+    SAVE_LAST_URL: 'save-last-url'
   }
 };

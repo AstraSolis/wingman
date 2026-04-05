@@ -7,11 +7,15 @@ const windowManager = require('./src/main/windowManager');
 const shortcutManager = require('./src/main/shortcutManager');
 const trayManager = require('./src/main/trayManager');
 const ipcHandlers = require('./src/main/ipcHandlers');
+const configManager = require('./src/main/configManager');
 
 // 应用就绪后初始化
 app.whenReady().then(() => {
-  // 初始化 i18n（需要最先加载）
-  i18n.init();
+  // 优先加载配置文件
+  configManager.init();
+
+  // 初始化 i18n（需要最先加载，根据配置项里的首选语言）
+  i18n.init(configManager.get('locale'));
 
   // 创建主窗口
   windowManager.createWindow();
@@ -40,4 +44,9 @@ app.on('activate', () => {
   if (!windowManager.getWindow()) {
     windowManager.createWindow();
   }
+});
+
+// 在程序彻底退出前，确保配置文件已经被强制写入磁盘
+app.on('before-quit', () => {
+  configManager.flush();
 });

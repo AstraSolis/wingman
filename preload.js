@@ -24,6 +24,11 @@ contextBridge.exposeInMainWorld('wingman', {
     ipcRenderer.send('hide-window');
   },
 
+  // 保存当前的 URL
+  saveLastUrl: (url) => {
+    ipcRenderer.send('save-last-url', url);
+  },
+
   // 获取初始状态
   getInitialState: () => {
     return ipcRenderer.invoke('get-initial-state');
