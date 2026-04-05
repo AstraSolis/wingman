@@ -1,0 +1,41 @@
+{
+  "app": {
+    "name": "Wingman",
+    "started": "Wingman 已启动"
+  },
+  "shortcut": {
+    "allRegistered": "所有全局快捷键已注册",
+    "allUnregistered": "所有全局快捷键已注销",
+    "registerFailed": "快捷键注册失败: {key}"
+  },
+  "ipc": {
+    "ready": "IPC 处理器已设置"
+  },
+  "tray": {
+    "tooltip": "Wingman - 游戏攻略助手",
+    "toggleWindow": "显示/隐藏窗口",
+    "quit": "退出"
+  },
+  "toolbar": {
+    "urlPlaceholder": "输入攻略网址...",
+    "loadBtn": "加载网页",
+    "opacityTitle": "透明度调节",
+    "clickThroughTitle": "切换点击穿透 (Ctrl+Shift+T)",
+    "hideTitle": "隐藏窗口 (Ctrl+Shift+H)"
+  },
+  "webview": {
+    "loading": "加载中...",
+    "loadFailed": "网页加载失败",
+    "loadError": "加载失败: {description} ({code})",
+    "retry": "重试"
+  },
+  "osd": {
+    "opacity": "透明度: {value}%",
+    "clickThroughOn": "穿透模式: 开启",
+    "clickThroughOff": "穿透模式: 关闭"
+  },
+  "renderer": {
+    "initialized": "Wingman 渲染进程已初始化",
+    "getStateFailed": "获取初始状态失败:"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "name": "wingman",
+  "version": "1.0.0",
+  "description": "游戏攻略悬浮窗助手 - 为 PC 游戏玩家设计的置顶透明攻略窗口",
+  "main": "main.js",
+  "scripts": {
+    "start": "chcp 65001 >nul && electron .",
+    "dist": "electron-builder"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^41.1.1",
+    "electron-builder": "^26.8.1"
+  },
+  "build": {
+    "appId": "com.wingman.app",
+    "productName": "Wingman",
+    "win": {
+      "target": "nsis",
+      "icon": "src/assets/icon.ico"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "src/assets/icon.png"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*"
+    ]
+  }
+}

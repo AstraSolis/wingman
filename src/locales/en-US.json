@@ -1,0 +1,41 @@
+{
+  "app": {
+    "name": "Wingman",
+    "started": "Wingman started"
+  },
+  "shortcut": {
+    "allRegistered": "All global shortcuts registered",
+    "allUnregistered": "All global shortcuts unregistered",
+    "registerFailed": "Shortcut registration failed: {key}"
+  },
+  "ipc": {
+    "ready": "IPC handlers ready"
+  },
+  "tray": {
+    "tooltip": "Wingman - Game Guide Overlay",
+    "toggleWindow": "Show/Hide Window",
+    "quit": "Quit"
+  },
+  "toolbar": {
+    "urlPlaceholder": "Enter guide URL...",
+    "loadBtn": "Load page",
+    "opacityTitle": "Opacity",
+    "clickThroughTitle": "Toggle click-through (Ctrl+Shift+T)",
+    "hideTitle": "Hide window (Ctrl+Shift+H)"
+  },
+  "webview": {
+    "loading": "Loading...",
+    "loadFailed": "Page failed to load",
+    "loadError": "Load failed: {description} ({code})",
+    "retry": "Retry"
+  },
+  "osd": {
+    "opacity": "Opacity: {value}%",
+    "clickThroughOn": "Click-through: ON",
+    "clickThroughOff": "Click-through: OFF"
+  },
+  "renderer": {
+    "initialized": "Wingman renderer initialized",
+    "getStateFailed": "Failed to get initial state:"
+  }
+}

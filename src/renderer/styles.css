@@ -1,0 +1,395 @@
+/* Wingman 样式表 */
+/* 透明无边框窗口、拖拽区域、控件美化 */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --toolbar-bg: rgba(18, 18, 24, 0.88);
+  --toolbar-border: rgba(255, 255, 255, 0.06);
+  --btn-bg: rgba(255, 255, 255, 0.08);
+  --btn-hover: rgba(255, 255, 255, 0.15);
+  --btn-active: rgba(255, 255, 255, 0.22);
+  --accent: #6c8cff;
+  --accent-glow: rgba(108, 140, 255, 0.3);
+  --text-primary: rgba(255, 255, 255, 0.92);
+  --text-secondary: rgba(255, 255, 255, 0.55);
+  --danger: #ff6b6b;
+  --success: #51cf66;
+  --warning: #ffd43b;
+  --radius: 8px;
+  --radius-sm: 5px;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: transparent;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+  color: var(--text-primary);
+  -webkit-app-region: drag; /* 整个背景可拖拽 */
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ========== 顶部控制栏 ========== */
+.toolbar {
+  -webkit-app-region: drag;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: var(--toolbar-bg);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border-bottom: 1px solid var(--toolbar-border);
+  z-index: 100;
+  position: relative;
+}
+
+/* 地址栏 */
+.url-bar {
+  -webkit-app-region: no-drag;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius);
+  padding: 0 4px 0 12px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.url-bar:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
+.url-bar input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-size: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', monospace;
+  padding: 6px 0;
+  letter-spacing: 0.01em;
+}
+
+.url-bar input::placeholder {
+  color: var(--text-secondary);
+}
+
+.url-bar button {
+  -webkit-app-region: no-drag;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.url-bar button:hover {
+  background: var(--btn-hover);
+  color: var(--accent);
+}
+
+.url-bar button:active {
+  background: var(--btn-active);
+  transform: scale(0.92);
+}
+
+/* 控制按钮组 */
+.controls {
+  -webkit-app-region: no-drag;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* 透明度控件 */
+.opacity-control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 6px;
+  color: var(--text-secondary);
+}
+
+.opacity-control svg {
+  flex-shrink: 0;
+}
+
+.opacity-value {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  min-width: 28px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 滑块样式 */
+input[type="range"] {
+  -webkit-app-region: no-drag;
+  -webkit-appearance: none;
+  appearance: none;
+  width: 72px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+input[type="range"]:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 0 3px var(--accent-glow), 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* 图标按钮 */
+.icon-btn {
+  -webkit-app-region: no-drag;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: var(--btn-bg);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.icon-btn:hover {
+  background: var(--btn-hover);
+  color: var(--text-primary);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.icon-btn:active {
+  background: var(--btn-active);
+  transform: scale(0.92);
+}
+
+/* 穿透模式激活状态 */
+.icon-btn.active {
+  background: rgba(108, 140, 255, 0.18);
+  color: var(--accent);
+  border-color: rgba(108, 140, 255, 0.3);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+/* ========== Webview 容器 ========== */
+.webview-container {
+  -webkit-app-region: no-drag;
+  position: relative;
+  flex: 1;
+  width: 100%;
+  height: calc(100% - 44px); /* 减去 toolbar 高度 */
+  overflow: hidden;
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+webview {
+  -webkit-app-region: no-drag;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* ========== 加载指示器 ========== */
+.loading-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: rgba(108, 140, 255, 0.12);
+  backdrop-filter: blur(8px);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 500;
+  z-index: 10;
+  animation: slideDown 0.25s ease;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.loading-spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(108, 140, 255, 0.3);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ========== 错误覆盖层 ========== */
+.error-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(18, 18, 24, 0.95);
+  backdrop-filter: blur(12px);
+  z-index: 20;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.error-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-secondary);
+}
+
+.error-content p {
+  font-size: 13px;
+  max-width: 300px;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.retry-btn {
+  -webkit-app-region: no-drag;
+  padding: 6px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius);
+  background: var(--btn-bg);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.retry-btn:hover {
+  background: var(--btn-hover);
+  border-color: var(--accent);
+}
+
+.retry-btn:active {
+  transform: scale(0.96);
+}
+
+/* ========== OSD 提示 ========== */
+.osd {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  background: var(--toolbar-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--toolbar-border);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 500;
+  z-index: 1000;
+  pointer-events: none;
+  animation: osdIn 0.25s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+.osd.fade-out {
+  animation: osdOut 0.3s ease forwards;
+}
+
+@keyframes osdIn {
+  from {
+    transform: translateY(10px) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes osdOut {
+  from {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(10px) scale(0.9);
+    opacity: 0;
+  }
+}
+
+/* ========== 工具类 ========== */
+.hidden {
+  display: none !important;
+}
+
+/* 调整大小手柄（窗口边框） */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: var(--radius);
+  pointer-events: none;
+  z-index: 9999;
+}
