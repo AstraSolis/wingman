@@ -61,5 +61,15 @@ contextBridge.exposeInMainWorld('wingman', {
   // i18n: 切换语言
   setLocale: (locale) => {
     return ipcRenderer.invoke('set-locale', locale);
+  },
+
+  // 获取开机自启状态
+  getAutoStart: () => {
+    return ipcRenderer.invoke('get-auto-start');
+  },
+
+  // 设置开机自启状态
+  setAutoStart: (enable) => {
+    return ipcRenderer.invoke('set-auto-start', enable);
   }
 });

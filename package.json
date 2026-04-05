@@ -20,6 +20,13 @@
       "target": "nsis",
       "icon": "src/assets/icon.png"
     },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Wingman"
+    },
     "mac": {
       "target": "dmg",
       "icon": "src/assets/icon.png"

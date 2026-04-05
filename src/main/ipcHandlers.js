@@ -1,7 +1,7 @@
 // IPC 消息处理模块
 // 处理渲染进程发来的 IPC 消息
 
-const { ipcMain } = require('electron');
+const { app, ipcMain } = require('electron');
 const { IPC_CHANNELS } = require('../common/constants');
 const windowManager = require('./windowManager');
 const i18n = require('./i18n');
@@ -53,6 +53,20 @@ function setup() {
     // 重建托盘菜单
     trayManager.updateContextMenu();
     return i18n.getAllTranslations();
+  });
+
+  // 获取开机自启状态
+  ipcMain.handle(IPC_CHANNELS.GET_AUTO_START, () => {
+    return app.getLoginItemSettings().openAtLogin;
+  });
+
+  // 设置开机自启状态
+  ipcMain.handle(IPC_CHANNELS.SET_AUTO_START, (_event, enable) => {
+    app.setLoginItemSettings({
+      openAtLogin: enable,
+      path: process.execPath
+    });
+    return app.getLoginItemSettings().openAtLogin;
   });
 
   console.log(i18n.t('ipc.ready'));

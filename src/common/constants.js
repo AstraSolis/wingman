@@ -38,6 +38,8 @@ module.exports = {
     GET_INITIAL_STATE: 'get-initial-state',
     GET_I18N_DATA: 'get-i18n-data',
     SET_LOCALE: 'set-locale',
-    NAVIGATE_URL: 'navigate-url'
+    NAVIGATE_URL: 'navigate-url',
+    GET_AUTO_START: 'get-auto-start',
+    SET_AUTO_START: 'set-auto-start'
   }
 };
