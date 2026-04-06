@@ -76,5 +76,30 @@ contextBridge.exposeInMainWorld('wingman', {
   // 设置开机自启状态
   setAutoStart: (enable) => {
     return ipcRenderer.invoke('set-auto-start', enable);
+  },
+
+  // 获取用户数据
+  getUserData: () => {
+    return ipcRenderer.invoke('get-user-data');
+  },
+
+  // 保存收藏
+  saveFavorite: (item) => {
+    return ipcRenderer.invoke('save-favorite', item);
+  },
+
+  // 移除收藏
+  removeFavorite: (url) => {
+    return ipcRenderer.invoke('remove-favorite', url);
+  },
+
+  // 添加历史记录
+  addHistory: (item) => {
+    ipcRenderer.send('add-history', item);
+  },
+
+  // 清除历史记录
+  clearHistory: () => {
+    return ipcRenderer.invoke('clear-history');
   }
 });

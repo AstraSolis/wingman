@@ -6,8 +6,8 @@ module.exports = {
   DEFAULT_LOCALE: 'zh-CN',
   SUPPORTED_LOCALES: ['zh-CN', 'en-US'],
 
-  // 默认攻略网站
-  DEFAULT_URL: 'https://www.bilibili.com',
+  // 默认主页标识
+  DEFAULT_URL: '', // 修改默认URL为空，以便渲染端一开始判断显示主页
 
   // 透明度配置
   DEFAULT_OPACITY: 0.85,
@@ -41,6 +41,13 @@ module.exports = {
     NAVIGATE_URL: 'navigate-url',
     GET_AUTO_START: 'get-auto-start',
     SET_AUTO_START: 'set-auto-start',
-    SAVE_LAST_URL: 'save-last-url'
+    SAVE_LAST_URL: 'save-last-url',
+    
+    // 首页相关功能
+    GET_USER_DATA: 'get-user-data',
+    SAVE_FAVORITE: 'save-favorite',
+    REMOVE_FAVORITE: 'remove-favorite',
+    ADD_HISTORY: 'add-history',
+    CLEAR_HISTORY: 'clear-history'
   }
 };

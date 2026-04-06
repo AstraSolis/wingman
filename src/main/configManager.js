@@ -9,9 +9,10 @@ const { DEFAULT_LOCALE, DEFAULT_OPACITY, DEFAULT_URL } = require('../common/cons
 // 默认配置
 const DEFAULT_CONFIG = {
   locale: DEFAULT_LOCALE,
-  opacity: DEFAULT_OPACITY,
   isClickThrough: false,
-  lastUrl: DEFAULT_URL
+  lastUrl: DEFAULT_URL,
+  favorites: [],
+  history: []
 };
 
 let configPath = '';
@@ -86,7 +87,8 @@ function get(key) {
  * @param {any} value
  */
 function set(key, value) {
-  if (currentConfig[key] !== value) {
+  // 对于对象或数组类型，可能存在内部突变，强制触发保存
+  if (typeof value === 'object' || currentConfig[key] !== value) {
     currentConfig[key] = value;
     debounceSave();
   }

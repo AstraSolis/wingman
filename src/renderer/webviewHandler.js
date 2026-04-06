@@ -20,11 +20,15 @@ function initWebview(webview, elements) {
     loadingIndicator.classList.add('hidden');
   });
 
-  // 页面导航成功，更新地址栏
+  // 页面导航成功，更新地址栏并记录历史
   webview.addEventListener('did-navigate', (event) => {
     urlInput.value = event.url;
     if (window.wingman && window.wingman.saveLastUrl) {
       window.wingman.saveLastUrl(event.url);
+    }
+    if (window.wingman && window.wingman.addHistory) {
+      const title = webview.getTitle() || event.url;
+      window.wingman.addHistory({ title, url: event.url });
     }
   });
 
@@ -34,6 +38,10 @@ function initWebview(webview, elements) {
       urlInput.value = event.url;
       if (window.wingman && window.wingman.saveLastUrl) {
         window.wingman.saveLastUrl(event.url);
+      }
+      if (window.wingman && window.wingman.addHistory) {
+        const title = webview.getTitle() || event.url;
+        window.wingman.addHistory({ title, url: event.url });
       }
     }
   });
@@ -64,17 +72,31 @@ function initWebview(webview, elements) {
 }
 
 /**
- * 加载指定 URL
+ * 加载指定 URL，或使用 Bing 搜索
  * @param {HTMLElement} webview - webview DOM 元素
- * @param {string} url - 要加载的 URL
+ * @param {string} url - 要加载的 URL 或 搜索词
  */
 function loadUrl(webview, url) {
   if (!url) return;
 
-  // 自动补全协议
-  let normalizedUrl = url.trim();
-  if (!/^https?:\/\//i.test(normalizedUrl)) {
-    normalizedUrl = 'https://' + normalizedUrl;
+  let query = url.trim();
+  let normalizedUrl = query;
+
+  // 简单的 URL 判断正则：看是否可能是一个网址 (包含 . 并且没有空格，或者以 http 开头)
+  const isUrl = /^(https?:\/\/)|([a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)/i.test(query) && !query.includes(' ');
+
+  if (isUrl) {
+    if (!/^https?:\/\//i.test(normalizedUrl)) {
+      normalizedUrl = 'https://' + normalizedUrl;
+    }
+  } else {
+    // 否则认为是搜索词，使用 Bing 搜索引擎
+    normalizedUrl = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
+  }
+
+  // 隐藏主页，显示 webview
+  if (window.UI && window.UI.switchView) {
+    window.UI.switchView('webview');
   }
 
   webview.src = normalizedUrl;
