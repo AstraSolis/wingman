@@ -25,7 +25,8 @@
     "opacityTitle": "Opacity",
     "clickThroughTitle": "Toggle click-through (Ctrl+Shift+T)",
     "settingsTitle": "Settings",
-    "hideTitle": "Hide window (Ctrl+Shift+H)"
+    "hideTitle": "Hide window (Ctrl+Shift+H)",
+    "closeTitle": "Close window"
   },
   "home": {
     "searchPlaceholder": "Enter URL or search...",
@@ -53,6 +54,17 @@
     "languageZhCN": "简体中文",
     "languageEnUS": "English",
     "autoStart": "Launch at startup",
+    "startupPage": "Startup page",
+    "startupPageHome": "Home",
+    "startupPageLast": "Last page",
+    "startupPageFavorites": "Favorites",
+    "startupPageCustom": "Custom URL",
+    "customStartupUrl": "Custom startup URL",
+    "customUrlPlaceholder": "Enter custom URL...",
+    "closeStrategy": "When closing window",
+    "closeStrategyQuit": "Quit application",
+    "closeStrategyMinimize": "Minimize to tray",
+    "rememberWindowBounds": "Remember window position and size",
     "dataGroup": "Data",
     "clearHistory": "Clear history",
     "clearBtn": "Clear",

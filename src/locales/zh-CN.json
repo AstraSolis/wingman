@@ -25,7 +25,8 @@
     "opacityTitle": "透明度调节",
     "clickThroughTitle": "切换点击穿透 (Ctrl+Shift+T)",
     "settingsTitle": "设置",
-    "hideTitle": "隐藏窗口 (Ctrl+Shift+H)"
+    "hideTitle": "隐藏窗口 (Ctrl+Shift+H)",
+    "closeTitle": "关闭窗口"
   },
   "home": {
     "searchPlaceholder": "输入网址或搜索内容...",
@@ -53,6 +54,17 @@
     "languageZhCN": "简体中文",
     "languageEnUS": "English",
     "autoStart": "开机自启",
+    "startupPage": "启动页面",
+    "startupPageHome": "主页",
+    "startupPageLast": "上次退出时页面",
+    "startupPageFavorites": "收藏夹",
+    "startupPageCustom": "自定义网址",
+    "customStartupUrl": "自定义启动网址",
+    "customUrlPlaceholder": "输入自定义网址...",
+    "closeStrategy": "关闭窗口时",
+    "closeStrategyQuit": "退出软件",
+    "closeStrategyMinimize": "最小化到托盘",
+    "rememberWindowBounds": "记忆窗口位置和尺寸",
     "dataGroup": "数据",
     "clearHistory": "清除历史记录",
     "clearBtn": "清除",

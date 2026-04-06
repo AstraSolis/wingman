@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     opacitySlider: document.getElementById('opacitySlider'),
     opacityValue: document.getElementById('opacityValue'),
     clickThroughBtn: document.getElementById('clickThroughBtn'),
-    hideBtn: document.getElementById('hideBtn'),
+    closeBtn: document.getElementById('closeBtn'),
     retryBtn: document.getElementById('retryBtn'),
     webview: document.getElementById('guideWebview'),
     loadingIndicator: document.getElementById('loadingIndicator'),
@@ -27,8 +27,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     closeSettingsBtn: document.getElementById('closeSettingsBtn'),
     languageSelect: document.getElementById('languageSelect'),
     autoStartCheckbox: document.getElementById('autoStartCheckbox'),
-    clearHistoryBtn: document.getElementById('clearHistoryBtn')
+    clearHistoryBtn: document.getElementById('clearHistoryBtn'),
+    startupPageSelected: document.getElementById('startupPageSelected'),
+    startupPageSelectedText: document.getElementById('startupPageSelectedText'),
+    startupPageMenu: document.getElementById('startupPageMenu'),
+    customStartupUrlInput: document.getElementById('customStartupUrlInput'),
+    customUrlSetting: document.getElementById('customUrlSetting'),
+    closeStrategySelected: document.getElementById('closeStrategySelected'),
+    closeStrategySelectedText: document.getElementById('closeStrategySelectedText'),
+    closeStrategyMenu: document.getElementById('closeStrategyMenu'),
+    rememberWindowBoundsCheckbox: document.getElementById('rememberWindowBoundsCheckbox')
   };
+
+  // 关闭按钮事件（需要在 initUI 之前绑定）
+  if (elements.closeBtn) {
+    elements.closeBtn.addEventListener('click', () => {
+      window.wingman.closeWindow();
+    });
+  }
 
   // 初始化 i18n 翻译
   try {
@@ -142,6 +158,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 获取初始状态并同步 UI
   try {
     const state = await window.wingman.getInitialState();
+    const startupConfig = await window.wingman.getStartupConfig();
+
     if (state) {
       // 同步透明度
       const percent = Math.round(state.opacity * 100);
@@ -153,13 +171,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         elements.clickThroughBtn.classList.add('active');
       }
 
-      // 同步上次访问的 URL
-      if (state.lastUrl && state.lastUrl !== '') {
-        elements.urlInput.value = state.lastUrl;
-        window.WebviewHandler.loadUrl(elements.webview, state.lastUrl);
-      } else {
-        // 如果没有保存记录或者记录为空，展示首页
+      // 根据启动页面配置决定显示内容
+      const startupPage = startupConfig.startupPage || 'lastPage';
+
+      if (startupPage === 'home') {
+        // 显示主页
         window.UI.switchView('home');
+      } else if (startupPage === 'lastPage') {
+        // 显示上次访问的页面
+        if (state.lastUrl && state.lastUrl !== '') {
+          elements.urlInput.value = state.lastUrl;
+          window.WebviewHandler.loadUrl(elements.webview, state.lastUrl);
+        } else {
+          window.UI.switchView('home');
+        }
+      } else if (startupPage === 'favorites') {
+        // 显示收藏夹
+        window.UI.switchView('home');
+        setTimeout(() => openFavorites(), 100);
+      } else if (startupPage === 'customUrl') {
+        // 加载自定义网址
+        const customUrl = startupConfig.customStartupUrl;
+        if (customUrl && customUrl !== '') {
+          elements.urlInput.value = customUrl;
+          window.WebviewHandler.loadUrl(elements.webview, customUrl);
+        } else {
+          window.UI.switchView('home');
+        }
       }
     }
   } catch (err) {
@@ -182,6 +220,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         languageSelectedText.textContent = window.UI.t(`settings.language${currentLocale === 'zh-CN' ? 'ZhCN' : 'EnUS'}`);
       }
       elements.autoStartCheckbox.checked = await window.wingman.getAutoStart();
+
+      // 加载启动配置
+      const startupConfig = await window.wingman.getStartupConfig();
+
+      // 设置启动页面下拉框
+      const startupPageKey = {
+        'home': 'Home',
+        'lastPage': 'Last',
+        'favorites': 'Favorites',
+        'customUrl': 'Custom'
+      }[startupConfig.startupPage || 'lastPage'];
+      elements.startupPageSelectedText.textContent = window.UI.t(`settings.startupPage${startupPageKey}`);
+
+      // 设置自定义网址输入框
+      elements.customStartupUrlInput.value = startupConfig.customStartupUrl || '';
+      elements.customUrlSetting.style.display = startupConfig.startupPage === 'customUrl' ? 'flex' : 'none';
+
+      // 设置关闭策略下拉框
+      const closeStrategyKey = startupConfig.closeStrategy === 'quit' ? 'Quit' : 'Minimize';
+      elements.closeStrategySelectedText.textContent = window.UI.t(`settings.closeStrategy${closeStrategyKey}`);
+
+      // 设置窗口位置记忆复选框
+      elements.rememberWindowBoundsCheckbox.checked = startupConfig.rememberWindowBounds ?? true;
+
       elements.settingsModal.classList.remove('hidden');
     } catch (err) {}
   });
@@ -231,6 +293,84 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       await window.wingman.clearHistory();
       window.UI.showOSD(window.UI.t('settings.historyCleared'));
+    } catch (err) {}
+  });
+
+  // 启动页面下拉菜单
+  if (elements.startupPageSelected && elements.startupPageMenu) {
+    elements.startupPageSelected.addEventListener('click', (e) => {
+      e.stopPropagation();
+      elements.startupPageMenu.classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', () => {
+      if (!elements.startupPageMenu.classList.contains('hidden')) {
+        elements.startupPageMenu.classList.add('hidden');
+      }
+    });
+
+    elements.startupPageMenu.querySelectorAll('.dropdown-item').forEach(item => {
+      item.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const val = item.getAttribute('data-value');
+        const keyMap = { 'home': 'Home', 'lastPage': 'Last', 'favorites': 'Favorites', 'customUrl': 'Custom' };
+        elements.startupPageSelectedText.textContent = window.UI.t(`settings.startupPage${keyMap[val]}`);
+        elements.startupPageMenu.classList.add('hidden');
+
+        // 显示或隐藏自定义网址输入框
+        elements.customUrlSetting.style.display = val === 'customUrl' ? 'flex' : 'none';
+
+        try {
+          await window.wingman.setStartupPage(val);
+        } catch (err) {}
+      });
+    });
+  }
+
+  // 自定义启动网址输入框
+  if (elements.customStartupUrlInput) {
+    let urlTimeout = null;
+    elements.customStartupUrlInput.addEventListener('input', (e) => {
+      if (urlTimeout) clearTimeout(urlTimeout);
+      urlTimeout = setTimeout(async () => {
+        try {
+          await window.wingman.setCustomStartupUrl(e.target.value);
+        } catch (err) {}
+      }, 500);
+    });
+  }
+
+  // 关闭策略下拉菜单
+  if (elements.closeStrategySelected && elements.closeStrategyMenu) {
+    elements.closeStrategySelected.addEventListener('click', (e) => {
+      e.stopPropagation();
+      elements.closeStrategyMenu.classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', () => {
+      if (!elements.closeStrategyMenu.classList.contains('hidden')) {
+        elements.closeStrategyMenu.classList.add('hidden');
+      }
+    });
+
+    elements.closeStrategyMenu.querySelectorAll('.dropdown-item').forEach(item => {
+      item.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const val = item.getAttribute('data-value');
+        const keyMap = { 'quit': 'Quit', 'minimize': 'Minimize' };
+        elements.closeStrategySelectedText.textContent = window.UI.t(`settings.closeStrategy${keyMap[val]}`);
+        elements.closeStrategyMenu.classList.add('hidden');
+        try {
+          await window.wingman.setCloseStrategy(val);
+        } catch (err) {}
+      });
+    });
+  }
+
+  // 窗口位置记忆复选框
+  elements.rememberWindowBoundsCheckbox.addEventListener('change', async (e) => {
+    try {
+      await window.wingman.setRememberWindowBounds(e.target.checked);
     } catch (err) {}
   });
 

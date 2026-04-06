@@ -853,7 +853,7 @@ body::after {
   box-shadow: 0 4px 16px rgba(0,0,0,0.12);
   overflow: hidden;
   z-index: 1000;
-  min-width: 120px;
+  min-width: 160px;
 }
 .dropdown-menu.hidden {
   display: none;
@@ -865,6 +865,7 @@ body::after {
   cursor: pointer;
   transition: background 0.2s;
   text-align: left;
+  white-space: nowrap;
 }
 .dropdown-item:hover {
   background: #f0f0f0;
@@ -941,4 +942,48 @@ body::after {
 }
 .slider-light.round:before {
   border-radius: 50%;
+}
+
+/* 自定义URL输入框样式 */
+.custom-url-item {
+  flex-direction: column;
+  align-items: flex-start !important;
+  padding: 12px 16px !important;
+}
+
+.custom-url-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.custom-url-wrapper label {
+  font-size: 13px;
+  color: #666;
+  font-weight: 500;
+}
+
+.custom-url-input {
+  -webkit-app-region: no-drag;
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background: #f5f5f5;
+  color: #333;
+  font-size: 13px;
+  outline: none;
+  transition: all 0.2s;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', monospace;
+}
+
+.custom-url-input:focus {
+  background: #fff;
+  border-color: #6c8cff;
+  box-shadow: 0 0 0 3px rgba(108, 140, 255, 0.1);
+}
+
+.custom-url-input::placeholder {
+  color: #999;
 }

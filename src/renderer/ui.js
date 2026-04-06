@@ -193,7 +193,7 @@ function showOSD(message, duration = 2000) {
 function initUI(elements) {
   const {
     urlInput, loadBtn, opacitySlider, opacityValue,
-    clickThroughBtn, hideBtn, retryBtn, webview,
+    clickThroughBtn, retryBtn, webview,
     homeBtn, addFavBtn, homeUrlInput, homeGoBtn,
     showFavBtn, showHistoryBtn, closeModalBtn
   } = elements;
@@ -253,11 +253,6 @@ function initUI(elements) {
   // 穿透切换按钮
   clickThroughBtn.addEventListener('click', () => {
     window.wingman.toggleClickThrough();
-  });
-
-  // 隐藏窗口按钮
-  hideBtn.addEventListener('click', () => {
-    window.wingman.hideWindow();
   });
 
   // 重试按钮

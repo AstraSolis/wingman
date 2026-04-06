@@ -123,6 +123,50 @@ function setup() {
     return [];
   });
 
+  // 获取启动配置
+  ipcMain.handle(IPC_CHANNELS.GET_STARTUP_CONFIG, () => {
+    return {
+      startupPage: configManager.get('startupPage'),
+      customStartupUrl: configManager.get('customStartupUrl'),
+      closeStrategy: configManager.get('closeStrategy'),
+      rememberWindowBounds: configManager.get('rememberWindowBounds')
+    };
+  });
+
+  // 设置启动页面类型
+  ipcMain.handle(IPC_CHANNELS.SET_STARTUP_PAGE, (_event, pageType) => {
+    configManager.set('startupPage', pageType);
+    return pageType;
+  });
+
+  // 设置自定义启动网址
+  ipcMain.handle(IPC_CHANNELS.SET_CUSTOM_STARTUP_URL, (_event, url) => {
+    configManager.set('customStartupUrl', url);
+    return url;
+  });
+
+  // 设置关闭窗口策略
+  ipcMain.handle(IPC_CHANNELS.SET_CLOSE_STRATEGY, (_event, strategy) => {
+    configManager.set('closeStrategy', strategy);
+    return strategy;
+  });
+
+  // 设置是否记忆窗口位置
+  ipcMain.handle(IPC_CHANNELS.SET_REMEMBER_WINDOW_BOUNDS, (_event, remember) => {
+    configManager.set('rememberWindowBounds', remember);
+    return remember;
+  });
+
+  // 关闭窗口（根据策略执行退出或最小化）
+  ipcMain.on(IPC_CHANNELS.CLOSE_WINDOW, () => {
+    const strategy = configManager.get('closeStrategy');
+    if (strategy === 'quit') {
+      app.quit();
+    } else {
+      windowManager.hideWindow();
+    }
+  });
+
   console.log(i18n.t('ipc.ready'));
 }
 

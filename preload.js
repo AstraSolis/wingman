@@ -101,5 +101,35 @@ contextBridge.exposeInMainWorld('wingman', {
   // 清除历史记录
   clearHistory: () => {
     return ipcRenderer.invoke('clear-history');
+  },
+
+  // 关闭窗口（根据策略）
+  closeWindow: () => {
+    ipcRenderer.send('close-window');
+  },
+
+  // 获取启动配置
+  getStartupConfig: () => {
+    return ipcRenderer.invoke('get-startup-config');
+  },
+
+  // 设置启动页面类型
+  setStartupPage: (pageType) => {
+    return ipcRenderer.invoke('set-startup-page', pageType);
+  },
+
+  // 设置自定义启动网址
+  setCustomStartupUrl: (url) => {
+    return ipcRenderer.invoke('set-custom-startup-url', url);
+  },
+
+  // 设置关闭窗口策略
+  setCloseStrategy: (strategy) => {
+    return ipcRenderer.invoke('set-close-strategy', strategy);
+  },
+
+  // 设置是否记忆窗口位置
+  setRememberWindowBounds: (remember) => {
+    return ipcRenderer.invoke('set-remember-window-bounds', remember);
   }
 });

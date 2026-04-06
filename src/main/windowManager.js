@@ -29,7 +29,11 @@ function createWindow() {
 
   const { width: screenWidth, height: screenHeight } = screen.getPrimaryDisplay().workAreaSize;
 
-  mainWindow = new BrowserWindow({
+  // 获取保存的窗口位置和尺寸
+  const rememberBounds = configManager.get('rememberWindowBounds') ?? true;
+  const savedBounds = configManager.get('windowBounds');
+
+  let windowOptions = {
     width: DEFAULT_WIDTH,
     height: DEFAULT_HEIGHT,
     x: Math.round((screenWidth - DEFAULT_WIDTH) / 2),
@@ -47,7 +51,17 @@ function createWindow() {
       nodeIntegration: false,
       contextIsolation: true
     }
-  });
+  };
+
+  // 如果启用了记忆功能且有保存的位置，则使用保存的位置
+  if (rememberBounds && savedBounds) {
+    windowOptions.x = savedBounds.x;
+    windowOptions.y = savedBounds.y;
+    windowOptions.width = savedBounds.width;
+    windowOptions.height = savedBounds.height;
+  }
+
+  mainWindow = new BrowserWindow(windowOptions);
 
   mainWindow.loadFile(path.join(__dirname, '..', 'renderer', 'index.html'));
 
@@ -56,7 +70,29 @@ function createWindow() {
     mainWindow.setIgnoreMouseEvents(true, { forward: true });
   }
 
+  // 监听窗口移动和缩放事件，保存位置
+  let boundsTimeout = null;
+  const saveBounds = () => {
+    if (!mainWindow) return;
+    const rememberBounds = configManager.get('rememberWindowBounds') ?? true;
+    if (rememberBounds) {
+      const bounds = mainWindow.getBounds();
+      configManager.set('windowBounds', bounds);
+    }
+  };
+
+  mainWindow.on('move', () => {
+    if (boundsTimeout) clearTimeout(boundsTimeout);
+    boundsTimeout = setTimeout(saveBounds, 500);
+  });
+
+  mainWindow.on('resize', () => {
+    if (boundsTimeout) clearTimeout(boundsTimeout);
+    boundsTimeout = setTimeout(saveBounds, 500);
+  });
+
   mainWindow.on('closed', () => {
+    if (boundsTimeout) clearTimeout(boundsTimeout);
     mainWindow = null;
   });
 

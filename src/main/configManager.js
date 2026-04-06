@@ -4,7 +4,7 @@
 const path = require('path');
 const fs = require('fs');
 const { app } = require('electron');
-const { DEFAULT_LOCALE, DEFAULT_OPACITY, DEFAULT_URL } = require('../common/constants');
+const { DEFAULT_LOCALE, DEFAULT_OPACITY, DEFAULT_URL, STARTUP_PAGE_TYPES, CLOSE_STRATEGIES } = require('../common/constants');
 
 // 默认配置
 const DEFAULT_CONFIG = {
@@ -12,7 +12,13 @@ const DEFAULT_CONFIG = {
   isClickThrough: false,
   lastUrl: DEFAULT_URL,
   favorites: [],
-  history: []
+  history: [],
+  // 新增配置项
+  startupPage: STARTUP_PAGE_TYPES.LAST_PAGE, // 启动页面类型
+  customStartupUrl: '', // 自定义启动网址
+  closeStrategy: CLOSE_STRATEGIES.MINIMIZE, // 关闭窗口策略
+  rememberWindowBounds: true, // 是否记忆窗口位置和尺寸
+  windowBounds: null // 窗口位置和尺寸 { x, y, width, height }
 };
 
 let configPath = '';

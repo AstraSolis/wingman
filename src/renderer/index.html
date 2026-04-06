@@ -54,10 +54,11 @@
         </svg>
       </button>
 
-      <!-- 最小化到托盘 -->
-      <button id="hideBtn" class="icon-btn" data-i18n-title="toolbar.hideTitle">
+      <!-- 关闭窗口 -->
+      <button id="closeBtn" class="icon-btn" data-i18n-title="toolbar.closeTitle">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
         </svg>
       </button>
     </div>
@@ -168,10 +169,51 @@
               </div>
             </div>
           </div>
-          <div class="setting-item-light border-none">
+          <div class="setting-item-light">
             <label data-i18n="settings.autoStart"></label>
             <label class="switch-light">
               <input type="checkbox" id="autoStartCheckbox">
+              <span class="slider-light round"></span>
+            </label>
+          </div>
+          <div class="setting-item-light">
+            <label data-i18n="settings.startupPage"></label>
+            <div class="custom-dropdown" id="startupPageDropdown">
+              <div class="dropdown-selected" id="startupPageSelected">
+                <span id="startupPageSelectedText"></span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </div>
+              <div class="dropdown-menu hidden" id="startupPageMenu">
+                <div class="dropdown-item" data-value="home" data-i18n="settings.startupPageHome"></div>
+                <div class="dropdown-item" data-value="lastPage" data-i18n="settings.startupPageLast"></div>
+                <div class="dropdown-item" data-value="favorites" data-i18n="settings.startupPageFavorites"></div>
+                <div class="dropdown-item" data-value="customUrl" data-i18n="settings.startupPageCustom"></div>
+              </div>
+            </div>
+          </div>
+          <div class="setting-item-light custom-url-item" id="customUrlSetting" style="display: none;">
+            <div class="custom-url-wrapper">
+              <label data-i18n="settings.customStartupUrl"></label>
+              <input type="text" id="customStartupUrlInput" data-i18n-placeholder="settings.customUrlPlaceholder" class="custom-url-input">
+            </div>
+          </div>
+          <div class="setting-item-light">
+            <label data-i18n="settings.closeStrategy"></label>
+            <div class="custom-dropdown" id="closeStrategyDropdown">
+              <div class="dropdown-selected" id="closeStrategySelected">
+                <span id="closeStrategySelectedText"></span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </div>
+              <div class="dropdown-menu hidden" id="closeStrategyMenu">
+                <div class="dropdown-item" data-value="minimize" data-i18n="settings.closeStrategyMinimize"></div>
+                <div class="dropdown-item" data-value="quit" data-i18n="settings.closeStrategyQuit"></div>
+              </div>
+            </div>
+          </div>
+          <div class="setting-item-light border-none">
+            <label data-i18n="settings.rememberWindowBounds"></label>
+            <label class="switch-light">
+              <input type="checkbox" id="rememberWindowBoundsCheckbox">
               <span class="slider-light round"></span>
             </label>
           </div>
