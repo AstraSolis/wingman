@@ -59,12 +59,6 @@ function initWebview(webview, elements) {
     });
   });
 
-  // 阻止新窗口弹出，在当前 webview 中打开
-  webview.addEventListener('new-window', (event) => {
-    event.preventDefault();
-    webview.src = event.url;
-  });
-
   // 标题变化
   webview.addEventListener('page-title-updated', (event) => {
     const appName = window.UI ? window.UI.t('app.name') : 'Wingman';

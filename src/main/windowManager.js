@@ -76,8 +76,18 @@ function createWindow() {
 
   mainWindow = new BrowserWindow(windowOptions);
 
-  mainWindow.loadFile(path.join(__dirname, '..', 'renderer', 'index.html'));
+  mainWindow.webContents.on('did-attach-webview', (_event, guestContents) => {
+    guestContents.setWindowOpenHandler(({ url }) => {
+      if (!url || !/^https?:\/\//i.test(url)) {
+        return { action: 'deny' };
+      }
 
+      mainWindow.webContents.send(IPC_CHANNELS.NAVIGATE_URL, url);
+      return { action: 'deny' };
+    });
+  });
+
+  mainWindow.loadFile(path.join(__dirname, '..', 'renderer', 'index.html'));
   // 恢复穿透状态（如果为 true 时需要显式设置）
   if (isClickThrough) {
     setClickThrough(true);
