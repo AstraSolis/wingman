@@ -21,10 +21,10 @@ module.exports = {
 
   // 全局快捷键定义
   SHORTCUTS: {
-    TOGGLE_CLICK_THROUGH: 'Ctrl+Shift+T',
-    INCREASE_OPACITY: 'Ctrl+Shift+Up',
-    DECREASE_OPACITY: 'Ctrl+Shift+Down',
-    TOGGLE_WINDOW: 'Ctrl+Shift+H'
+    TOGGLE_CLICK_THROUGH: 'CommandOrControl+Shift+T',
+    INCREASE_OPACITY: 'CommandOrControl+Shift+Up',
+    DECREASE_OPACITY: 'CommandOrControl+Shift+Down',
+    TOGGLE_WINDOW: 'CommandOrControl+Shift+H'
   },
 
   // 启动页面类型

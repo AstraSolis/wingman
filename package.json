@@ -4,7 +4,7 @@
   "description": "游戏攻略悬浮窗助手 - 为 PC 游戏玩家设计的置顶透明攻略窗口",
   "main": "main.js",
   "scripts": {
-    "start": "chcp 65001 >nul && electron .",
+    "start": "node scripts/start.js",
     "dist": "electron-builder"
   },
   "author": "",
@@ -29,6 +29,10 @@
     },
     "mac": {
       "target": "dmg",
+      "icon": "src/assets/icon.png"
+    },
+    "linux": {
+      "target": "AppImage",
       "icon": "src/assets/icon.png"
     },
     "files": [

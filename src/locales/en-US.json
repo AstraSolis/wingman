@@ -23,9 +23,9 @@
     "loadBtn": "Load page",
     "addFavTitle": "Bookmark current page",
     "opacityTitle": "Opacity",
-    "clickThroughTitle": "Toggle click-through (Ctrl+Shift+T)",
+    "clickThroughTitle": "Toggle click-through (Ctrl/Cmd+Shift+T)",
     "settingsTitle": "Settings",
-    "hideTitle": "Hide window (Ctrl+Shift+H)",
+    "hideTitle": "Hide window (Ctrl/Cmd+Shift+H)",
     "closeTitle": "Close window"
   },
   "home": {

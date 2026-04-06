@@ -23,9 +23,9 @@
     "loadBtn": "加载网页",
     "addFavTitle": "收藏当前页面",
     "opacityTitle": "透明度调节",
-    "clickThroughTitle": "切换点击穿透 (Ctrl+Shift+T)",
+    "clickThroughTitle": "切换点击穿透 (Ctrl/Cmd+Shift+T)",
     "settingsTitle": "设置",
-    "hideTitle": "隐藏窗口 (Ctrl+Shift+H)",
+    "hideTitle": "隐藏窗口 (Ctrl/Cmd+Shift+H)",
     "closeTitle": "关闭窗口"
   },
   "home": {

@@ -14,6 +14,8 @@ const {
 } = require('../common/constants');
 const configManager = require('./configManager');
 
+const FORWARD_CLICK_THROUGH_PLATFORMS = new Set(['win32', 'darwin']);
+
 let mainWindow = null;
 let currentOpacity = DEFAULT_OPACITY;
 let isClickThrough = false;
@@ -22,6 +24,17 @@ let isClickThrough = false;
  * 创建主窗口
  * 透明、无边框、置顶、不在任务栏显示
  */
+function shouldForwardClickThrough() {
+  return FORWARD_CLICK_THROUGH_PLATFORMS.has(process.platform);
+}
+
+function setClickThrough(enabled) {
+  if (!mainWindow) return;
+
+  const options = shouldForwardClickThrough() ? { forward: true } : undefined;
+  mainWindow.setIgnoreMouseEvents(enabled, options);
+}
+
 function createWindow() {
   // 在初始化完 configManager 后，再获取持久化的状态
   currentOpacity = configManager.get('opacity') ?? DEFAULT_OPACITY;
@@ -41,10 +54,10 @@ function createWindow() {
     transparent: true,
     frame: false,
     alwaysOnTop: true,
-    skipTaskbar: true,
+    skipTaskbar: process.platform !== 'darwin',
     resizable: true,
     opacity: currentOpacity,
-    hasShadow: false,
+    hasShadow: process.platform === 'darwin',
     webPreferences: {
       preload: path.join(__dirname, '..', '..', 'preload.js'),
       webviewTag: true,
@@ -67,7 +80,7 @@ function createWindow() {
 
   // 恢复穿透状态（如果为 true 时需要显式设置）
   if (isClickThrough) {
-    mainWindow.setIgnoreMouseEvents(true, { forward: true });
+    setClickThrough(true);
   }
 
   // 监听窗口移动和缩放事件，保存位置
@@ -151,7 +164,7 @@ function toggleIgnoreMouse() {
   if (!mainWindow) return;
 
   isClickThrough = !isClickThrough;
-  mainWindow.setIgnoreMouseEvents(isClickThrough, { forward: true });
+  setClickThrough(isClickThrough);
 
   // 持久化保存点击穿透状态
   configManager.set('isClickThrough', isClickThrough);

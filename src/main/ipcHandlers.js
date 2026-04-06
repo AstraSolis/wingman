@@ -2,6 +2,8 @@
 // 处理渲染进程发来的 IPC 消息
 
 const { app, ipcMain } = require('electron');
+
+const AUTO_START_SUPPORTED_PLATFORMS = new Set(['win32', 'darwin']);
 const { IPC_CHANNELS } = require('../common/constants');
 const windowManager = require('./windowManager');
 const i18n = require('./i18n');
@@ -11,6 +13,18 @@ const configManager = require('./configManager');
 /**
  * 设置所有 IPC 处理器
  */
+function isAutoStartSupported() {
+  return AUTO_START_SUPPORTED_PLATFORMS.has(process.platform);
+}
+
+function getAutoStartState() {
+  if (!isAutoStartSupported()) {
+    return false;
+  }
+
+  return app.getLoginItemSettings().openAtLogin;
+}
+
 function setup() {
   // 设置透明度
   ipcMain.on(IPC_CHANNELS.SET_OPACITY, (_event, opacity) => {
@@ -59,16 +73,20 @@ function setup() {
 
   // 获取开机自启状态
   ipcMain.handle(IPC_CHANNELS.GET_AUTO_START, () => {
-    return app.getLoginItemSettings().openAtLogin;
+    return getAutoStartState();
   });
 
   // 设置开机自启状态
   ipcMain.handle(IPC_CHANNELS.SET_AUTO_START, (_event, enable) => {
+    if (!isAutoStartSupported()) {
+      return false;
+    }
+
     app.setLoginItemSettings({
       openAtLogin: enable,
       path: process.execPath
     });
-    return app.getLoginItemSettings().openAtLogin;
+    return getAutoStartState();
   });
 
   // 保存最后访问的 URL
