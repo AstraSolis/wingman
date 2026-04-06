@@ -21,7 +21,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     homeGoBtn: document.getElementById('homeGoBtn'),
     showFavBtn: document.getElementById('showFavBtn'),
     showHistoryBtn: document.getElementById('showHistoryBtn'),
-    closeModalBtn: document.getElementById('closeModalBtn')
+    closeModalBtn: document.getElementById('closeModalBtn'),
+    settingsBtn: document.getElementById('settingsBtn'),
+    settingsModal: document.getElementById('settingsModal'),
+    closeSettingsBtn: document.getElementById('closeSettingsBtn'),
+    languageSelect: document.getElementById('languageSelect'),
+    autoStartCheckbox: document.getElementById('autoStartCheckbox'),
+    clearHistoryBtn: document.getElementById('clearHistoryBtn')
   };
 
   // 初始化 i18n 翻译
@@ -157,6 +163,114 @@ document.addEventListener('DOMContentLoaded', async () => {
   } catch (err) {
     console.error(window.UI.t('renderer.getStateFailed'), err);
     window.UI.switchView('home');
+  }
+
+  // 设置面板逻辑
+  const languageSelected = document.getElementById('languageSelected');
+  const languageSelectedText = document.getElementById('languageSelectedText');
+  const languageMenu = document.getElementById('languageMenu');
+
+  elements.settingsBtn.addEventListener('click', async () => {
+    try {
+      const i18nData = await window.wingman.getI18nData();
+      const currentLocale = i18nData.locale || 'zh-CN';
+      // 更新自定义下拉框显示
+      const selItem = document.querySelector(`.dropdown-item[data-value="${currentLocale}"]`);
+      if (selItem && languageSelectedText) {
+        languageSelectedText.textContent = selItem.textContent;
+      }
+      elements.autoStartCheckbox.checked = await window.wingman.getAutoStart();
+      elements.settingsModal.classList.remove('hidden');
+    } catch (err) {}
+  });
+
+  const hideSettings = () => elements.settingsModal.classList.add('hidden');
+  elements.closeSettingsBtn.addEventListener('click', hideSettings);
+  elements.settingsModal.addEventListener('click', (e) => {
+    if (e.target.id === 'settingsModal') hideSettings();
+  });
+
+  // 自定义下拉菜单交互逻辑
+  if (languageSelected && languageMenu) {
+    languageSelected.addEventListener('click', (e) => {
+      e.stopPropagation();
+      languageMenu.classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', () => {
+      if (!languageMenu.classList.contains('hidden')) {
+        languageMenu.classList.add('hidden');
+      }
+    });
+
+    languageMenu.querySelectorAll('.dropdown-item').forEach(item => {
+      item.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const val = item.getAttribute('data-value');
+        const text = item.textContent;
+        languageSelectedText.textContent = text;
+        languageMenu.classList.add('hidden');
+        try {
+          const newI18n = await window.wingman.setLocale(val);
+          window.UI.setTranslations(newI18n);
+        } catch (err) {}
+      });
+    });
+  }
+
+  elements.autoStartCheckbox.addEventListener('change', async (e) => {
+    try {
+      await window.wingman.setAutoStart(e.target.checked);
+    } catch (err) {}
+  });
+
+  elements.clearHistoryBtn.addEventListener('click', async () => {
+    try {
+      await window.wingman.clearHistory();
+      window.UI.showOSD(window.UI.t('settings.historyCleared') || '历史记录已清除');
+    } catch (err) {}
+  });
+
+  // 设置面板搜索逻辑
+  const settingsSearchInput = document.getElementById('settingsSearchInput');
+  if (settingsSearchInput) {
+    settingsSearchInput.addEventListener('input', (e) => {
+      const keyword = e.target.value.toLowerCase().trim();
+      const groups = document.querySelectorAll('.settings-group');
+      const groupTitles = document.querySelectorAll('.settings-group-title');
+
+      groups.forEach((group, index) => {
+        let hasVisibleItem = false;
+        const items = group.querySelectorAll('.setting-item-light');
+
+        items.forEach(item => {
+          const label = item.querySelector('label');
+          const text = label ? label.textContent.toLowerCase() : '';
+          
+          if (text.includes(keyword)) {
+            item.style.display = 'flex';
+            hasVisibleItem = true;
+          } else {
+            item.style.display = 'none';
+          }
+        });
+
+        // 控制整个组及其标题的显示隐藏
+        if (hasVisibleItem) {
+          group.style.display = 'block';
+          if (groupTitles[index]) groupTitles[index].style.display = 'block';
+        } else {
+          group.style.display = 'none';
+          if (groupTitles[index]) groupTitles[index].style.display = 'none';
+        }
+      });
+    });
+    
+    // 每次打开面板时清空搜索内容
+    elements.settingsBtn.addEventListener('click', () => {
+      settingsSearchInput.value = '';
+      settingsSearchInput.dispatchEvent(new Event('input'));
+    });
   }
 
   console.log(window.UI.t('renderer.initialized'));
