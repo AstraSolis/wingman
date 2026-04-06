@@ -254,17 +254,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (e.target.id === 'settingsModal') hideSettings();
   });
 
+  // 关闭所有下拉菜单的辅助函数
+  const closeAllDropdowns = () => {
+    if (languageMenu) languageMenu.classList.add('hidden');
+    if (elements.startupPageMenu) elements.startupPageMenu.classList.add('hidden');
+    if (elements.closeStrategyMenu) elements.closeStrategyMenu.classList.add('hidden');
+  };
+
+  // 统一的全局点击监听器，用于关闭所有下拉菜单
+  document.addEventListener('click', () => {
+    closeAllDropdowns();
+  });
+
   // 自定义下拉菜单交互逻辑
   if (languageSelected && languageMenu) {
     languageSelected.addEventListener('click', (e) => {
       e.stopPropagation();
-      languageMenu.classList.toggle('hidden');
+      const isHidden = languageMenu.classList.contains('hidden');
+      closeAllDropdowns();
+      if (isHidden) {
+        languageMenu.classList.remove('hidden');
+      }
     });
 
-    document.addEventListener('click', () => {
-      if (!languageMenu.classList.contains('hidden')) {
-        languageMenu.classList.add('hidden');
-      }
+    // 防止点击菜单本身时关闭
+    languageMenu.addEventListener('click', (e) => {
+      e.stopPropagation();
     });
 
     languageMenu.querySelectorAll('.dropdown-item').forEach(item => {
@@ -272,7 +287,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         e.stopPropagation();
         const val = item.getAttribute('data-value');
         languageSelectedText.textContent = window.UI.t(`settings.language${val === 'zh-CN' ? 'ZhCN' : 'EnUS'}`);
-        languageMenu.classList.add('hidden');
+        closeAllDropdowns();
         try {
           const newI18n = await window.wingman.setLocale(val);
           window.UI.setTranslations(newI18n);
@@ -300,13 +315,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (elements.startupPageSelected && elements.startupPageMenu) {
     elements.startupPageSelected.addEventListener('click', (e) => {
       e.stopPropagation();
-      elements.startupPageMenu.classList.toggle('hidden');
+      const isHidden = elements.startupPageMenu.classList.contains('hidden');
+      closeAllDropdowns();
+      if (isHidden) {
+        elements.startupPageMenu.classList.remove('hidden');
+      }
     });
 
-    document.addEventListener('click', () => {
-      if (!elements.startupPageMenu.classList.contains('hidden')) {
-        elements.startupPageMenu.classList.add('hidden');
-      }
+    // 防止点击菜单本身时关闭
+    elements.startupPageMenu.addEventListener('click', (e) => {
+      e.stopPropagation();
     });
 
     elements.startupPageMenu.querySelectorAll('.dropdown-item').forEach(item => {
@@ -315,7 +333,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const val = item.getAttribute('data-value');
         const keyMap = { 'home': 'Home', 'lastPage': 'Last', 'favorites': 'Favorites', 'customUrl': 'Custom' };
         elements.startupPageSelectedText.textContent = window.UI.t(`settings.startupPage${keyMap[val]}`);
-        elements.startupPageMenu.classList.add('hidden');
+        closeAllDropdowns();
 
         // 显示或隐藏自定义网址输入框
         elements.customUrlSetting.style.display = val === 'customUrl' ? 'flex' : 'none';
@@ -344,13 +362,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (elements.closeStrategySelected && elements.closeStrategyMenu) {
     elements.closeStrategySelected.addEventListener('click', (e) => {
       e.stopPropagation();
-      elements.closeStrategyMenu.classList.toggle('hidden');
+      const isHidden = elements.closeStrategyMenu.classList.contains('hidden');
+      closeAllDropdowns();
+      if (isHidden) {
+        elements.closeStrategyMenu.classList.remove('hidden');
+      }
     });
 
-    document.addEventListener('click', () => {
-      if (!elements.closeStrategyMenu.classList.contains('hidden')) {
-        elements.closeStrategyMenu.classList.add('hidden');
-      }
+    // 防止点击菜单本身时关闭
+    elements.closeStrategyMenu.addEventListener('click', (e) => {
+      e.stopPropagation();
     });
 
     elements.closeStrategyMenu.querySelectorAll('.dropdown-item').forEach(item => {
@@ -359,7 +380,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const val = item.getAttribute('data-value');
         const keyMap = { 'quit': 'Quit', 'minimize': 'Minimize' };
         elements.closeStrategySelectedText.textContent = window.UI.t(`settings.closeStrategy${keyMap[val]}`);
-        elements.closeStrategyMenu.classList.add('hidden');
+        closeAllDropdowns();
         try {
           await window.wingman.setCloseStrategy(val);
         } catch (err) {}
