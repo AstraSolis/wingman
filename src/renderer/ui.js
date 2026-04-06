@@ -51,6 +51,10 @@ function setTranslations(i18nData) {
   currentTranslations = i18nData.translations || {};
   fallbackTranslations = i18nData.fallback || {};
   applyTranslations();
+  // 更新页面标题
+  if (document.title.includes('Wingman')) {
+    document.title = t('app.title');
+  }
 }
 
 /**
@@ -101,7 +105,6 @@ function showModal(title, items, type, onSelect, onDelete) {
     const emptyEl = document.createElement('div');
     emptyEl.className = 'empty-state';
     emptyEl.textContent = t('home.emptyList');
-    if (emptyEl.textContent === 'home.emptyList') emptyEl.textContent = '暂无记录';
     modalList.appendChild(emptyEl);
   } else {
     items.forEach((item, index) => {
@@ -113,7 +116,7 @@ function showModal(title, items, type, onSelect, onDelete) {
       
       const titleEl = document.createElement('div');
       titleEl.className = 'list-item-title';
-      titleEl.textContent = item.title || 'Unknown Title';
+      titleEl.textContent = item.title || t('home.unknownTitle');
       
       const urlEl = document.createElement('div');
       urlEl.className = 'list-item-url';

@@ -35,6 +35,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const i18nData = await window.wingman.getI18nData();
     if (i18nData) {
       window.UI.setTranslations(i18nData);
+      // 设置页面标题
+      document.title = window.UI.t('app.title');
     }
   } catch (err) {
     console.error('[i18n] Failed to initialize:', err);
@@ -93,10 +95,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       if (isFav) {
         await window.wingman.removeFavorite(currentUrl);
-        window.UI.showOSD(window.UI.t('home.favRemoved') || '已取消收藏');
+        window.UI.showOSD(window.UI.t('home.favRemoved'));
       } else {
         await window.wingman.saveFavorite({ title: currentTitle, url: currentUrl });
-        window.UI.showOSD(window.UI.t('home.favAdded') || '已加入收藏');
+        window.UI.showOSD(window.UI.t('home.favAdded'));
       }
       refreshFavButtonStatus();
     } catch (err) {
@@ -107,10 +109,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const openFavorites = async () => {
     try {
       const data = await window.wingman.getUserData();
-      window.UI.showModal('收藏夹', data.favorites, 'favorites', 
+      window.UI.showModal(window.UI.t('modal.favorites'), data.favorites, 'favorites',
         (item) => { // 选中
           window.WebviewHandler.loadUrl(elements.webview, item.url);
-        }, 
+        },
         async (item, index) => { // 删除
           await window.wingman.removeFavorite(item.url);
           openFavorites(); // 刷新列表
@@ -118,11 +120,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       );
     } catch (err) {}
   };
-  
+
   const openHistory = async () => {
     try {
       const data = await window.wingman.getUserData();
-      window.UI.showModal('历史记录', data.history, 'history',
+      window.UI.showModal(window.UI.t('modal.history'), data.history, 'history',
         (item) => {
           window.WebviewHandler.loadUrl(elements.webview, item.url);
         }
@@ -177,7 +179,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       // 更新自定义下拉框显示
       const selItem = document.querySelector(`.dropdown-item[data-value="${currentLocale}"]`);
       if (selItem && languageSelectedText) {
-        languageSelectedText.textContent = selItem.textContent;
+        languageSelectedText.textContent = window.UI.t(`settings.language${currentLocale === 'zh-CN' ? 'ZhCN' : 'EnUS'}`);
       }
       elements.autoStartCheckbox.checked = await window.wingman.getAutoStart();
       elements.settingsModal.classList.remove('hidden');
@@ -207,12 +209,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       item.addEventListener('click', async (e) => {
         e.stopPropagation();
         const val = item.getAttribute('data-value');
-        const text = item.textContent;
-        languageSelectedText.textContent = text;
+        languageSelectedText.textContent = window.UI.t(`settings.language${val === 'zh-CN' ? 'ZhCN' : 'EnUS'}`);
         languageMenu.classList.add('hidden');
         try {
           const newI18n = await window.wingman.setLocale(val);
           window.UI.setTranslations(newI18n);
+          // 更新下拉菜单显示
+          languageSelectedText.textContent = window.UI.t(`settings.language${val === 'zh-CN' ? 'ZhCN' : 'EnUS'}`);
         } catch (err) {}
       });
     });
@@ -227,7 +230,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   elements.clearHistoryBtn.addEventListener('click', async () => {
     try {
       await window.wingman.clearHistory();
-      window.UI.showOSD(window.UI.t('settings.historyCleared') || '历史记录已清除');
+      window.UI.showOSD(window.UI.t('settings.historyCleared'));
     } catch (err) {}
   });
 

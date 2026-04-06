@@ -1,6 +1,7 @@
 {
   "app": {
     "name": "Wingman",
+    "title": "Wingman - Game Guide Overlay",
     "started": "Wingman started"
   },
   "shortcut": {
@@ -17,11 +18,23 @@
     "quit": "Quit"
   },
   "toolbar": {
+    "homeTitle": "Back to home",
     "urlPlaceholder": "Enter guide URL...",
     "loadBtn": "Load page",
+    "addFavTitle": "Bookmark current page",
     "opacityTitle": "Opacity",
     "clickThroughTitle": "Toggle click-through (Ctrl+Shift+T)",
+    "settingsTitle": "Settings",
     "hideTitle": "Hide window (Ctrl+Shift+H)"
+  },
+  "home": {
+    "searchPlaceholder": "Enter URL or search...",
+    "favorites": "Favorites",
+    "history": "History",
+    "emptyList": "No records",
+    "favAdded": "Added to favorites",
+    "favRemoved": "Removed from favorites",
+    "unknownTitle": "Unknown Title"
   },
   "webview": {
     "loading": "Loading...",
@@ -33,6 +46,22 @@
     "opacity": "Opacity: {value}%",
     "clickThroughOn": "Click-through: ON",
     "clickThroughOff": "Click-through: OFF"
+  },
+  "settings": {
+    "generalGroup": "General",
+    "language": "Language",
+    "languageZhCN": "简体中文",
+    "languageEnUS": "English",
+    "autoStart": "Launch at startup",
+    "dataGroup": "Data",
+    "clearHistory": "Clear history",
+    "clearBtn": "Clear",
+    "historyCleared": "History cleared",
+    "searchPlaceholder": "Search settings..."
+  },
+  "modal": {
+    "favorites": "Favorites",
+    "history": "History"
   },
   "renderer": {
     "initialized": "Wingman renderer initialized",

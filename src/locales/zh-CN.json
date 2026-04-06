@@ -1,6 +1,7 @@
 {
   "app": {
     "name": "Wingman",
+    "title": "Wingman - 游戏攻略助手",
     "started": "Wingman 已启动"
   },
   "shortcut": {
@@ -17,11 +18,23 @@
     "quit": "退出"
   },
   "toolbar": {
+    "homeTitle": "返回主页",
     "urlPlaceholder": "输入攻略网址...",
     "loadBtn": "加载网页",
+    "addFavTitle": "收藏当前页面",
     "opacityTitle": "透明度调节",
     "clickThroughTitle": "切换点击穿透 (Ctrl+Shift+T)",
+    "settingsTitle": "设置",
     "hideTitle": "隐藏窗口 (Ctrl+Shift+H)"
+  },
+  "home": {
+    "searchPlaceholder": "输入网址或搜索内容...",
+    "favorites": "收藏夹",
+    "history": "历史记录",
+    "emptyList": "暂无记录",
+    "favAdded": "已加入收藏",
+    "favRemoved": "已取消收藏",
+    "unknownTitle": "未知标题"
   },
   "webview": {
     "loading": "加载中...",
@@ -33,6 +46,22 @@
     "opacity": "透明度: {value}%",
     "clickThroughOn": "穿透模式: 开启",
     "clickThroughOff": "穿透模式: 关闭"
+  },
+  "settings": {
+    "generalGroup": "常规",
+    "language": "语言 / Language",
+    "languageZhCN": "简体中文",
+    "languageEnUS": "English",
+    "autoStart": "开机自启",
+    "dataGroup": "数据",
+    "clearHistory": "清除历史记录",
+    "clearBtn": "清除",
+    "historyCleared": "历史记录已清除",
+    "searchPlaceholder": "搜索设置..."
+  },
+  "modal": {
+    "favorites": "收藏夹",
+    "history": "历史记录"
   },
   "renderer": {
     "initialized": "Wingman 渲染进程已初始化",

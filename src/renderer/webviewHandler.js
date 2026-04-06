@@ -67,7 +67,8 @@ function initWebview(webview, elements) {
 
   // 标题变化
   webview.addEventListener('page-title-updated', (event) => {
-    document.title = `Wingman - ${event.title}`;
+    const appName = window.UI ? window.UI.t('app.name') : 'Wingman';
+    document.title = `${appName} - ${event.title}`;
   });
 }
 
