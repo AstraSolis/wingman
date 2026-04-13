@@ -4,14 +4,20 @@
   "description": "游戏攻略悬浮窗助手 - 为 PC 游戏玩家设计的置顶透明攻略窗口",
   "main": "main.js",
   "scripts": {
+    "dev": "concurrently \"vite\" \"cross-env NODE_ENV=development electron .\"",
+    "build": "vite build",
     "start": "node scripts/start.js",
-    "dist": "electron-builder"
+    "dist": "npm run build && electron-builder"
   },
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@vitejs/plugin-react": "^6.0.1",
+    "concurrently": "^9.2.1",
+    "cross-env": "^7.0.3",
     "electron": "^41.1.1",
-    "electron-builder": "^26.8.1"
+    "electron-builder": "^26.8.1",
+    "vite": "^8.0.8"
   },
   "build": {
     "appId": "com.wingman.app",
@@ -38,7 +44,15 @@
     "files": [
       "main.js",
       "preload.js",
-      "src/**/*"
+      "src/main/**/*",
+      "src/common/**/*",
+      "src/locales/**/*",
+      "src/assets/**/*",
+      "dist/renderer/**/*"
     ]
+  },
+  "dependencies": {
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5"
   }
 }

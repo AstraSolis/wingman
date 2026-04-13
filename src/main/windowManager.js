@@ -87,7 +87,11 @@ function createWindow() {
     });
   });
 
-  mainWindow.loadFile(path.join(__dirname, '..', 'renderer', 'index.html'));
+  if (process.env.NODE_ENV === 'development') {
+    mainWindow.loadURL('http://localhost:5173');
+  } else {
+    mainWindow.loadFile(path.join(__dirname, '..', '..', 'dist', 'renderer', 'index.html'));
+  }
   // 恢复穿透状态（如果为 true 时需要显式设置）
   if (isClickThrough) {
     setClickThrough(true);

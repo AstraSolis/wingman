@@ -1,0 +1,73 @@
+import { useRef, useEffect, useState } from 'react';
+
+export default function WebviewContainer({ url, visible, onUrlChange, onTitleChange, t }) {
+  const webviewRef = useRef(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const wv = webviewRef.current;
+    if (!wv) return;
+
+    const onStart = () => { setLoading(true); setError(null); };
+    const onStop = () => setLoading(false);
+    const onNavigate = (e) => {
+      onUrlChange(e.url);
+      window.wingman.saveLastUrl?.(e.url);
+      window.wingman.addHistory?.({ title: wv.getTitle() || e.url, url: e.url });
+    };
+    const onNavigateInPage = (e) => {
+      if (e.isMainFrame) onNavigate(e);
+    };
+    const onFail = (e) => {
+      if (e.errorCode === -3) return;
+      setLoading(false);
+      setError(`${e.errorDescription} (${e.errorCode})`);
+    };
+    const onTitle = (e) => onTitleChange(e.title);
+
+    wv.addEventListener('did-start-loading', onStart);
+    wv.addEventListener('did-stop-loading', onStop);
+    wv.addEventListener('did-navigate', onNavigate);
+    wv.addEventListener('did-navigate-in-page', onNavigateInPage);
+    wv.addEventListener('did-fail-load', onFail);
+    wv.addEventListener('page-title-updated', onTitle);
+
+    return () => {
+      wv.removeEventListener('did-start-loading', onStart);
+      wv.removeEventListener('did-stop-loading', onStop);
+      wv.removeEventListener('did-navigate', onNavigate);
+      wv.removeEventListener('did-navigate-in-page', onNavigateInPage);
+      wv.removeEventListener('did-fail-load', onFail);
+      wv.removeEventListener('page-title-updated', onTitle);
+    };
+  }, [onUrlChange, onTitleChange]);
+
+  useEffect(() => {
+    const wv = webviewRef.current;
+    if (wv && url && wv.src !== url) wv.src = url;
+  }, [url]);
+
+  return (
+    <div className="webview-container" style={{ display: visible ? undefined : 'none' }}>
+      <webview ref={webviewRef} style={{ width: '100%', height: '100%' }} allowpopups="true" />
+      {loading && (
+        <div className="loading-indicator">
+          <div className="loading-spinner" />
+          <span>{t('webview.loading')}</span>
+        </div>
+      )}
+      {error && (
+        <div className="error-overlay">
+          <div className="error-content">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            <p>{error}</p>
+            <button className="retry-btn" onClick={() => { setError(null); webviewRef.current?.reload(); }}>
+              {t('webview.retry')}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
