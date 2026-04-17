@@ -9,7 +9,10 @@ export default function WebviewContainer({ url, visible, onUrlChange, onTitleCha
     const wv = webviewRef.current;
     if (!wv) return;
 
-    const onStart = () => { setLoading(true); setError(null); };
+    const onStart = () => {
+      setLoading(true);
+      setError(null);
+    };
     const onStop = () => setLoading(false);
     const onNavigate = (e) => {
       onUrlChange(e.url);
@@ -60,9 +63,27 @@ export default function WebviewContainer({ url, visible, onUrlChange, onTitleCha
       {error && (
         <div className="error-overlay">
           <div className="error-content">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            <svg
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              opacity="0.5"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="15" y1="9" x2="9" y2="15" />
+              <line x1="9" y1="9" x2="15" y2="15" />
+            </svg>
             <p>{error}</p>
-            <button className="retry-btn" onClick={() => { setError(null); webviewRef.current?.reload(); }}>
+            <button
+              className="retry-btn"
+              onClick={() => {
+                setError(null);
+                webviewRef.current?.reload();
+              }}
+            >
               {t('webview.retry')}
             </button>
           </div>

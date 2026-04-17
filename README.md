@@ -77,10 +77,19 @@ wingman/
 
 ## 技术栈
 
-- **前端**：HTML5, Vanilla JavaScript, CSS3
+- **前端**：React 19, JSX, CSS3
+- **构建工具**：[Vite](https://vitejs.dev/) 8
 - **后端**：Node.js
 - **框架体系**：[Electron](https://www.electronjs.org/)
 - **打包工具**：[electron-builder](https://www.electron.build/)
+
+## 平台差异说明
+
+虽然项目支持 Windows、macOS 和 Linux 三大平台打包，但部分功能存在平台差异：
+
+- **开机自启**：仅支持 Windows 和 macOS
+- **点击穿透事件转发**：仅在 Windows 和 macOS 上启用完整转发
+- **任务栏行为**：macOS 会显示在 Dock 中，其他平台运行时自动隐藏
 
 ## 许可证
 

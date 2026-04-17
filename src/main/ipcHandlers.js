@@ -106,7 +106,7 @@ function setup() {
   ipcMain.handle(IPC_CHANNELS.SAVE_FAVORITE, (_event, item) => {
     const favorites = configManager.get('favorites') || [];
     // 避免重复收藏
-    if (!favorites.some(f => f.url === item.url)) {
+    if (!favorites.some((f) => f.url === item.url)) {
       favorites.push({ ...item, timestamp: Date.now() });
       configManager.set('favorites', favorites);
     }
@@ -116,7 +116,7 @@ function setup() {
   // 移除收藏
   ipcMain.handle(IPC_CHANNELS.REMOVE_FAVORITE, (_event, url) => {
     let favorites = configManager.get('favorites') || [];
-    favorites = favorites.filter(f => f.url !== url);
+    favorites = favorites.filter((f) => f.url !== url);
     configManager.set('favorites', favorites);
     return favorites;
   });
@@ -125,9 +125,9 @@ function setup() {
   ipcMain.on(IPC_CHANNELS.ADD_HISTORY, (_event, item) => {
     let history = configManager.get('history') || [];
     // 移除重复的，并将新的插在头部
-    history = history.filter(h => h.url !== item.url);
+    history = history.filter((h) => h.url !== item.url);
     history.unshift({ ...item, timestamp: Date.now() });
-    
+
     // 限制最大 100 条
     if (history.length > 100) {
       history = history.slice(0, 100);

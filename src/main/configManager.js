@@ -4,11 +4,18 @@
 const path = require('path');
 const fs = require('fs');
 const { app } = require('electron');
-const { DEFAULT_LOCALE, DEFAULT_OPACITY, DEFAULT_URL, STARTUP_PAGE_TYPES, CLOSE_STRATEGIES } = require('../common/constants');
+const {
+  DEFAULT_LOCALE,
+  DEFAULT_OPACITY,
+  DEFAULT_URL,
+  STARTUP_PAGE_TYPES,
+  CLOSE_STRATEGIES
+} = require('../common/constants');
 
 // 默认配置
 const DEFAULT_CONFIG = {
   locale: DEFAULT_LOCALE,
+  opacity: DEFAULT_OPACITY,
   isClickThrough: false,
   lastUrl: DEFAULT_URL,
   favorites: [],
@@ -50,7 +57,7 @@ function debounceSave() {
   if (saveTimeout) {
     clearTimeout(saveTimeout);
   }
-  
+
   saveTimeout = setTimeout(() => {
     flush();
   }, 1000); // 1秒 debounce

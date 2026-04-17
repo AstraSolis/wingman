@@ -63,10 +63,10 @@ function setLocale(locale) {
     return;
   }
   currentLocale = locale;
-  
+
   // 持久化保存
   configManager.set('locale', currentLocale);
-  
+
   if (locale === 'zh-CN') {
     translations = fallbackTranslations;
   } else {

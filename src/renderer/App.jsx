@@ -23,12 +23,15 @@ export default function App() {
 
   const showOSD = useCallback((msg) => setOsdMessage({ text: msg, id: Date.now() }), []);
 
-  const navigate = useCallback((rawUrl) => {
-    const url = loadUrl(rawUrl);
-    if (!url) return;
-    setCurrentUrl(url);
-    setView('webview');
-  }, [loadUrl]);
+  const navigate = useCallback(
+    (rawUrl) => {
+      const url = loadUrl(rawUrl);
+      if (!url) return;
+      setCurrentUrl(url);
+      setView('webview');
+    },
+    [loadUrl]
+  );
 
   const openFavorites = useCallback(async () => {
     const data = await window.wingman.getUserData();
@@ -36,11 +39,14 @@ export default function App() {
       title: t('modal.favorites'),
       items: data.favorites,
       type: 'favorites',
-      onSelect: (item) => { navigate(item.url); setListModal(null); },
+      onSelect: (item) => {
+        navigate(item.url);
+        setListModal(null);
+      },
       onDelete: async (item) => {
         await window.wingman.removeFavorite(item.url);
         const updated = await window.wingman.getUserData();
-        setListModal(m => ({ ...m, items: updated.favorites }));
+        setListModal((m) => ({ ...m, items: updated.favorites }));
       }
     });
   }, [t, navigate]);
@@ -51,7 +57,10 @@ export default function App() {
       title: t('modal.history'),
       items: data.history,
       type: 'history',
-      onSelect: (item) => { navigate(item.url); setListModal(null); }
+      onSelect: (item) => {
+        navigate(item.url);
+        setListModal(null);
+      }
     });
   }, [t, navigate]);
 
@@ -99,24 +108,30 @@ export default function App() {
     window.wingman.onNavigateUrl((url) => navigate(url));
   }, [t, navigate, showOSD]);
 
-  const handleAddFav = useCallback(async (url, title) => {
-    if (!url || url === 'about:blank') return;
-    const data = await window.wingman.getUserData();
-    const isFav = data.favorites.some(f => f.url === url);
-    if (isFav) {
-      await window.wingman.removeFavorite(url);
-      showOSD(t('home.favRemoved'));
-    } else {
-      await window.wingman.saveFavorite({ title, url });
-      showOSD(t('home.favAdded'));
-    }
-  }, [t, showOSD]);
+  const handleAddFav = useCallback(
+    async (url, title) => {
+      if (!url || url === 'about:blank') return;
+      const data = await window.wingman.getUserData();
+      const isFav = data.favorites.some((f) => f.url === url);
+      if (isFav) {
+        await window.wingman.removeFavorite(url);
+        showOSD(t('home.favRemoved'));
+      } else {
+        await window.wingman.saveFavorite({ title, url });
+        showOSD(t('home.favAdded'));
+      }
+    },
+    [t, showOSD]
+  );
 
   const handleUrlChange = useCallback((url) => setCurrentUrl(url), []);
-  const handleTitleChange = useCallback((title) => {
-    setCurrentTitle(title);
-    document.title = `${t('app.name')} - ${title}`;
-  }, [t]);
+  const handleTitleChange = useCallback(
+    (title) => {
+      setCurrentTitle(title);
+      document.title = `${t('app.name')} - ${title}`;
+    },
+    [t]
+  );
 
   const handleOpacityChange = useCallback((val) => {
     setOpacity(val);
@@ -124,7 +139,11 @@ export default function App() {
   }, []);
 
   const handleClickThrough = useCallback(() => window.wingman.toggleClickThrough(), []);
-  const handleHome = useCallback(() => { setView('home'); setCurrentUrl(''); setCurrentTitle(''); }, []);
+  const handleHome = useCallback(() => {
+    setView('home');
+    setCurrentUrl('');
+    setCurrentTitle('');
+  }, []);
   const handleSettings = useCallback(() => setShowSettings(true), []);
   const handleClose = useCallback(() => window.wingman.closeWindow(), []);
 
@@ -149,12 +168,7 @@ export default function App() {
       />
 
       {view === 'home' && (
-        <HomeView
-          onNavigate={navigate}
-          onFavorites={openFavorites}
-          onHistory={openHistory}
-          t={t}
-        />
+        <HomeView onNavigate={navigate} onFavorites={openFavorites} onHistory={openHistory} t={t} />
       )}
 
       <WebviewContainer

@@ -1,28 +1,73 @@
 import { useState, useEffect, useRef } from 'react';
 
-const chevron = <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#666" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>;
-const closeIcon = <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>;
+const chevron = (
+  <svg
+    width="14"
+    height="14"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="#666"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <polyline points="6 9 12 15 18 9" />
+  </svg>
+);
+const closeIcon = (
+  <svg
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <line x1="18" y1="6" x2="6" y2="18" />
+    <line x1="6" y1="6" x2="18" y2="18" />
+  </svg>
+);
 
 function Dropdown({ value, options, onChange }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
   useEffect(() => {
-    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    const handler = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    };
     document.addEventListener('click', handler);
     return () => document.removeEventListener('click', handler);
   }, []);
 
-  const current = options.find(o => o.value === value);
+  const current = options.find((o) => o.value === value);
   return (
     <div className="custom-dropdown" ref={ref}>
-      <div className="dropdown-selected" onClick={e => { e.stopPropagation(); setOpen(o => !o); }}>
-        <span>{current?.label}</span>{chevron}
+      <div
+        className="dropdown-selected"
+        onClick={(e) => {
+          e.stopPropagation();
+          setOpen((o) => !o);
+        }}
+      >
+        <span>{current?.label}</span>
+        {chevron}
       </div>
       {open && (
-        <div className="dropdown-menu" onClick={e => e.stopPropagation()}>
-          {options.map(o => (
-            <div key={o.value} className="dropdown-item" onClick={() => { onChange(o.value); setOpen(false); }}>{o.label}</div>
+        <div className="dropdown-menu" onClick={(e) => e.stopPropagation()}>
+          {options.map((o) => (
+            <div
+              key={o.value}
+              className="dropdown-item"
+              onClick={() => {
+                onChange(o.value);
+                setOpen(false);
+              }}
+            >
+              {o.label}
+            </div>
           ))}
         </div>
       )}
@@ -54,7 +99,9 @@ export default function SettingsModal({ onClose, onLocaleChange, showOSD, t }) {
       setCloseStrategy(config?.closeStrategy || 'minimize');
       setRememberBounds(config?.rememberWindowBounds ?? true);
     })();
-    return () => { if (urlTimer.current) clearTimeout(urlTimer.current); };
+    return () => {
+      if (urlTimer.current) clearTimeout(urlTimer.current);
+    };
   }, []);
 
   const langOptions = [
@@ -82,20 +129,27 @@ export default function SettingsModal({ onClose, onLocaleChange, showOSD, t }) {
   ];
 
   const kw = search.toLowerCase();
-  const visible = (key) => !kw || allItems.find(i => i.key === key)?.label.toLowerCase().includes(kw);
+  const visible = (key) =>
+    !kw ||
+    allItems
+      .find((i) => i.key === key)
+      ?.label.toLowerCase()
+      .includes(kw);
 
   return (
-    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+    <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="modal-content settings-modal-light">
         <div className="settings-header">
           <h2>{t('toolbar.settingsTitle')}</h2>
-          <button className="close-btn-light" onClick={onClose}>{closeIcon}</button>
+          <button className="close-btn-light" onClick={onClose}>
+            {closeIcon}
+          </button>
         </div>
         <div className="settings-search">
           <input
             type="text"
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
             placeholder={t('settings.searchPlaceholder')}
           />
         </div>
@@ -105,20 +159,28 @@ export default function SettingsModal({ onClose, onLocaleChange, showOSD, t }) {
             {visible('language') && (
               <div className="setting-item-light">
                 <label>{t('settings.language')}</label>
-                <Dropdown value={locale} options={langOptions} onChange={async val => {
-                  setLocale(val);
-                  await onLocaleChange(val);
-                }} />
+                <Dropdown
+                  value={locale}
+                  options={langOptions}
+                  onChange={async (val) => {
+                    setLocale(val);
+                    await onLocaleChange(val);
+                  }}
+                />
               </div>
             )}
             {visible('autoStart') && (
               <div className="setting-item-light">
                 <label>{t('settings.autoStart')}</label>
                 <label className="switch-light">
-                  <input type="checkbox" checked={autoStart} onChange={async e => {
-                    setAutoStart(e.target.checked);
-                    await window.wingman.setAutoStart(e.target.checked);
-                  }} />
+                  <input
+                    type="checkbox"
+                    checked={autoStart}
+                    onChange={async (e) => {
+                      setAutoStart(e.target.checked);
+                      await window.wingman.setAutoStart(e.target.checked);
+                    }}
+                  />
                   <span className="slider-light round" />
                 </label>
               </div>
@@ -126,10 +188,14 @@ export default function SettingsModal({ onClose, onLocaleChange, showOSD, t }) {
             {visible('startupPage') && (
               <div className="setting-item-light">
                 <label>{t('settings.startupPage')}</label>
-                <Dropdown value={startupPage} options={startupOptions} onChange={async val => {
-                  setStartupPage(val);
-                  await window.wingman.setStartupPage(val);
-                }} />
+                <Dropdown
+                  value={startupPage}
+                  options={startupOptions}
+                  onChange={async (val) => {
+                    setStartupPage(val);
+                    await window.wingman.setStartupPage(val);
+                  }}
+                />
               </div>
             )}
             {startupPage === 'customUrl' && (
@@ -141,10 +207,13 @@ export default function SettingsModal({ onClose, onLocaleChange, showOSD, t }) {
                     className="custom-url-input"
                     value={customUrl}
                     placeholder={t('settings.customUrlPlaceholder')}
-                    onChange={e => {
+                    onChange={(e) => {
                       setCustomUrl(e.target.value);
                       if (urlTimer.current) clearTimeout(urlTimer.current);
-                      urlTimer.current = setTimeout(() => window.wingman.setCustomStartupUrl(e.target.value), 500);
+                      urlTimer.current = setTimeout(
+                        () => window.wingman.setCustomStartupUrl(e.target.value),
+                        500
+                      );
                     }}
                   />
                 </div>
@@ -153,20 +222,28 @@ export default function SettingsModal({ onClose, onLocaleChange, showOSD, t }) {
             {visible('closeStrategy') && (
               <div className="setting-item-light">
                 <label>{t('settings.closeStrategy')}</label>
-                <Dropdown value={closeStrategy} options={closeOptions} onChange={async val => {
-                  setCloseStrategy(val);
-                  await window.wingman.setCloseStrategy(val);
-                }} />
+                <Dropdown
+                  value={closeStrategy}
+                  options={closeOptions}
+                  onChange={async (val) => {
+                    setCloseStrategy(val);
+                    await window.wingman.setCloseStrategy(val);
+                  }}
+                />
               </div>
             )}
             {visible('rememberBounds') && (
               <div className="setting-item-light border-none">
                 <label>{t('settings.rememberWindowBounds')}</label>
                 <label className="switch-light">
-                  <input type="checkbox" checked={rememberBounds} onChange={async e => {
-                    setRememberBounds(e.target.checked);
-                    await window.wingman.setRememberWindowBounds(e.target.checked);
-                  }} />
+                  <input
+                    type="checkbox"
+                    checked={rememberBounds}
+                    onChange={async (e) => {
+                      setRememberBounds(e.target.checked);
+                      await window.wingman.setRememberWindowBounds(e.target.checked);
+                    }}
+                  />
                   <span className="slider-light round" />
                 </label>
               </div>
@@ -177,10 +254,15 @@ export default function SettingsModal({ onClose, onLocaleChange, showOSD, t }) {
             {visible('clearHistory') && (
               <div className="setting-item-light border-none">
                 <label>{t('settings.clearHistory')}</label>
-                <button className="settings-btn-light danger" onClick={async () => {
-                  await window.wingman.clearHistory();
-                  showOSD(t('settings.historyCleared'));
-                }}>{t('settings.clearBtn')}</button>
+                <button
+                  className="settings-btn-light danger"
+                  onClick={async () => {
+                    await window.wingman.clearHistory();
+                    showOSD(t('settings.historyCleared'));
+                  }}
+                >
+                  {t('settings.clearBtn')}
+                </button>
               </div>
             )}
           </div>

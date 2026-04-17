@@ -9,13 +9,14 @@ export function useI18n() {
   const [translations, setTranslations] = useState(null);
   const [fallback, setFallback] = useState({});
 
-  const t = useCallback((key, vars) => {
-    const data = getNestedValue(translations ?? {}, key)
-      ?? getNestedValue(fallback, key)
-      ?? key;
-    if (!vars) return data;
-    return data.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? '');
-  }, [translations, fallback]);
+  const t = useCallback(
+    (key, vars) => {
+      const data = getNestedValue(translations ?? {}, key) ?? getNestedValue(fallback, key) ?? key;
+      if (!vars) return data;
+      return data.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? '');
+    },
+    [translations, fallback]
+  );
 
   const applyI18nData = (i18nData) => {
     if (!i18nData) return;
