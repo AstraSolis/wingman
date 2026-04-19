@@ -2,32 +2,41 @@
   "name": "wingman",
   "version": "1.0.0",
   "description": "游戏攻略悬浮窗助手 - 为 PC 游戏玩家设计的置顶透明攻略窗口",
-  "main": "main.js",
+  "main": "out/main/index.js",
   "scripts": {
-    "dev": "concurrently \"vite\" \"cross-env NODE_ENV=development electron .\"",
-    "build": "vite build",
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
     "start": "node scripts/start.js",
     "dist": "npm run build && electron-builder",
-    "format": "prettier --write \"src/**/*.{js,jsx}\" \"*.js\" \"preload.js\" \"main.js\"",
-    "lint": "eslint \"src/**/*.{js,jsx}\" \"*.js\" \"preload.js\" \"main.js\"",
-    "check": "npm run format && npm run lint"
+    "format": "prettier --write \"src/**/*.{ts,tsx}\" \"*.ts\"",
+    "lint": "eslint \"src/**/*.{ts,tsx}\"",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run format && npm run lint && npm run typecheck"
   },
   "author": "",
   "license": "MIT",
   "devDependencies": {
     "@eslint/js": "^9.17.0",
-    "@vitejs/plugin-react": "^6.0.1",
-    "@vitest/coverage-v8": "^2.1.8",
+    "@types/node": "^25.6.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@typescript-eslint/eslint-plugin": "^8.58.2",
+    "@typescript-eslint/parser": "^8.58.2",
+    "@vitejs/plugin-react": "^5.2.0",
+    "@vitest/coverage-v8": "^3.2.4",
     "concurrently": "^9.2.1",
     "cross-env": "^7.0.3",
     "electron": "^41.1.1",
     "electron-builder": "^26.8.1",
+    "electron-vite": "^5.0.0",
     "eslint": "^9.17.0",
     "eslint-plugin-react": "^7.37.2",
     "globals": "^15.14.0",
     "prettier": "^3.4.2",
-    "vite": "^8.0.8",
-    "vitest": "^2.1.8"
+    "typescript": "^5.9.3",
+    "vite": "^7.3.2",
+    "vitest": "^3.2.4",
+    "wait-on": "^9.0.5"
   },
   "build": {
     "appId": "com.wingman.app",
@@ -52,13 +61,14 @@
       "icon": "src/assets/icon.png"
     },
     "files": [
-      "main.js",
-      "preload.js",
-      "src/main/**/*",
-      "src/common/**/*",
-      "src/locales/**/*",
-      "src/assets/**/*",
-      "dist/renderer/**/*"
+      "out/**/*",
+      "src/assets/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "src/assets/icon.png",
+        "to": "icon.png"
+      }
     ]
   },
   "dependencies": {

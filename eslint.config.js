@@ -2,20 +2,23 @@ const js = require('@eslint/js');
 const react = require('eslint-plugin-react');
 const globals = require('globals');
 
+const tsParser = require('@typescript-eslint/parser');
+const tsPlugin = require('@typescript-eslint/eslint-plugin');
+
 module.exports = [
   js.configs.recommended,
   {
-    files: ['**/*.{js,jsx}'],
+    files: ['**/*.{ts,tsx}'],
     plugins: {
-      react
+      react,
+      '@typescript-eslint': tsPlugin
     },
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
+      parser: tsParser,
       parserOptions: {
-        ecmaFeatures: {
-          jsx: true
-        }
+        ecmaFeatures: { jsx: true }
       },
       globals: {
         ...globals.browser,
@@ -23,12 +26,10 @@ module.exports = [
       }
     },
     rules: {
-      'no-unused-vars': [
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': [
         'warn',
-        {
-          argsIgnorePattern: '^_',
-          varsIgnorePattern: '^(React|[A-Z])'
-        }
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^React$' }
       ],
       'no-console': 'off',
       'react/react-in-jsx-scope': 'off',
@@ -37,12 +38,10 @@ module.exports = [
       'react/jsx-uses-vars': 'error'
     },
     settings: {
-      react: {
-        version: 'detect'
-      }
+      react: { version: 'detect' }
     }
   },
   {
-    ignores: ['dist', 'node_modules', '*.config.js']
+    ignores: ['dist', 'out', 'node_modules', '*.config.js']
   }
 ];
