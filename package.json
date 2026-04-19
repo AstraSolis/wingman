@@ -4,7 +4,7 @@
   "description": "游戏攻略悬浮窗助手 - 为 PC 游戏玩家设计的置顶透明攻略窗口",
   "main": "out/main/index.js",
   "scripts": {
-    "dev": "electron-vite dev",
+    "dev": "node scripts/start.js --dev",
     "build": "electron-vite build",
     "start": "node scripts/start.js",
     "dist": "npm run build && electron-builder",

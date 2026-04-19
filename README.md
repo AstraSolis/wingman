@@ -63,23 +63,24 @@ npm run dist
 
 ```text
 wingman/
-├── main.js                 # 核心：Electron 主进程入口
-├── preload.js              # 安全：IPC 与 ContextBridge 预加载通信桥
-├── package.json            # 依赖与打包配置文件
-├── scripts/                # 脚本
 ├── src/
-│   ├── main/               # 后端逻辑: 窗口、快捷键、系统托盘、配置管理等
+│   ├── main/               # 主进程: 窗口、快捷键、系统托盘、配置管理等
+│   │   └── index.ts        # 主进程入口
+│   ├── preload/
+│   │   └── index.ts        # 安全: IPC 与 ContextBridge 预加载通信桥
 │   ├── renderer/           # 前端渲染: 核心 UI、Webview 处理、主页、设置面板
 │   ├── common/             # 公共库: 共享常量与多端共享工具函数
 │   ├── locales/            # 语言包: JSON 国际化文本资源
 │   └── assets/             # 静态资源: 托盘图标等
+├── scripts/                # 脚本
+└── package.json            # 依赖与打包配置文件
 ```
 
 ## 技术栈
 
-- **前端**：React 19, JSX, CSS3
-- **构建工具**：[Vite](https://vitejs.dev/) 8
-- **后端**：Node.js
+- **前端**：React 19, TypeScript, CSS3
+- **构建工具**：[electron-vite](https://electron-vite.org/) 5 + Vite 7
+- **后端**：Node.js + TypeScript
 - **框架体系**：[Electron](https://www.electronjs.org/)
 - **打包工具**：[electron-builder](https://www.electron.build/)
 
