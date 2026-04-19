@@ -19,6 +19,15 @@ export default function WebviewContainer({
   const webviewRef = useRef<ElectronWebviewElement>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // 只记录我们主动加载过的 URL，did-navigate（内部链接跳转）不更新它
+  const loadedUrlRef = useRef('');
+
+  useEffect(() => {
+    const wv = webviewRef.current;
+    if (!wv || !url || loadedUrlRef.current === url) return;
+    loadedUrlRef.current = url;
+    wv.src = url;
+  }, [url]);
 
   useEffect(() => {
     const wv = webviewRef.current;
@@ -42,12 +51,31 @@ export default function WebviewContainer({
     };
     const onTitle = (e: Event & { title: string }) => onTitleChange(e.title);
 
+    // 每次页面加载完成后，注入脚本拦截 target="_blank" 链接点击，
+    // 将其转为当前页面导航，避免依赖不可靠的弹窗机制
+    const onDomReady = () => {
+      wv.executeJavaScript(`
+        if (!window.__wingmanLinkInterceptor) {
+          window.__wingmanLinkInterceptor = true;
+          document.addEventListener('click', function(e) {
+            var a = e.target.closest ? e.target.closest('a') : null;
+            if (a && a.target === '_blank' && a.href && /^https?:/.test(a.href)) {
+              e.preventDefault();
+              e.stopPropagation();
+              window.location.href = a.href;
+            }
+          }, true);
+        }
+      `).catch(() => {});
+    };
+
     wv.addEventListener('did-start-loading', onStart);
     wv.addEventListener('did-stop-loading', onStop);
     wv.addEventListener('did-navigate', handleNavigate as EventListener);
     wv.addEventListener('did-navigate-in-page', onNavigateInPage as EventListener);
     wv.addEventListener('did-fail-load', onFail as EventListener);
     wv.addEventListener('page-title-updated', onTitle as EventListener);
+    wv.addEventListener('dom-ready', onDomReady);
 
     return () => {
       wv.removeEventListener('did-start-loading', onStart);
@@ -56,13 +84,9 @@ export default function WebviewContainer({
       wv.removeEventListener('did-navigate-in-page', onNavigateInPage as EventListener);
       wv.removeEventListener('did-fail-load', onFail as EventListener);
       wv.removeEventListener('page-title-updated', onTitle as EventListener);
+      wv.removeEventListener('dom-ready', onDomReady);
     };
   }, [onNavigate, onTitleChange]);
-
-  useEffect(() => {
-    const wv = webviewRef.current;
-    if (wv && url && wv.src !== url) wv.src = url;
-  }, [url]);
 
   return (
     <div className="webview-container" style={{ display: visible ? undefined : 'none' }}>

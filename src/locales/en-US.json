@@ -67,6 +67,7 @@
     "rememberWindowBounds": "Remember window position and size",
     "dataGroup": "Data",
     "clearHistory": "Clear history",
+    "clearHistoryDesc": "Delete all browsing history",
     "clearBtn": "Clear",
     "historyCleared": "History cleared",
     "searchPlaceholder": "Search settings..."

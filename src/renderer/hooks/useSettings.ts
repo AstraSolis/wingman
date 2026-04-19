@@ -22,26 +22,6 @@ function useDebouncedSave(callback: (value: string) => unknown, delay = 500) {
   return debouncedSave;
 }
 
-interface SettingsItem {
-  key: string;
-  label: string;
-}
-
-function useSettingsSearch(allItems: SettingsItem[]) {
-  const [search, setSearch] = useState('');
-
-  const isVisible = useCallback(
-    (key: string) => {
-      if (!search) return true;
-      const kw = search.toLowerCase();
-      return allItems.find((item) => item.key === key)?.label.toLowerCase().includes(kw) ?? false;
-    },
-    [allItems, search]
-  );
-
-  return { search, setSearch, isVisible };
-}
-
 export function useSettingsPanel(
   locale: string,
   onLocaleChange: (locale: string) => Promise<void>,
@@ -95,20 +75,6 @@ export function useSettingsPanel(
     [t]
   );
 
-  const allItems = useMemo<SettingsItem[]>(
-    () => [
-      { label: t('settings.language'), key: 'language' },
-      { label: t('settings.autoStart'), key: 'autoStart' },
-      { label: t('settings.startupPage'), key: 'startupPage' },
-      { label: t('settings.closeStrategy'), key: 'closeStrategy' },
-      { label: t('settings.rememberWindowBounds'), key: 'rememberBounds' },
-      { label: t('settings.clearHistory'), key: 'clearHistory' }
-    ],
-    [t]
-  );
-
-  const { search, setSearch, isVisible } = useSettingsSearch(allItems);
-
   const handleLocaleChange = useCallback(
     async (value: string) => {
       await onLocaleChange(value);
@@ -159,9 +125,6 @@ export function useSettingsPanel(
     langOptions,
     startupOptions,
     closeOptions,
-    search,
-    setSearch,
-    isVisible,
     handleLocaleChange,
     handleAutoStartChange,
     handleStartupPageChange,

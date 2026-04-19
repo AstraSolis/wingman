@@ -20,7 +20,7 @@ function AppContent() {
   const { loadUrl } = useWingman();
   const { osdMessage, showOSD } = useOSD();
 
-  const { view, currentUrl, currentTitle, navigate, goHome, handleNavigate, handleTitleChange } =
+  const { view, targetUrl, currentUrl, currentTitle, navigate, goHome, handleNavigate, handleTitleChange } =
     useNavigation(loadUrl);
 
   const { opacity, isClickThrough, handleOpacityChange, handleClickThrough, handleClose } =
@@ -63,13 +63,15 @@ function AppContent() {
         />
       )}
 
-      <WebviewContainer
-        url={currentUrl}
-        visible={view === 'webview'}
-        onNavigate={handleNavigate}
-        onTitleChange={handleTitleChange}
-        t={t}
-      />
+      {view === 'webview' && (
+        <WebviewContainer
+          url={targetUrl}
+          visible={true}
+          onNavigate={handleNavigate}
+          onTitleChange={handleTitleChange}
+          t={t}
+        />
+      )}
 
       {showSettings && (
         <SettingsModal

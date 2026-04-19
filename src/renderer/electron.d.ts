@@ -4,6 +4,7 @@ interface ElectronWebviewElement extends HTMLElement {
   src: string;
   reload(): void;
   getTitle(): string;
+  executeJavaScript(code: string): Promise<unknown>;
 }
 
 interface WingmanWindowState {

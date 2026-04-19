@@ -67,6 +67,7 @@
     "rememberWindowBounds": "记忆窗口位置和尺寸",
     "dataGroup": "数据",
     "clearHistory": "清除历史记录",
+    "clearHistoryDesc": "删除所有浏览历史记录",
     "clearBtn": "清除",
     "historyCleared": "历史记录已清除",
     "searchPlaceholder": "搜索设置..."

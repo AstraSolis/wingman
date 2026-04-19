@@ -1,33 +1,62 @@
 .settings-modal-light {
   background: #f7f7f7 !important; color: #333;
-  border-radius: 12px; width: 540px; max-width: 90%;
-  border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  border-radius: 14px; width: 680px; max-width: 92%;
+  border: none; box-shadow: 0 16px 48px rgba(0,0,0,0.22);
+  display: flex; flex-direction: column; overflow: hidden;
 }
-.settings-header { display: flex; align-items: center; justify-content: space-between; padding: 24px 24px 16px; }
-.settings-header h2 { font-size: 22px; font-weight: bold; color: #000; margin: 0; }
+.settings-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 24px 16px; border-bottom: 1px solid #ebebeb; flex-shrink: 0;
+}
+.settings-header h2 { font-size: 18px; font-weight: 600; color: #000; margin: 0; }
 .close-btn-light {
   -webkit-app-region: no-drag; background: transparent; border: none; color: #666;
   cursor: pointer; display: flex; align-items: center; justify-content: center;
   padding: 4px; border-radius: 50%; transition: background 0.2s;
 }
 .close-btn-light:hover { background: rgba(0,0,0,0.05); }
-.settings-search { padding: 0 24px; margin-bottom: 20px; }
-.settings-search input {
-  -webkit-app-region: no-drag; width: 100%; padding: 10px 16px;
-  border: none; border-radius: 8px; background: #e6e6e6;
-  color: #333; font-size: 14px; outline: none; transition: background 0.2s;
+
+/* 双栏布局 */
+.settings-layout { display: flex; flex: 1; overflow: hidden; min-height: 360px; }
+
+/* 左侧导航栏 */
+.settings-sidebar {
+  width: 168px; flex-shrink: 0; padding: 12px 8px;
+  background: #efefef; border-right: 1px solid #e2e2e2;
+  display: flex; flex-direction: column; gap: 2px;
 }
-.settings-search input:focus { background: #dfdfdf; }
-.settings-search input::placeholder { color: #888; }
-.settings-body-light { padding: 0 24px 24px; overflow-y: auto; max-height: 60vh; }
+.settings-nav-item {
+  -webkit-app-region: no-drag;
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: 8px; border: none;
+  background: transparent; color: #444; font-size: 13px;
+  cursor: pointer; text-align: left; width: 100%;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.settings-nav-item:hover { background: rgba(0,0,0,0.06); }
+.settings-nav-item.active { background: #fff; color: #000; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+.settings-nav-icon { display: flex; align-items: center; flex-shrink: 0; opacity: 0.7; }
+.settings-nav-item.active .settings-nav-icon { opacity: 1; }
+.settings-nav-label { font-weight: 500; }
+
+/* 右侧内容区 */
+.settings-body-light { flex: 1; padding: 16px 20px 20px; overflow-y: auto; }
 .settings-body-light::-webkit-scrollbar { width: 6px; }
 .settings-body-light::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 3px; }
-.settings-group-title { font-size: 13px; font-weight: 600; color: #333; margin-bottom: 8px; margin-top: 16px; }
-.settings-group-title:first-child { margin-top: 0; }
-.settings-group { background: #fff; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
-.setting-item-light { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid #f0f0f0; }
+.settings-section { display: flex; flex-direction: column; gap: 16px; }
+
+.settings-group { background: #fff; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); overflow: hidden; }
+.setting-item-light {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 13px 16px; border-bottom: 1px solid #f0f0f0;
+}
 .setting-item-light.border-none { border-bottom: none; }
 .setting-item-light label { font-size: 14px; color: #000; }
+.setting-item-info { display: flex; flex-direction: column; gap: 3px; }
+.setting-item-label { font-size: 14px; color: #000; font-weight: 400; }
+.setting-item-desc { font-size: 12px; color: #888; }
+
+/* Dropdown */
 .custom-dropdown { position: relative; -webkit-app-region: no-drag; }
 .dropdown-selected {
   background: #f5f5f5; border: 1px solid #e0e0e0; border-radius: 6px;
@@ -43,15 +72,19 @@
 }
 .dropdown-item { padding: 10px 16px; font-size: 13px; color: #333; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
 .dropdown-item:hover { background: #f0f0f0; }
+
+/* 按钮 */
 .settings-btn-light {
   -webkit-app-region: no-drag; padding: 6px 16px; border-radius: 6px;
   border: 1px solid #e0e0e0; background: #f5f5f5; color: #333;
-  font-size: 13px; cursor: pointer; transition: all 0.2s;
+  font-size: 13px; cursor: pointer; transition: all 0.2s; white-space: nowrap;
 }
 .settings-btn-light:hover { background: #e8e8e8; }
 .settings-btn-light.danger { color: var(--danger); border-color: rgba(255,107,107,0.3); background: rgba(255,107,107,0.05); }
 .settings-btn-light.danger:hover { background: rgba(255,107,107,0.1); }
-.switch-light { position: relative; display: inline-block; width: 44px; height: 24px; -webkit-app-region: no-drag; }
+
+/* Toggle Switch */
+.switch-light { position: relative; display: inline-block; width: 44px; height: 24px; -webkit-app-region: no-drag; flex-shrink: 0; }
 .switch-light input { opacity: 0; width: 0; height: 0; }
 .slider-light { position: absolute; cursor: pointer; inset: 0; background-color: #e5e5ea; transition: .4s; }
 .slider-light:before { position: absolute; content: ""; height: 20px; width: 20px; left: 2px; bottom: 2px; background-color: white; transition: .4s; box-shadow: 0 2px 4px rgba(0,0,0,0.15); }
@@ -59,6 +92,8 @@
 .switch-light input:checked + .slider-light:before { transform: translateX(20px); }
 .slider-light.round { border-radius: 24px; }
 .slider-light.round:before { border-radius: 50%; }
+
+/* 自定义URL */
 .custom-url-item { flex-direction: column; align-items: flex-start !important; padding: 12px 16px !important; }
 .custom-url-wrapper { width: 100%; display: flex; flex-direction: column; gap: 8px; }
 .custom-url-wrapper label { font-size: 13px; color: #666; font-weight: 500; }
@@ -66,7 +101,7 @@
   -webkit-app-region: no-drag; width: 100%; padding: 8px 12px;
   border: 1px solid #e0e0e0; border-radius: 6px; background: #f5f5f5;
   color: #333; font-size: 13px; outline: none; transition: all 0.2s;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', monospace;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', monospace; box-sizing: border-box;
 }
 .custom-url-input:focus { background: #fff; border-color: #6c8cff; box-shadow: 0 0 0 3px rgba(108,140,255,0.1); }
 .custom-url-input::placeholder { color: #999; }
