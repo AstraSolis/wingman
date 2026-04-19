@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 
-export default function WebviewContainer({ url, visible, onUrlChange, onTitleChange, t }) {
+export default function WebviewContainer({ url, visible, onNavigate, onTitleChange, t }) {
   const webviewRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -14,13 +14,11 @@ export default function WebviewContainer({ url, visible, onUrlChange, onTitleCha
       setError(null);
     };
     const onStop = () => setLoading(false);
-    const onNavigate = (e) => {
-      onUrlChange(e.url);
-      window.wingman.saveLastUrl?.(e.url);
-      window.wingman.addHistory?.({ title: wv.getTitle() || e.url, url: e.url });
+    const handleNavigate = (event) => {
+      onNavigate(event.url, wv.getTitle() || event.url);
     };
-    const onNavigateInPage = (e) => {
-      if (e.isMainFrame) onNavigate(e);
+    const onNavigateInPage = (event) => {
+      if (event.isMainFrame) handleNavigate(event);
     };
     const onFail = (e) => {
       if (e.errorCode === -3) return;
@@ -31,7 +29,7 @@ export default function WebviewContainer({ url, visible, onUrlChange, onTitleCha
 
     wv.addEventListener('did-start-loading', onStart);
     wv.addEventListener('did-stop-loading', onStop);
-    wv.addEventListener('did-navigate', onNavigate);
+    wv.addEventListener('did-navigate', handleNavigate);
     wv.addEventListener('did-navigate-in-page', onNavigateInPage);
     wv.addEventListener('did-fail-load', onFail);
     wv.addEventListener('page-title-updated', onTitle);
@@ -39,12 +37,12 @@ export default function WebviewContainer({ url, visible, onUrlChange, onTitleCha
     return () => {
       wv.removeEventListener('did-start-loading', onStart);
       wv.removeEventListener('did-stop-loading', onStop);
-      wv.removeEventListener('did-navigate', onNavigate);
+      wv.removeEventListener('did-navigate', handleNavigate);
       wv.removeEventListener('did-navigate-in-page', onNavigateInPage);
       wv.removeEventListener('did-fail-load', onFail);
       wv.removeEventListener('page-title-updated', onTitle);
     };
-  }, [onUrlChange, onTitleChange]);
+  }, [onNavigate, onTitleChange]);
 
   useEffect(() => {
     const wv = webviewRef.current;

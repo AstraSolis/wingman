@@ -6,6 +6,7 @@ function getNestedValue(obj, key) {
 }
 
 export function useI18n() {
+  const [locale, setCurrentLocale] = useState('zh-CN');
   const [translations, setTranslations] = useState(null);
   const [fallback, setFallback] = useState({});
 
@@ -20,18 +21,19 @@ export function useI18n() {
 
   const applyI18nData = (i18nData) => {
     if (!i18nData) return;
+    setCurrentLocale(i18nData.locale || 'zh-CN');
     setTranslations(i18nData.translations || {});
     setFallback(i18nData.fallback || {});
   };
 
   useEffect(() => {
-    window.wingman.getI18nData().then(applyI18nData);
+    window.wingman.i18n.getData().then(applyI18nData);
   }, []);
 
   const setLocale = useCallback(async (locale) => {
-    const i18nData = await window.wingman.setLocale(locale);
+    const i18nData = await window.wingman.i18n.setLocale(locale);
     applyI18nData(i18nData);
   }, []);
 
-  return { t, setLocale, ready: translations !== null };
+  return { locale, t, setLocale, ready: translations !== null };
 }

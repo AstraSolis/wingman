@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useSettingsPanel } from '../hooks/useSettings.js';
 
 const chevron = (
   <svg
@@ -75,66 +76,27 @@ function Dropdown({ value, options, onChange }) {
   );
 }
 
-export default function SettingsModal({ onClose, onLocaleChange, showOSD, t }) {
-  const [locale, setLocale] = useState('zh-CN');
-  const [autoStart, setAutoStart] = useState(false);
-  const [startupPage, setStartupPage] = useState('lastPage');
-  const [customUrl, setCustomUrl] = useState('');
-  const [closeStrategy, setCloseStrategy] = useState('minimize');
-  const [rememberBounds, setRememberBounds] = useState(true);
-  const [search, setSearch] = useState('');
-  const urlTimer = useRef(null);
-
-  useEffect(() => {
-    (async () => {
-      const [i18n, autoS, config] = await Promise.all([
-        window.wingman.getI18nData(),
-        window.wingman.getAutoStart(),
-        window.wingman.getStartupConfig()
-      ]);
-      setLocale(i18n?.locale || 'zh-CN');
-      setAutoStart(autoS);
-      setStartupPage(config?.startupPage || 'lastPage');
-      setCustomUrl(config?.customStartupUrl || '');
-      setCloseStrategy(config?.closeStrategy || 'minimize');
-      setRememberBounds(config?.rememberWindowBounds ?? true);
-    })();
-    return () => {
-      if (urlTimer.current) clearTimeout(urlTimer.current);
-    };
-  }, []);
-
-  const langOptions = [
-    { value: 'zh-CN', label: t('settings.languageZhCN') },
-    { value: 'en-US', label: t('settings.languageEnUS') }
-  ];
-  const startupOptions = [
-    { value: 'home', label: t('settings.startupPageHome') },
-    { value: 'lastPage', label: t('settings.startupPageLast') },
-    { value: 'favorites', label: t('settings.startupPageFavorites') },
-    { value: 'customUrl', label: t('settings.startupPageCustom') }
-  ];
-  const closeOptions = [
-    { value: 'minimize', label: t('settings.closeStrategyMinimize') },
-    { value: 'quit', label: t('settings.closeStrategyQuit') }
-  ];
-
-  const allItems = [
-    { label: t('settings.language'), key: 'language' },
-    { label: t('settings.autoStart'), key: 'autoStart' },
-    { label: t('settings.startupPage'), key: 'startupPage' },
-    { label: t('settings.closeStrategy'), key: 'closeStrategy' },
-    { label: t('settings.rememberWindowBounds'), key: 'rememberBounds' },
-    { label: t('settings.clearHistory'), key: 'clearHistory' }
-  ];
-
-  const kw = search.toLowerCase();
-  const visible = (key) =>
-    !kw ||
-    allItems
-      .find((i) => i.key === key)
-      ?.label.toLowerCase()
-      .includes(kw);
+export default function SettingsModal({ onClose, locale, onLocaleChange, showOSD, t }) {
+  const {
+    autoStart,
+    startupPage,
+    customUrl,
+    closeStrategy,
+    rememberBounds,
+    langOptions,
+    startupOptions,
+    closeOptions,
+    search,
+    setSearch,
+    isVisible,
+    handleLocaleChange,
+    handleAutoStartChange,
+    handleStartupPageChange,
+    handleCustomUrlChange,
+    handleCloseStrategyChange,
+    handleRememberBoundsChange,
+    handleClearHistory
+  } = useSettingsPanel(locale, onLocaleChange, showOSD, t);
 
   return (
     <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
@@ -156,45 +118,32 @@ export default function SettingsModal({ onClose, onLocaleChange, showOSD, t }) {
         <div className="modal-body settings-body-light">
           <div className="settings-group-title">{t('settings.generalGroup')}</div>
           <div className="settings-group">
-            {visible('language') && (
+            {isVisible('language') && (
               <div className="setting-item-light">
                 <label>{t('settings.language')}</label>
-                <Dropdown
-                  value={locale}
-                  options={langOptions}
-                  onChange={async (val) => {
-                    setLocale(val);
-                    await onLocaleChange(val);
-                  }}
-                />
+                <Dropdown value={locale} options={langOptions} onChange={handleLocaleChange} />
               </div>
             )}
-            {visible('autoStart') && (
+            {isVisible('autoStart') && (
               <div className="setting-item-light">
                 <label>{t('settings.autoStart')}</label>
                 <label className="switch-light">
                   <input
                     type="checkbox"
                     checked={autoStart}
-                    onChange={async (e) => {
-                      setAutoStart(e.target.checked);
-                      await window.wingman.setAutoStart(e.target.checked);
-                    }}
+                    onChange={(e) => handleAutoStartChange(e.target.checked)}
                   />
                   <span className="slider-light round" />
                 </label>
               </div>
             )}
-            {visible('startupPage') && (
+            {isVisible('startupPage') && (
               <div className="setting-item-light">
                 <label>{t('settings.startupPage')}</label>
                 <Dropdown
                   value={startupPage}
                   options={startupOptions}
-                  onChange={async (val) => {
-                    setStartupPage(val);
-                    await window.wingman.setStartupPage(val);
-                  }}
+                  onChange={handleStartupPageChange}
                 />
               </div>
             )}
@@ -207,42 +156,29 @@ export default function SettingsModal({ onClose, onLocaleChange, showOSD, t }) {
                     className="custom-url-input"
                     value={customUrl}
                     placeholder={t('settings.customUrlPlaceholder')}
-                    onChange={(e) => {
-                      setCustomUrl(e.target.value);
-                      if (urlTimer.current) clearTimeout(urlTimer.current);
-                      urlTimer.current = setTimeout(
-                        () => window.wingman.setCustomStartupUrl(e.target.value),
-                        500
-                      );
-                    }}
+                    onChange={(e) => handleCustomUrlChange(e.target.value)}
                   />
                 </div>
               </div>
             )}
-            {visible('closeStrategy') && (
+            {isVisible('closeStrategy') && (
               <div className="setting-item-light">
                 <label>{t('settings.closeStrategy')}</label>
                 <Dropdown
                   value={closeStrategy}
                   options={closeOptions}
-                  onChange={async (val) => {
-                    setCloseStrategy(val);
-                    await window.wingman.setCloseStrategy(val);
-                  }}
+                  onChange={handleCloseStrategyChange}
                 />
               </div>
             )}
-            {visible('rememberBounds') && (
+            {isVisible('rememberBounds') && (
               <div className="setting-item-light border-none">
                 <label>{t('settings.rememberWindowBounds')}</label>
                 <label className="switch-light">
                   <input
                     type="checkbox"
                     checked={rememberBounds}
-                    onChange={async (e) => {
-                      setRememberBounds(e.target.checked);
-                      await window.wingman.setRememberWindowBounds(e.target.checked);
-                    }}
+                    onChange={(e) => handleRememberBoundsChange(e.target.checked)}
                   />
                   <span className="slider-light round" />
                 </label>
@@ -251,16 +187,10 @@ export default function SettingsModal({ onClose, onLocaleChange, showOSD, t }) {
           </div>
           <div className="settings-group-title">{t('settings.dataGroup')}</div>
           <div className="settings-group">
-            {visible('clearHistory') && (
+            {isVisible('clearHistory') && (
               <div className="setting-item-light border-none">
                 <label>{t('settings.clearHistory')}</label>
-                <button
-                  className="settings-btn-light danger"
-                  onClick={async () => {
-                    await window.wingman.clearHistory();
-                    showOSD(t('settings.historyCleared'));
-                  }}
-                >
+                <button className="settings-btn-light danger" onClick={handleClearHistory}>
                   {t('settings.clearBtn')}
                 </button>
               </div>

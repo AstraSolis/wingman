@@ -3,133 +3,89 @@
 
 const { contextBridge, ipcRenderer } = require('electron');
 
-contextBridge.exposeInMainWorld('wingman', {
-  // 设置透明度
-  setOpacity: (opacity) => {
-    ipcRenderer.send('set-opacity', opacity);
-  },
-
-  // 切换点击穿透
-  toggleClickThrough: () => {
-    ipcRenderer.send('toggle-click-through');
-  },
-
-  // 加载 URL
-  loadUrl: (url) => {
-    ipcRenderer.send('load-url', url);
-  },
-
-  // 隐藏窗口
-  hideWindow: () => {
-    ipcRenderer.send('hide-window');
-  },
-
-  // 保存当前的 URL
-  saveLastUrl: (url) => {
-    ipcRenderer.send('save-last-url', url);
-  },
-
-  // 获取初始状态
-  getInitialState: () => {
-    return ipcRenderer.invoke('get-initial-state');
-  },
-
-  // 监听透明度更新（防止重复注册）
+// 窗口控制相关
+const windowAPI = {
+  setOpacity: (opacity) => ipcRenderer.send('set-opacity', opacity),
+  toggleClickThrough: () => ipcRenderer.send('toggle-click-through'),
+  hide: () => ipcRenderer.send('hide-window'),
+  close: () => ipcRenderer.send('close-window'),
+  getInitialState: () => ipcRenderer.invoke('get-initial-state'),
   onOpacityUpdated: (callback) => {
     ipcRenderer.removeAllListeners('opacity-updated');
-    ipcRenderer.on('opacity-updated', (_event, opacity) => {
-      callback(opacity);
-    });
+    ipcRenderer.on('opacity-updated', (_event, opacity) => callback(opacity));
   },
-
-  // 监听穿透状态更新（防止重复注册）
   onClickThroughUpdated: (callback) => {
     ipcRenderer.removeAllListeners('click-through-updated');
-    ipcRenderer.on('click-through-updated', (_event, isEnabled) => {
-      callback(isEnabled);
-    });
-  },
+    ipcRenderer.on('click-through-updated', (_event, isEnabled) => callback(isEnabled));
+  }
+};
 
-  // 监听 URL 导航（防止重复注册）
+// 设置管理相关
+const settingsAPI = {
+  getAutoStart: () => ipcRenderer.invoke('get-auto-start'),
+  setAutoStart: (enable) => ipcRenderer.invoke('set-auto-start', enable),
+  getStartupConfig: () => ipcRenderer.invoke('get-startup-config'),
+  setStartupPage: (pageType) => ipcRenderer.invoke('set-startup-page', pageType),
+  setCustomStartupUrl: (url) => ipcRenderer.invoke('set-custom-startup-url', url),
+  setCloseStrategy: (strategy) => ipcRenderer.invoke('set-close-strategy', strategy),
+  setRememberWindowBounds: (remember) => ipcRenderer.invoke('set-remember-window-bounds', remember)
+};
+
+// 用户数据相关
+const userDataAPI = {
+  get: () => ipcRenderer.invoke('get-user-data'),
+  saveFavorite: (item) => ipcRenderer.invoke('save-favorite', item),
+  removeFavorite: (url) => ipcRenderer.invoke('remove-favorite', url),
+  addHistory: (item) => ipcRenderer.send('add-history', item),
+  clearHistory: () => ipcRenderer.invoke('clear-history'),
+  saveLastUrl: (url) => ipcRenderer.send('save-last-url', url)
+};
+
+// 导航相关
+const navigationAPI = {
+  loadUrl: (url) => ipcRenderer.send('load-url', url),
   onNavigateUrl: (callback) => {
     ipcRenderer.removeAllListeners('navigate-url');
-    ipcRenderer.on('navigate-url', (_event, url) => {
-      callback(url);
-    });
-  },
-
-  // i18n: 获取翻译数据
-  getI18nData: () => {
-    return ipcRenderer.invoke('get-i18n-data');
-  },
-
-  // i18n: 切换语言
-  setLocale: (locale) => {
-    return ipcRenderer.invoke('set-locale', locale);
-  },
-
-  // 获取开机自启状态
-  getAutoStart: () => {
-    return ipcRenderer.invoke('get-auto-start');
-  },
-
-  // 设置开机自启状态
-  setAutoStart: (enable) => {
-    return ipcRenderer.invoke('set-auto-start', enable);
-  },
-
-  // 获取用户数据
-  getUserData: () => {
-    return ipcRenderer.invoke('get-user-data');
-  },
-
-  // 保存收藏
-  saveFavorite: (item) => {
-    return ipcRenderer.invoke('save-favorite', item);
-  },
-
-  // 移除收藏
-  removeFavorite: (url) => {
-    return ipcRenderer.invoke('remove-favorite', url);
-  },
-
-  // 添加历史记录
-  addHistory: (item) => {
-    ipcRenderer.send('add-history', item);
-  },
-
-  // 清除历史记录
-  clearHistory: () => {
-    return ipcRenderer.invoke('clear-history');
-  },
-
-  // 关闭窗口（根据策略）
-  closeWindow: () => {
-    ipcRenderer.send('close-window');
-  },
-
-  // 获取启动配置
-  getStartupConfig: () => {
-    return ipcRenderer.invoke('get-startup-config');
-  },
-
-  // 设置启动页面类型
-  setStartupPage: (pageType) => {
-    return ipcRenderer.invoke('set-startup-page', pageType);
-  },
-
-  // 设置自定义启动网址
-  setCustomStartupUrl: (url) => {
-    return ipcRenderer.invoke('set-custom-startup-url', url);
-  },
-
-  // 设置关闭窗口策略
-  setCloseStrategy: (strategy) => {
-    return ipcRenderer.invoke('set-close-strategy', strategy);
-  },
-
-  // 设置是否记忆窗口位置
-  setRememberWindowBounds: (remember) => {
-    return ipcRenderer.invoke('set-remember-window-bounds', remember);
+    ipcRenderer.on('navigate-url', (_event, url) => callback(url));
   }
+};
+
+// i18n 相关
+const i18nAPI = {
+  getData: () => ipcRenderer.invoke('get-i18n-data'),
+  setLocale: (locale) => ipcRenderer.invoke('set-locale', locale)
+};
+
+contextBridge.exposeInMainWorld('wingman', {
+  window: windowAPI,
+  settings: settingsAPI,
+  userData: userDataAPI,
+  navigation: navigationAPI,
+  i18n: i18nAPI,
+
+  // 向后兼容:保留旧的扁平接口,逐步迁移后可移除
+  setOpacity: windowAPI.setOpacity,
+  toggleClickThrough: windowAPI.toggleClickThrough,
+  hideWindow: windowAPI.hide,
+  closeWindow: windowAPI.close,
+  getInitialState: windowAPI.getInitialState,
+  onOpacityUpdated: windowAPI.onOpacityUpdated,
+  onClickThroughUpdated: windowAPI.onClickThroughUpdated,
+  loadUrl: navigationAPI.loadUrl,
+  onNavigateUrl: navigationAPI.onNavigateUrl,
+  getAutoStart: settingsAPI.getAutoStart,
+  setAutoStart: settingsAPI.setAutoStart,
+  getStartupConfig: settingsAPI.getStartupConfig,
+  setStartupPage: settingsAPI.setStartupPage,
+  setCustomStartupUrl: settingsAPI.setCustomStartupUrl,
+  setCloseStrategy: settingsAPI.setCloseStrategy,
+  setRememberWindowBounds: settingsAPI.setRememberWindowBounds,
+  getUserData: userDataAPI.get,
+  saveFavorite: userDataAPI.saveFavorite,
+  removeFavorite: userDataAPI.removeFavorite,
+  addHistory: userDataAPI.addHistory,
+  clearHistory: userDataAPI.clearHistory,
+  saveLastUrl: userDataAPI.saveLastUrl,
+  getI18nData: i18nAPI.getData,
+  setLocale: i18nAPI.setLocale
 });
