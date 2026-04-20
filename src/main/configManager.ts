@@ -24,6 +24,12 @@ export interface UserDataItem {
   timestamp?: number;
 }
 
+export interface DockItem {
+  id: string;
+  title: string;
+  url: string;
+}
+
 export interface AppConfig {
   locale: string;
   opacity: number;
@@ -31,6 +37,7 @@ export interface AppConfig {
   lastUrl: string;
   favorites: UserDataItem[];
   history: UserDataItem[];
+  dockItems: DockItem[];
   startupPage: string;
   customStartupUrl: string;
   closeStrategy: string;
@@ -45,6 +52,7 @@ const DEFAULT_CONFIG: AppConfig = {
   lastUrl: DEFAULT_URL,
   favorites: [],
   history: [],
+  dockItems: [],
   startupPage: STARTUP_PAGE_TYPES.LAST_PAGE,
   customStartupUrl: '',
   closeStrategy: CLOSE_STRATEGIES.MINIMIZE,

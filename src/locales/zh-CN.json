@@ -37,6 +37,14 @@
     "favRemoved": "已取消收藏",
     "unknownTitle": "未知标题"
   },
+  "dock": {
+    "addSite": "添加网站",
+    "urlPlaceholder": "输入网址，如 https://...",
+    "titlePlaceholder": "网站名称（可选）",
+    "add": "添加",
+    "cancel": "取消",
+    "delete": "从 Dock 移除"
+  },
   "webview": {
     "loading": "加载中...",
     "loadFailed": "网页加载失败",

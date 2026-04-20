@@ -55,12 +55,20 @@ const i18nAPI = {
   setLocale: (locale: string) => ipcRenderer.invoke('set-locale', locale)
 };
 
+const dockAPI = {
+  getItems: () => ipcRenderer.invoke('get-dock-items'),
+  addItem: (item: { title: string; url: string }) => ipcRenderer.invoke('add-dock-item', item),
+  removeItem: (id: string) => ipcRenderer.invoke('remove-dock-item', id),
+  reorderItems: (orderedIds: string[]) => ipcRenderer.invoke('reorder-dock-items', orderedIds)
+};
+
 contextBridge.exposeInMainWorld('wingman', {
   window: windowAPI,
   settings: settingsAPI,
   userData: userDataAPI,
   navigation: navigationAPI,
   i18n: i18nAPI,
+  dock: dockAPI,
 
   // 向后兼容：保留旧的扁平接口，逐步迁移后可移除
   setOpacity: windowAPI.setOpacity,

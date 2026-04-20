@@ -52,27 +52,260 @@
 .home-search button:hover { background: rgba(255,255,255,0.2); }
 .home-search button:active { background: rgba(0,0,0,0.15); }
 
+/* ── Dock 容器 ── */
 .home-dock-container {
   -webkit-app-region: no-drag;
-  position: absolute; bottom: 30px; left: 0; right: 0;
+  position: absolute; bottom: 28px; left: 0; right: 0;
   display: flex; justify-content: center; z-index: 10;
   animation: slideUpFade 0.6s 0.1s both cubic-bezier(0.16, 1, 0.3, 1);
 }
+
 .home-dock {
-  display: flex; gap: 12px; padding: 10px 18px;
-  background: rgba(0,0,0,0.3); backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,0.15); border-radius: 28px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  padding: 10px 14px 12px;
+  background: rgba(12, 12, 18, 0.62);
+  backdrop-filter: blur(40px) saturate(1.8);
+  -webkit-backdrop-filter: blur(40px) saturate(1.8);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 24px;
+  box-shadow:
+    0 24px 56px rgba(0,0,0,0.45),
+    0 1px 0 rgba(255,255,255,0.08) inset;
+  position: relative;
 }
-.dock-btn {
-  display: flex; align-items: center; justify-content: center;
-  width: 44px; height: 44px; border-radius: 14px;
-  background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.1);
-  color: #fff; cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+/* ── Dock 通用 item ── */
+.dock-item {
+  position: relative;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: bottom center;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  outline: none;
 }
-.dock-btn:hover { background: rgba(255,255,255,0.3); transform: translateY(-4px) scale(1.05); box-shadow: 0 8px 16px rgba(0,0,0,0.2); }
-.dock-btn:active { transform: translateY(0) scale(0.95); }
-.dock-btn svg { transition: transform 0.2s ease; }
-.dock-btn:hover svg { transform: scale(1.1); }
+
+/* macOS 风格放大效果 */
+.dock-item:hover {
+  transform: translateY(-6px) scale(1.18);
+  z-index: 5;
+}
+.dock-item:has(+ .dock-item:hover),
+.dock-item:hover + .dock-item {
+  transform: translateY(-3px) scale(1.08);
+  z-index: 4;
+}
+.dock-item:active {
+  transform: translateY(-4px) scale(1.12) !important;
+}
+
+/* ── 图标容器 ── */
+.dock-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: rgba(255,255,255,0.13);
+  border: 1px solid rgba(255,255,255,0.08);
+  transition: box-shadow 0.2s, background 0.2s;
+}
+.dock-item:hover .dock-icon {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+  background: rgba(255,255,255,0.18);
+}
+.dock-icon-builtin {
+  color: rgba(255,255,255,0.92);
+}
+.dock-icon img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+}
+
+/* favicon 加载失败时显示首字母 */
+.dock-icon-fallback-letter {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, rgba(99,102,241,0.7), rgba(168,85,247,0.7));
+  border-radius: 6px;
+  user-select: none;
+}
+
+/* ── 悬浮标签 ── */
+.dock-label {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(16, 16, 22, 0.88);
+  backdrop-filter: blur(12px);
+  color: rgba(255,255,255,0.9);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 9px;
+  border-radius: 7px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+.dock-item:hover .dock-label {
+  opacity: 1;
+}
+
+/* ── 网站 item 专属：删除按钮 ── */
+.dock-item-del {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ff3b30;
+  border: 1.5px solid rgba(255,255,255,0.35);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s, transform 0.15s;
+  z-index: 20;
+  padding: 0;
+}
+.dock-site:hover .dock-item-del {
+  opacity: 1;
+}
+.dock-item-del:hover {
+  transform: scale(1.2);
+}
+
+/* ── 拖拽状态 ── */
+.dock-dragging {
+  opacity: 0.35;
+}
+.dock-drag-over .dock-icon {
+  box-shadow: 0 0 0 2.5px rgba(255,255,255,0.55);
+}
+
+/* ── 分隔线 ── */
+.dock-sep {
+  width: 1px;
+  height: 30px;
+  background: rgba(255,255,255,0.14);
+  margin: 0 4px;
+  align-self: center;
+  flex-shrink: 0;
+}
+
+/* ── 添加按钮激活态 ── */
+.dock-add-active .dock-icon {
+  background: rgba(99,102,241,0.5) !important;
+  border-color: rgba(99,102,241,0.6) !important;
+}
+
+/* ── 添加面板 ── */
+.dock-add-wrapper {
+  position: relative;
+}
+.dock-add-panel {
+  position: absolute;
+  bottom: calc(100% + 18px);
+  right: 0;
+  width: 230px;
+  -webkit-app-region: no-drag;
+  background: rgba(16, 16, 24, 0.92);
+  backdrop-filter: blur(32px) saturate(1.6);
+  -webkit-backdrop-filter: blur(32px) saturate(1.6);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 14px;
+  padding: 14px 12px 12px;
+  box-shadow: 0 20px 48px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.06) inset;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: dockPanelIn 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 50;
+}
+@keyframes dockPanelIn {
+  from { opacity: 0; transform: scale(0.88) translateY(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+.dock-add-panel-title {
+  margin: 0 0 2px;
+  color: rgba(255,255,255,0.75);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+.dock-add-panel input {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 13px;
+  padding: 8px 10px;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+.dock-add-panel input:focus {
+  border-color: rgba(99,102,241,0.6);
+  background: rgba(255,255,255,0.1);
+}
+.dock-add-panel input::placeholder {
+  color: rgba(255,255,255,0.3);
+}
+.dock-add-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 2px;
+}
+.dock-add-confirm {
+  flex: 1;
+  padding: 7px 0;
+  background: rgba(99,102,241,0.75);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.dock-add-confirm:hover {
+  background: rgba(99,102,241,1);
+}
+.dock-add-cancel {
+  flex: 1;
+  padding: 7px 0;
+  background: rgba(255,255,255,0.07);
+  border: none;
+  border-radius: 8px;
+  color: rgba(255,255,255,0.55);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.dock-add-cancel:hover {
+  background: rgba(255,255,255,0.13);
+}

@@ -56,5 +56,9 @@ export const IPC_CHANNELS = {
   SET_STARTUP_PAGE: 'set-startup-page',
   SET_CUSTOM_STARTUP_URL: 'set-custom-startup-url',
   SET_CLOSE_STRATEGY: 'set-close-strategy',
-  SET_REMEMBER_WINDOW_BOUNDS: 'set-remember-window-bounds'
+  SET_REMEMBER_WINDOW_BOUNDS: 'set-remember-window-bounds',
+  GET_DOCK_ITEMS: 'get-dock-items',
+  ADD_DOCK_ITEM: 'add-dock-item',
+  REMOVE_DOCK_ITEM: 'remove-dock-item',
+  REORDER_DOCK_ITEMS: 'reorder-dock-items'
 } as const;

@@ -37,6 +37,14 @@
     "favRemoved": "Removed from favorites",
     "unknownTitle": "Unknown Title"
   },
+  "dock": {
+    "addSite": "Add Website",
+    "urlPlaceholder": "Enter URL, e.g. https://...",
+    "titlePlaceholder": "Site name (optional)",
+    "add": "Add",
+    "cancel": "Cancel",
+    "delete": "Remove from Dock"
+  },
   "webview": {
     "loading": "Loading...",
     "loadFailed": "Page failed to load",

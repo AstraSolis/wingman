@@ -37,6 +37,19 @@ interface WingmanUserData {
   history: WingmanUserDataItem[];
 }
 
+interface WingmanDockItem {
+  id: string;
+  title: string;
+  url: string;
+}
+
+interface WingmanDockAPI {
+  getItems: () => Promise<WingmanDockItem[]>;
+  addItem: (item: { title: string; url: string }) => Promise<WingmanDockItem[]>;
+  removeItem: (id: string) => Promise<WingmanDockItem[]>;
+  reorderItems: (orderedIds: string[]) => Promise<WingmanDockItem[]>;
+}
+
 interface WingmanWindowAPI {
   setOpacity: (opacity: number) => void;
   toggleClickThrough: () => void;
@@ -82,6 +95,7 @@ interface WingmanAPI {
   userData: WingmanUserDataAPI;
   navigation: WingmanNavigationAPI;
   i18n: WingmanI18nAPI;
+  dock: WingmanDockAPI;
   // 向后兼容扁平接口
   setOpacity: (opacity: number) => void;
   toggleClickThrough: () => void;

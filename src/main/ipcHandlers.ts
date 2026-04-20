@@ -6,7 +6,7 @@ import * as windowManager from './windowManager';
 import * as i18n from './i18n';
 import * as trayManager from './trayManager';
 import * as configManager from './configManager';
-import type { UserDataItem } from './configManager';
+import type { UserDataItem, DockItem } from './configManager';
 
 const AUTO_START_SUPPORTED_PLATFORMS = new Set(['win32', 'darwin']);
 
@@ -136,6 +136,37 @@ export function setup(): void {
   ipcMain.handle(IPC_CHANNELS.SET_REMEMBER_WINDOW_BOUNDS, (_event, remember: boolean) => {
     configManager.set('rememberWindowBounds', remember);
     return remember;
+  });
+
+  ipcMain.handle(IPC_CHANNELS.GET_DOCK_ITEMS, () => {
+    return configManager.get('dockItems');
+  });
+
+  ipcMain.handle(
+    IPC_CHANNELS.ADD_DOCK_ITEM,
+    (_event, item: { title: string; url: string }) => {
+      const items = [...configManager.get('dockItems')];
+      const id = Date.now().toString(36) + Math.random().toString(36).slice(2);
+      items.push({ id, title: item.title, url: item.url });
+      configManager.set('dockItems', items);
+      return items;
+    }
+  );
+
+  ipcMain.handle(IPC_CHANNELS.REMOVE_DOCK_ITEM, (_event, id: string) => {
+    const items = configManager.get('dockItems').filter((item: DockItem) => item.id !== id);
+    configManager.set('dockItems', items);
+    return items;
+  });
+
+  ipcMain.handle(IPC_CHANNELS.REORDER_DOCK_ITEMS, (_event, orderedIds: string[]) => {
+    const current = configManager.get('dockItems');
+    const map = new Map(current.map((item: DockItem) => [item.id, item]));
+    const reordered = orderedIds
+      .map((id) => map.get(id))
+      .filter((item): item is DockItem => item !== undefined);
+    configManager.set('dockItems', reordered);
+    return reordered;
   });
 
   ipcMain.on(IPC_CHANNELS.CLOSE_WINDOW, () => {
