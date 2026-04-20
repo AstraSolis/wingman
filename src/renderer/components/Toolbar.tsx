@@ -8,6 +8,7 @@ interface ToolbarProps {
   currentWebviewUrl: string;
   currentTitle: string;
   onNavigate: (url: string) => void;
+  onReload: () => void;
   onOpacityChange: (val: number) => void;
   onClickThrough: () => void;
   onHome: () => void;
@@ -47,7 +48,7 @@ const SVG: Record<string, ReactElement> = {
       <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
     </svg>
   ),
-  go: (
+  reload: (
     <svg
       width="14"
       height="14"
@@ -58,8 +59,8 @@ const SVG: Record<string, ReactElement> = {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <polyline points="5 12 12 5 19 12" />
-      <line x1="12" y1="19" x2="12" y2="5" />
+      <polyline points="1 4 1 10 7 10" />
+      <path d="M3.51 15a9 9 0 1 0 .49-4.95" />
     </svg>
   ),
   cursor: (
@@ -120,6 +121,7 @@ export default function Toolbar({
   currentWebviewUrl,
   currentTitle,
   onNavigate,
+  onReload,
   onOpacityChange,
   onClickThrough,
   onHome,
@@ -163,8 +165,8 @@ export default function Toolbar({
         >
           {SVG.star}
         </button>
-        <button title={t('toolbar.loadBtn')} onClick={handleNavigate}>
-          {SVG.go}
+        <button title={t('toolbar.reloadBtn')} onClick={onReload}>
+          {SVG.reload}
         </button>
       </div>
       <div className="controls">

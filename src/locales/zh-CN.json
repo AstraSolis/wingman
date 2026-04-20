@@ -20,7 +20,7 @@
   "toolbar": {
     "homeTitle": "返回主页",
     "urlPlaceholder": "输入攻略网址...",
-    "loadBtn": "加载网页",
+    "reloadBtn": "重新加载",
     "addFavTitle": "收藏当前页面",
     "opacityTitle": "透明度调节",
     "clickThroughTitle": "切换点击穿透 (Ctrl/Cmd+Shift+T)",

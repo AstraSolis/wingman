@@ -20,7 +20,7 @@
   "toolbar": {
     "homeTitle": "Back to home",
     "urlPlaceholder": "Enter guide URL...",
-    "loadBtn": "Load page",
+    "reloadBtn": "Reload",
     "addFavTitle": "Bookmark current page",
     "opacityTitle": "Opacity",
     "clickThroughTitle": "Toggle click-through (Ctrl/Cmd+Shift+T)",

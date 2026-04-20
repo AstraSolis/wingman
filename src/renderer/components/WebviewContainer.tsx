@@ -4,6 +4,7 @@ import type { TFunction } from '../hooks/useI18n';
 interface WebviewContainerProps {
   url: string;
   visible: boolean;
+  reloadTrigger?: number;
   onNavigate: (url: string, title?: string) => void;
   onTitleChange: (title: string) => void;
   t: TFunction;
@@ -12,6 +13,7 @@ interface WebviewContainerProps {
 export default function WebviewContainer({
   url,
   visible,
+  reloadTrigger,
   onNavigate,
   onTitleChange,
   t
@@ -28,6 +30,11 @@ export default function WebviewContainer({
     loadedUrlRef.current = url;
     wv.src = url;
   }, [url]);
+
+  useEffect(() => {
+    if (!reloadTrigger) return;
+    webviewRef.current?.reload();
+  }, [reloadTrigger]);
 
   useEffect(() => {
     const wv = webviewRef.current;

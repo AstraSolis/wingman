@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useI18n } from './hooks/useI18n';
 import { useWingman } from './hooks/useWingman';
 import { useOSD } from './hooks/useOSD';
@@ -23,6 +24,9 @@ function AppContent() {
   const { view, targetUrl, currentUrl, currentTitle, navigate, goHome, handleNavigate, handleTitleChange } =
     useNavigation(loadUrl);
 
+  const [reloadTrigger, setReloadTrigger] = useState(0);
+  const handleReload = () => setReloadTrigger(n => n + 1);
+
   const { opacity, isClickThrough, handleOpacityChange, handleClickThrough, handleClose } =
     useWindowState(showOSD, t);
 
@@ -45,6 +49,7 @@ function AppContent() {
         currentWebviewUrl={currentUrl}
         currentTitle={currentTitle}
         onNavigate={navigate}
+        onReload={handleReload}
         onOpacityChange={handleOpacityChange}
         onClickThrough={handleClickThrough}
         onHome={goHome}
@@ -67,6 +72,7 @@ function AppContent() {
         <WebviewContainer
           url={targetUrl}
           visible={true}
+          reloadTrigger={reloadTrigger}
           onNavigate={handleNavigate}
           onTitleChange={handleTitleChange}
           t={t}
