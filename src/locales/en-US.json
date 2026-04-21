@@ -43,7 +43,9 @@
     "titlePlaceholder": "Site name (optional)",
     "add": "Add",
     "cancel": "Cancel",
-    "delete": "Remove from Dock"
+    "delete": "Remove from Dock",
+    "editSite": "Edit Website",
+    "save": "Save"
   },
   "webview": {
     "loading": "Loading...",
@@ -79,6 +81,24 @@
     "clearBtn": "Clear",
     "historyCleared": "History cleared",
     "searchPlaceholder": "Search settings..."
+  },
+  "contextMenu": {
+    "reload": "Reload",
+    "copyPageUrl": "Copy Page URL",
+    "addFav": "Add to Favorites",
+    "copyText": "Copy Selected Text",
+    "copyLinkUrl": "Copy Link Address",
+    "cut": "Cut",
+    "copy": "Copy",
+    "paste": "Paste",
+    "open": "Open",
+    "edit": "Edit",
+    "delete": "Delete",
+    "copyUrl": "Copy URL",
+    "copied": "Copied",
+    "settings": "Settings",
+    "favorites": "Favorites",
+    "history": "History"
   },
   "modal": {
     "favorites": "Favorites",

@@ -48,6 +48,25 @@ interface WingmanDockAPI {
   addItem: (item: { title: string; url: string }) => Promise<WingmanDockItem[]>;
   removeItem: (id: string) => Promise<WingmanDockItem[]>;
   reorderItems: (orderedIds: string[]) => Promise<WingmanDockItem[]>;
+  updateItem: (item: { id: string; title: string; url: string }) => Promise<WingmanDockItem[]>;
+}
+
+interface WingmanWebviewContextParams {
+  x: number;
+  y: number;
+  selectionText: string;
+  linkURL: string;
+  isEditable: boolean;
+  canCopy: boolean;
+  canCut: boolean;
+  canPaste: boolean;
+  currentURL: string;
+  currentTitle: string;
+}
+
+interface WingmanWebviewAPI {
+  onContextMenu: (callback: (params: WingmanWebviewContextParams) => void) => () => void;
+  execAction: (action: 'cut' | 'copy' | 'paste') => void;
 }
 
 interface WingmanWindowAPI {
@@ -96,6 +115,7 @@ interface WingmanAPI {
   navigation: WingmanNavigationAPI;
   i18n: WingmanI18nAPI;
   dock: WingmanDockAPI;
+  webview: WingmanWebviewAPI;
   // 向后兼容扁平接口
   setOpacity: (opacity: number) => void;
   toggleClickThrough: () => void;

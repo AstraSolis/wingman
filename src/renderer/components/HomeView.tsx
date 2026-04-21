@@ -1,10 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import type { TFunction } from '../hooks/useI18n';
+import ContextMenu from './ContextMenu';
 
 interface HomeViewProps {
   onNavigate: (url: string) => void;
   onFavorites: () => void;
   onHistory: () => void;
+  onSettings: () => void;
+  showOSD?: (msg: string) => void;
   t: TFunction;
 }
 
@@ -25,16 +28,19 @@ function getDomain(url: string): string {
   }
 }
 
-export default function HomeView({ onNavigate, onFavorites, onHistory, t }: HomeViewProps) {
+export default function HomeView({ onNavigate, onFavorites, onHistory, onSettings, showOSD, t }: HomeViewProps) {
   const [time, setTime] = useState('');
   const [input, setInput] = useState('');
   const [dockItems, setDockItems] = useState<WingmanDockItem[]>([]);
   const [addOpen, setAddOpen] = useState(false);
   const [addUrl, setAddUrl] = useState('');
   const [addTitle, setAddTitle] = useState('');
+  const [editingItem, setEditingItem] = useState<WingmanDockItem | null>(null);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [faviconErrors, setFaviconErrors] = useState<Set<string>>(new Set());
+  const [dockCtxMenu, setDockCtxMenu] = useState<{ x: number; y: number; item: WingmanDockItem } | null>(null);
+  const [bgCtxMenu, setBgCtxMenu] = useState<{ x: number; y: number } | null>(null);
 
   const addWrapperRef = useRef<HTMLDivElement>(null);
   const addUrlInputRef = useRef<HTMLInputElement>(null);
@@ -60,6 +66,7 @@ export default function HomeView({ onNavigate, onFavorites, onHistory, t }: Home
     const handler = (e: MouseEvent) => {
       if (addWrapperRef.current && !addWrapperRef.current.contains(e.target as Node)) {
         setAddOpen(false);
+        setEditingItem(null);
       }
     };
     document.addEventListener('mousedown', handler);
@@ -78,11 +85,17 @@ export default function HomeView({ onNavigate, onFavorites, onHistory, t }: Home
     const trimmed = addUrl.trim();
     if (!trimmed) return;
     const title = addTitle.trim() || getDomain(trimmed);
-    const items = await window.wingman.dock.addItem({ title, url: trimmed });
+    let items: WingmanDockItem[];
+    if (editingItem) {
+      items = await window.wingman.dock.updateItem({ id: editingItem.id, title, url: trimmed });
+    } else {
+      items = await window.wingman.dock.addItem({ title, url: trimmed });
+    }
     setDockItems(items);
     setAddUrl('');
     setAddTitle('');
     setAddOpen(false);
+    setEditingItem(null);
   };
 
   const handleRemoveDockItem = async (e: React.MouseEvent, id: string) => {
@@ -92,6 +105,7 @@ export default function HomeView({ onNavigate, onFavorites, onHistory, t }: Home
   };
 
   const handleDragStart = (e: React.DragEvent, index: number) => {
+    if (dockCtxMenu) { e.preventDefault(); return; }
     setDraggedIndex(index);
     e.dataTransfer.effectAllowed = 'move';
   };
@@ -129,7 +143,14 @@ export default function HomeView({ onNavigate, onFavorites, onHistory, t }: Home
   };
 
   return (
-    <div className="home-view">
+    <div
+      className="home-view"
+      onContextMenu={(e) => {
+        e.preventDefault();
+        setDockCtxMenu(null);
+        setBgCtxMenu({ x: e.clientX, y: e.clientY });
+      }}
+    >
       <div
         className="home-bg"
         style={{ backgroundImage: "url('https://api.dujin.org/bing/1920.php')" }}
@@ -226,6 +247,12 @@ export default function HomeView({ onNavigate, onFavorites, onHistory, t }: Home
               onDrop={(e) => handleDrop(e, index)}
               onDragEnd={handleDragEnd}
               onClick={() => onNavigate(item.url)}
+              onContextMenu={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setBgCtxMenu(null);
+                setDockCtxMenu({ x: e.clientX, y: e.clientY, item });
+              }}
               title={item.title}
             >
               <div className="dock-icon">
@@ -268,7 +295,12 @@ export default function HomeView({ onNavigate, onFavorites, onHistory, t }: Home
             <button
               className={`dock-item dock-add-btn${addOpen ? ' dock-add-active' : ''}`}
               title={t('dock.addSite')}
-              onClick={() => setAddOpen((v) => !v)}
+              onClick={() => {
+                setEditingItem(null);
+                setAddUrl('');
+                setAddTitle('');
+                setAddOpen((v) => !v);
+              }}
             >
               <div className="dock-icon dock-icon-builtin">
                 <svg
@@ -292,7 +324,9 @@ export default function HomeView({ onNavigate, onFavorites, onHistory, t }: Home
                 className="dock-add-panel"
                 onMouseDown={(e) => e.stopPropagation()}
               >
-                <p className="dock-add-panel-title">{t('dock.addSite')}</p>
+                <p className="dock-add-panel-title">
+                  {editingItem ? t('dock.editSite') : t('dock.addSite')}
+                </p>
                 <input
                   ref={addUrlInputRef}
                   type="text"
@@ -311,7 +345,7 @@ export default function HomeView({ onNavigate, onFavorites, onHistory, t }: Home
                 />
                 <div className="dock-add-actions">
                   <button className="dock-add-confirm" onClick={handleAddDockItem}>
-                    {t('dock.add')}
+                    {editingItem ? t('dock.save') : t('dock.add')}
                   </button>
                   <button
                     className="dock-add-cancel"
@@ -319,6 +353,7 @@ export default function HomeView({ onNavigate, onFavorites, onHistory, t }: Home
                       setAddOpen(false);
                       setAddUrl('');
                       setAddTitle('');
+                      setEditingItem(null);
                     }}
                   >
                     {t('dock.cancel')}
@@ -329,6 +364,81 @@ export default function HomeView({ onNavigate, onFavorites, onHistory, t }: Home
           </div>
         </div>
       </div>
+      {dockCtxMenu && (
+        <ContextMenu
+          x={dockCtxMenu.x}
+          y={dockCtxMenu.y}
+          items={[
+            {
+              key: 'open',
+              label: t('contextMenu.open'),
+              icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>,
+              onClick: () => onNavigate(dockCtxMenu.item.url)
+            },
+            { key: 'sep', separator: true },
+            {
+              key: 'edit',
+              label: t('contextMenu.edit'),
+              icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>,
+              onClick: () => {
+                setEditingItem(dockCtxMenu.item);
+                setAddUrl(dockCtxMenu.item.url);
+                setAddTitle(dockCtxMenu.item.title);
+                setAddOpen(true);
+              }
+            },
+            {
+              key: 'copyUrl',
+              label: t('contextMenu.copyUrl'),
+              icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>,
+              onClick: () => {
+                navigator.clipboard.writeText(dockCtxMenu.item.url);
+                showOSD?.(t('contextMenu.copied'));
+              }
+            },
+            { key: 'sep2', separator: true },
+            {
+              key: 'delete',
+              label: t('contextMenu.delete'),
+              danger: true,
+              icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>,
+              onClick: async () => {
+                const items = await window.wingman.dock.removeItem(dockCtxMenu.item.id);
+                setDockItems(items);
+              }
+            }
+          ]}
+          onClose={() => setDockCtxMenu(null)}
+        />
+      )}
+      {bgCtxMenu && (
+        <ContextMenu
+          x={bgCtxMenu.x}
+          y={bgCtxMenu.y}
+          items={[
+            {
+              key: 'favorites',
+              label: t('contextMenu.favorites'),
+              icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
+              onClick: onFavorites
+            },
+            {
+              key: 'history',
+              label: t('contextMenu.history'),
+              icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
+              onClick: onHistory
+            },
+            { key: 'sep', separator: true },
+            {
+              key: 'settings',
+              label: t('contextMenu.settings'),
+              icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
+              onClick: onSettings
+            }
+          ]}
+          onClose={() => setBgCtxMenu(null)}
+        />
+      )}
     </div>
   );
 }

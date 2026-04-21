@@ -178,5 +178,21 @@ export function setup(): void {
     }
   });
 
+  ipcMain.on(IPC_CHANNELS.WEBVIEW_EXEC_ACTION, (_event, action: 'cut' | 'copy' | 'paste') => {
+    const wc = windowManager.getGuestWebContents();
+    if (!wc || wc.isDestroyed()) return;
+    if (action === 'cut') wc.cut();
+    else if (action === 'copy') wc.copy();
+    else if (action === 'paste') wc.paste();
+  });
+
+  ipcMain.handle(IPC_CHANNELS.UPDATE_DOCK_ITEM, (_event, item: DockItem) => {
+    const items = configManager
+      .get('dockItems')
+      .map((d: DockItem) => (d.id === item.id ? { ...d, title: item.title, url: item.url } : d));
+    configManager.set('dockItems', items);
+    return items;
+  });
+
   console.log(i18n.t('ipc.ready'));
 }

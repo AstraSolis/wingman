@@ -64,6 +64,8 @@ function AppContent() {
           onNavigate={navigate}
           onFavorites={() => openListModal(openFavorites)}
           onHistory={() => openListModal(openHistory)}
+          onSettings={openSettings}
+          showOSD={showOSD}
           t={t}
         />
       )}
@@ -75,6 +77,8 @@ function AppContent() {
           reloadTrigger={reloadTrigger}
           onNavigate={handleNavigate}
           onTitleChange={handleTitleChange}
+          onAddFav={handleAddFav}
+          showOSD={showOSD}
           t={t}
         />
       )}

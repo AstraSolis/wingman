@@ -43,7 +43,9 @@
     "titlePlaceholder": "网站名称（可选）",
     "add": "添加",
     "cancel": "取消",
-    "delete": "从 Dock 移除"
+    "delete": "从 Dock 移除",
+    "editSite": "编辑网站",
+    "save": "保存"
   },
   "webview": {
     "loading": "加载中...",
@@ -79,6 +81,24 @@
     "clearBtn": "清除",
     "historyCleared": "历史记录已清除",
     "searchPlaceholder": "搜索设置..."
+  },
+  "contextMenu": {
+    "reload": "刷新页面",
+    "copyPageUrl": "复制页面地址",
+    "addFav": "收藏此页",
+    "copyText": "复制选中文字",
+    "copyLinkUrl": "复制链接地址",
+    "cut": "剪切",
+    "copy": "复制",
+    "paste": "粘贴",
+    "open": "打开",
+    "edit": "编辑",
+    "delete": "删除",
+    "copyUrl": "复制地址",
+    "copied": "已复制",
+    "settings": "设置",
+    "favorites": "收藏夹",
+    "history": "历史记录"
   },
   "modal": {
     "favorites": "收藏夹",

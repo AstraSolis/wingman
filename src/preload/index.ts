@@ -3,6 +3,19 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import type { UserDataItem } from '../main/configManager';
 
+interface WebviewContextMenuParams {
+  x: number;
+  y: number;
+  selectionText: string;
+  linkURL: string;
+  isEditable: boolean;
+  canCopy: boolean;
+  canCut: boolean;
+  canPaste: boolean;
+  currentURL: string;
+  currentTitle: string;
+}
+
 const windowAPI = {
   setOpacity: (opacity: number) => ipcRenderer.send('set-opacity', opacity),
   toggleClickThrough: () => ipcRenderer.send('toggle-click-through'),
@@ -59,7 +72,19 @@ const dockAPI = {
   getItems: () => ipcRenderer.invoke('get-dock-items'),
   addItem: (item: { title: string; url: string }) => ipcRenderer.invoke('add-dock-item', item),
   removeItem: (id: string) => ipcRenderer.invoke('remove-dock-item', id),
-  reorderItems: (orderedIds: string[]) => ipcRenderer.invoke('reorder-dock-items', orderedIds)
+  reorderItems: (orderedIds: string[]) => ipcRenderer.invoke('reorder-dock-items', orderedIds),
+  updateItem: (item: { id: string; title: string; url: string }) =>
+    ipcRenderer.invoke('update-dock-item', item)
+};
+
+const webviewAPI = {
+  onContextMenu: (callback: (params: WebviewContextMenuParams) => void): (() => void) => {
+    const listener = (_event: Electron.IpcRendererEvent, params: unknown) =>
+      callback(params as WebviewContextMenuParams);
+    ipcRenderer.on('webview-context-menu', listener);
+    return () => ipcRenderer.removeListener('webview-context-menu', listener);
+  },
+  execAction: (action: 'cut' | 'copy' | 'paste') => ipcRenderer.send('webview-exec-action', action)
 };
 
 contextBridge.exposeInMainWorld('wingman', {
@@ -69,6 +94,7 @@ contextBridge.exposeInMainWorld('wingman', {
   navigation: navigationAPI,
   i18n: i18nAPI,
   dock: dockAPI,
+  webview: webviewAPI,
 
   // 向后兼容：保留旧的扁平接口，逐步迁移后可移除
   setOpacity: windowAPI.setOpacity,

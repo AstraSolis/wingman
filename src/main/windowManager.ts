@@ -18,6 +18,11 @@ const FORWARD_CLICK_THROUGH_PLATFORMS = new Set(['win32', 'darwin']);
 let mainWindow: BrowserWindow | null = null;
 let currentOpacity = DEFAULT_OPACITY;
 let isClickThrough = false;
+let activeGuestContents: Electron.WebContents | null = null;
+
+export function getGuestWebContents(): Electron.WebContents | null {
+  return activeGuestContents;
+}
 
 function shouldForwardClickThrough(): boolean {
   return FORWARD_CLICK_THROUGH_PLATFORMS.has(process.platform);
@@ -66,6 +71,11 @@ export function createWindow(): BrowserWindow {
 
   mainWindow = new BrowserWindow(windowOptions);
 
+  // 屏蔽 Windows 无框窗口在标题栏区域右键弹出的系统菜单
+  mainWindow.on('system-context-menu', (e) => {
+    e.preventDefault();
+  });
+
   mainWindow.webContents.on('did-attach-webview', (_event, guestContents) => {
     guestContents.setWindowOpenHandler(({ url }) => {
       if (!url || !/^https?:\/\//i.test(url)) {
@@ -73,6 +83,27 @@ export function createWindow(): BrowserWindow {
       }
       mainWindow?.webContents.send(IPC_CHANNELS.NAVIGATE_URL, url);
       return { action: 'deny' };
+    });
+
+    guestContents.on('context-menu', (_e, params) => {
+      if (!mainWindow) return;
+      mainWindow.webContents.send(IPC_CHANNELS.WEBVIEW_CONTEXT_MENU, {
+        x: params.x,
+        y: params.y,
+        selectionText: params.selectionText ?? '',
+        linkURL: params.linkURL ?? '',
+        isEditable: params.isEditable,
+        canCopy: params.editFlags.canCopy,
+        canCut: params.editFlags.canCut,
+        canPaste: params.editFlags.canPaste,
+        currentURL: guestContents.getURL(),
+        currentTitle: guestContents.getTitle()
+      });
+    });
+
+    activeGuestContents = guestContents;
+    guestContents.on('destroyed', () => {
+      if (activeGuestContents === guestContents) activeGuestContents = null;
     });
   });
 
