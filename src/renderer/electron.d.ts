@@ -4,6 +4,7 @@ interface ElectronWebviewElement extends HTMLElement {
   src: string;
   reload(): void;
   getTitle(): string;
+  getWebContentsId(): number;
   executeJavaScript(code: string): Promise<unknown>;
 }
 
@@ -62,11 +63,12 @@ interface WingmanWebviewContextParams {
   canPaste: boolean;
   currentURL: string;
   currentTitle: string;
+  webContentsId: number;
 }
 
 interface WingmanWebviewAPI {
   onContextMenu: (callback: (params: WingmanWebviewContextParams) => void) => () => void;
-  execAction: (action: 'cut' | 'copy' | 'paste') => void;
+  execAction: (action: 'cut' | 'copy' | 'paste', webContentsId?: number) => void;
 }
 
 interface WingmanWindowAPI {

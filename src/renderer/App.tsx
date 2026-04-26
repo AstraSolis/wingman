@@ -1,8 +1,7 @@
-import { useState } from 'react';
 import { useI18n } from './hooks/useI18n';
 import { useWingman } from './hooks/useWingman';
 import { useOSD } from './hooks/useOSD';
-import { useNavigation } from './hooks/useNavigation';
+import { useTabsPool } from './hooks/useTabsPool';
 import { useWindowState } from './hooks/useWindowState';
 import { useModals } from './hooks/useModals';
 import { useStartupPage } from './hooks/useStartupPage';
@@ -11,7 +10,7 @@ import { BootStateProvider } from './hooks/useBootState';
 import { useDocumentTitle } from './hooks/useDocumentTitle';
 import Toolbar from './components/Toolbar';
 import HomeView from './components/HomeView';
-import WebviewContainer from './components/WebviewContainer';
+import WebviewPoolContainer from './components/WebviewPoolContainer';
 import SettingsModal from './components/SettingsModal';
 import ListModal from './components/ListModal';
 import OSD from './components/OSD';
@@ -21,11 +20,22 @@ function AppContent() {
   const { loadUrl } = useWingman();
   const { osdMessage, showOSD } = useOSD();
 
-  const { view, targetUrl, currentUrl, currentTitle, navigate, goHome, handleNavigate, handleTitleChange } =
-    useNavigation(loadUrl);
-
-  const [reloadTrigger, setReloadTrigger] = useState(0);
-  const handleReload = () => setReloadTrigger(n => n + 1);
+  const {
+    tabs,
+    activeTabId,
+    warmIds,
+    view,
+    navigate,
+    openInBackground,
+    closeTab,
+    switchTab,
+    goHome,
+    reloadActiveTab,
+    handleTabNavigate,
+    handleTabTitleChange,
+    currentUrl,
+    currentTitle
+  } = useTabsPool(loadUrl);
 
   const { opacity, isClickThrough, handleOpacityChange, handleClickThrough, handleClose } =
     useWindowState(showOSD, t);
@@ -48,14 +58,19 @@ function AppContent() {
         isClickThrough={isClickThrough}
         currentWebviewUrl={currentUrl}
         currentTitle={currentTitle}
+        tabs={tabs}
+        activeTabId={activeTabId}
         onNavigate={navigate}
-        onReload={handleReload}
+        onReload={reloadActiveTab}
         onOpacityChange={handleOpacityChange}
         onClickThrough={handleClickThrough}
         onHome={goHome}
         onSettings={openSettings}
         onClose={handleClose}
         onAddFav={handleAddFav}
+        onSwitchTab={switchTab}
+        onCloseTab={closeTab}
+        onNewTab={goHome}
         t={t}
       />
 
@@ -70,18 +85,18 @@ function AppContent() {
         />
       )}
 
-      {view === 'webview' && (
-        <WebviewContainer
-          url={targetUrl}
-          visible={true}
-          reloadTrigger={reloadTrigger}
-          onNavigate={handleNavigate}
-          onTitleChange={handleTitleChange}
-          onAddFav={handleAddFav}
-          showOSD={showOSD}
-          t={t}
-        />
-      )}
+      <WebviewPoolContainer
+        tabs={tabs}
+        activeTabId={activeTabId}
+        warmIds={warmIds}
+        visible={view === 'webview'}
+        onNavigate={handleTabNavigate}
+        onTitleChange={handleTabTitleChange}
+        onOpenInBackground={openInBackground}
+        onAddFav={handleAddFav}
+        showOSD={showOSD}
+        t={t}
+      />
 
       {showSettings && (
         <SettingsModal

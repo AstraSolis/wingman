@@ -11,6 +11,7 @@
 
 .url-bar {
   -webkit-app-region: no-drag;
+  position: relative;
   display: flex; align-items: center;
   flex: 0 1 540px; width: min(56%, 540px); min-width: 0; gap: 4px;
   background: rgba(255,255,255,0.06);
@@ -85,4 +86,160 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .icon-btn.active {
   background: rgba(108,140,255,0.18); color: var(--accent);
   border-color: rgba(108,140,255,0.3); box-shadow: 0 0 8px var(--accent-glow);
+}
+
+/* 标签页下拉 */
+.tabs-dropdown-wrapper {
+  -webkit-app-region: no-drag;
+  flex-shrink: 0;
+}
+
+.tabs-btn {
+  position: relative;
+  width: 32px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: var(--btn-bg);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  -webkit-app-region: no-drag;
+}
+.tabs-btn:hover { background: var(--btn-hover); color: var(--text-primary); border-color: rgba(255,255,255,0.1); }
+.tabs-btn:active { background: var(--btn-active); transform: scale(0.92); }
+.tabs-btn.active {
+  background: rgba(108,140,255,0.18); color: var(--accent);
+  border-color: rgba(108,140,255,0.3); box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.tab-count-badge {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 3px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  border-radius: 7px;
+  line-height: 14px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.tabs-dropdown-panel {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  width: auto;
+  background: rgba(22, 22, 30, 0.96);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  z-index: 300;
+  -webkit-app-region: no-drag;
+  overflow: hidden;
+}
+
+.tabs-list {
+  max-height: 260px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.tabs-empty {
+  padding: 16px 14px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.tab-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px 7px 12px;
+  cursor: pointer;
+  transition: background 0.12s ease;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+.tab-item:last-of-type { border-bottom: none; }
+.tab-item:hover { background: var(--btn-hover); }
+.tab-item.active {
+  background: rgba(108, 140, 255, 0.15);
+  border-left: 2px solid var(--accent);
+  padding-left: 10px;
+}
+
+.tab-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  color: var(--text-primary);
+}
+.tab-item.active .tab-title { color: var(--accent); }
+
+.tab-close-btn {
+  -webkit-app-region: no-drag;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.12s ease, background 0.12s ease, color 0.12s ease;
+}
+.tab-item:hover .tab-close-btn { opacity: 1; }
+.tab-close-btn:hover { background: rgba(255, 107, 107, 0.2); color: var(--danger); }
+
+.tabs-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 6px 8px;
+}
+
+.tabs-footer .tabs-new-btn {
+  -webkit-app-region: no-drag;
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: auto;
+  box-sizing: border-box;
+  padding: 6px 10px;
+  border: 1px dashed rgba(255, 255, 255, 0.22);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-family: inherit;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  flex-shrink: unset;
+  transform: none;
+}
+.tabs-footer .tabs-new-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(108, 140, 255, 0.08);
+  transform: none;
 }

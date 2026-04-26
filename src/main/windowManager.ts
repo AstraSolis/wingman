@@ -97,7 +97,8 @@ export function createWindow(): BrowserWindow {
         canCut: params.editFlags.canCut,
         canPaste: params.editFlags.canPaste,
         currentURL: guestContents.getURL(),
-        currentTitle: guestContents.getTitle()
+        currentTitle: guestContents.getTitle(),
+        webContentsId: guestContents.id
       });
     });
 

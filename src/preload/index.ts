@@ -14,6 +14,7 @@ interface WebviewContextMenuParams {
   canPaste: boolean;
   currentURL: string;
   currentTitle: string;
+  webContentsId: number;
 }
 
 const windowAPI = {
@@ -84,7 +85,8 @@ const webviewAPI = {
     ipcRenderer.on('webview-context-menu', listener);
     return () => ipcRenderer.removeListener('webview-context-menu', listener);
   },
-  execAction: (action: 'cut' | 'copy' | 'paste') => ipcRenderer.send('webview-exec-action', action)
+  execAction: (action: 'cut' | 'copy' | 'paste', webContentsId?: number) =>
+    ipcRenderer.send('webview-exec-action', action, webContentsId)
 };
 
 contextBridge.exposeInMainWorld('wingman', {

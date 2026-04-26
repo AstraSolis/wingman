@@ -1,6 +1,6 @@
 // IPC 消息处理模块
 
-import { app, ipcMain } from 'electron';
+import { app, ipcMain, webContents } from 'electron';
 import { IPC_CHANNELS } from '../common/constants';
 import * as windowManager from './windowManager';
 import * as i18n from './i18n';
@@ -178,8 +178,8 @@ export function setup(): void {
     }
   });
 
-  ipcMain.on(IPC_CHANNELS.WEBVIEW_EXEC_ACTION, (_event, action: 'cut' | 'copy' | 'paste') => {
-    const wc = windowManager.getGuestWebContents();
+  ipcMain.on(IPC_CHANNELS.WEBVIEW_EXEC_ACTION, (_event, action: 'cut' | 'copy' | 'paste', webContentsId?: number) => {
+    const wc = webContentsId ? webContents.fromId(webContentsId) : windowManager.getGuestWebContents();
     if (!wc || wc.isDestroyed()) return;
     if (action === 'cut') wc.cut();
     else if (action === 'copy') wc.copy();

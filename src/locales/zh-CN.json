@@ -26,7 +26,10 @@
     "clickThroughTitle": "切换点击穿透 (Ctrl/Cmd+Shift+T)",
     "settingsTitle": "设置",
     "hideTitle": "隐藏窗口 (Ctrl/Cmd+Shift+H)",
-    "closeTitle": "关闭窗口"
+    "closeTitle": "关闭窗口",
+    "tabsTitle": "管理标签页",
+    "newTab": "新标签页",
+    "noTabs": "暂无已打开标签页"
   },
   "home": {
     "searchPlaceholder": "输入网址或搜索内容...",
@@ -88,6 +91,7 @@
     "addFav": "收藏此页",
     "copyText": "复制选中文字",
     "copyLinkUrl": "复制链接地址",
+    "openInBackground": "在后台标签页打开",
     "cut": "剪切",
     "copy": "复制",
     "paste": "粘贴",

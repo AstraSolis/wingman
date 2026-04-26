@@ -10,6 +10,7 @@ interface WebviewContainerProps {
   onNavigate: (url: string, title?: string) => void;
   onTitleChange: (title: string) => void;
   onAddFav?: (url: string, title: string) => void;
+  onOpenInBackground?: (url: string) => void;
   showOSD?: (msg: string) => void;
   t: TFunction;
 }
@@ -21,6 +22,7 @@ export default function WebviewContainer({
   onNavigate,
   onTitleChange,
   onAddFav,
+  onOpenInBackground,
   showOSD,
   t
 }: WebviewContainerProps) {
@@ -30,6 +32,13 @@ export default function WebviewContainer({
   const [ctxParams, setCtxParams] = useState<(WingmanWebviewContextParams & { adjustedY: number }) | null>(null);
   // 只记录我们主动加载过的 URL，did-navigate（内部链接跳转）不更新它
   const loadedUrlRef = useRef('');
+  // 当前 webview 实例的 webContentsId，dom-ready 后设置，用于过滤其他 webview 的右键菜单事件
+  const myWebContentsIdRef = useRef<number | null>(null);
+  // 用 ref 持有最新回调，使事件监听 effect 只注册一次（无需随 prop 变化重建监听器）
+  const onNavigateRef = useRef(onNavigate);
+  onNavigateRef.current = onNavigate;
+  const onTitleChangeRef = useRef(onTitleChange);
+  onTitleChangeRef.current = onTitleChange;
 
   useEffect(() => {
     const wv = webviewRef.current;
@@ -43,9 +52,10 @@ export default function WebviewContainer({
     webviewRef.current?.reload();
   }, [reloadTrigger]);
 
-  // 订阅主进程发来的 webview 右键菜单事件
+  // 订阅主进程发来的 webview 右键菜单事件，按 webContentsId 过滤确保只响应本实例
   useEffect(() => {
     const unsub = window.wingman.webview.onContextMenu((params) => {
+      if (myWebContentsIdRef.current !== null && params.webContentsId !== myWebContentsIdRef.current) return;
       const toolbarEl = document.querySelector('.toolbar');
       const toolbarBottom = toolbarEl ? toolbarEl.getBoundingClientRect().bottom : 44;
       setCtxParams({ ...params, adjustedY: params.y + toolbarBottom });
@@ -63,7 +73,7 @@ export default function WebviewContainer({
     };
     const onStop = () => setLoading(false);
     const handleNavigate = (event: Event & { url: string }) => {
-      onNavigate(event.url, wv.getTitle() || event.url);
+      onNavigateRef.current(event.url, wv.getTitle() || event.url);
     };
     const onNavigateInPage = (event: Event & { url: string; isMainFrame: boolean }) => {
       if (event.isMainFrame) handleNavigate(event);
@@ -73,11 +83,11 @@ export default function WebviewContainer({
       setLoading(false);
       setError(`${e.errorDescription} (${e.errorCode})`);
     };
-    const onTitle = (e: Event & { title: string }) => onTitleChange(e.title);
+    const onTitle = (e: Event & { title: string }) => onTitleChangeRef.current(e.title);
 
-    // 每次页面加载完成后，注入脚本拦截 target="_blank" 链接点击，
-    // 将其转为当前页面导航，避免依赖不可靠的弹窗机制
+    // dom-ready 时记录本实例的 webContentsId，供右键菜单事件过滤使用
     const onDomReady = () => {
+      myWebContentsIdRef.current = wv.getWebContentsId();
       wv.executeJavaScript(`
         if (!window.__wingmanLinkInterceptor) {
           window.__wingmanLinkInterceptor = true;
@@ -110,7 +120,7 @@ export default function WebviewContainer({
       wv.removeEventListener('page-title-updated', onTitle as EventListener);
       wv.removeEventListener('dom-ready', onDomReady);
     };
-  }, [onNavigate, onTitleChange]);
+  }, []);
 
   // 根据右键参数构建菜单项
   const buildMenuItems = (): ContextMenuItem[] => {
@@ -123,21 +133,21 @@ export default function WebviewContainer({
         label: t('contextMenu.cut'),
         icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="6" cy="20" r="2"/><circle cx="18" cy="20" r="2"/><path d="M5.5 6l7 14M18.5 6l-7 14"/><line x1="3" y1="6" x2="21" y2="6"/></svg>,
         disabled: !ctxParams.canCut,
-        onClick: () => window.wingman.webview.execAction('cut')
+        onClick: () => window.wingman.webview.execAction('cut', ctxParams.webContentsId)
       });
       items.push({
         key: 'copy',
         label: t('contextMenu.copy'),
         icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>,
         disabled: !ctxParams.canCopy,
-        onClick: () => window.wingman.webview.execAction('copy')
+        onClick: () => window.wingman.webview.execAction('copy', ctxParams.webContentsId)
       });
       items.push({
         key: 'paste',
         label: t('contextMenu.paste'),
         icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>,
         disabled: !ctxParams.canPaste,
-        onClick: () => window.wingman.webview.execAction('paste')
+        onClick: () => window.wingman.webview.execAction('paste', ctxParams.webContentsId)
       });
       items.push({ key: 'sep-edit', separator: true });
     }
@@ -166,6 +176,14 @@ export default function WebviewContainer({
           showOSD?.(t('contextMenu.copied'));
         }
       });
+      if (onOpenInBackground) {
+        items.push({
+          key: 'openInBackground',
+          label: t('contextMenu.openInBackground'),
+          icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="8" width="14" height="12" rx="2"/><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3"/></svg>,
+          onClick: () => onOpenInBackground(ctxParams.linkURL)
+        });
+      }
       items.push({ key: 'sep-link', separator: true });
     }
 

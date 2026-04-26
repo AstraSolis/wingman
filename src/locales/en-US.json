@@ -26,7 +26,10 @@
     "clickThroughTitle": "Toggle click-through (Ctrl/Cmd+Shift+T)",
     "settingsTitle": "Settings",
     "hideTitle": "Hide window (Ctrl/Cmd+Shift+H)",
-    "closeTitle": "Close window"
+    "closeTitle": "Close window",
+    "tabsTitle": "Manage Tabs",
+    "newTab": "New Tab",
+    "noTabs": "No open tabs"
   },
   "home": {
     "searchPlaceholder": "Enter URL or search...",
@@ -88,6 +91,7 @@
     "addFav": "Add to Favorites",
     "copyText": "Copy Selected Text",
     "copyLinkUrl": "Copy Link Address",
+    "openInBackground": "Open in Background Tab",
     "cut": "Cut",
     "copy": "Copy",
     "paste": "Paste",

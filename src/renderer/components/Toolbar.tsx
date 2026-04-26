@@ -1,12 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { ReactElement } from 'react';
 import type { TFunction } from '../hooks/useI18n';
+import type { Tab } from '../hooks/useTabsPool';
 
 interface ToolbarProps {
   opacity: number;
   isClickThrough: boolean;
   currentWebviewUrl: string;
   currentTitle: string;
+  tabs: Tab[];
+  activeTabId: string | null;
   onNavigate: (url: string) => void;
   onReload: () => void;
   onOpacityChange: (val: number) => void;
@@ -15,6 +18,9 @@ interface ToolbarProps {
   onSettings: () => void;
   onClose: () => void;
   onAddFav: (url: string, title: string) => void;
+  onSwitchTab: (id: string) => void;
+  onCloseTab: (id: string) => void;
+  onNewTab: () => void;
   t: TFunction;
 }
 
@@ -108,6 +114,26 @@ const SVG: Record<string, ReactElement> = {
       <line x1="6" y1="6" x2="18" y2="18" />
     </svg>
   ),
+  tabs: (
+    <svg
+      width="12"
+      height="12"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
+  ),
+  tabClose: (
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  ),
   opacity: (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" opacity="0.6">
       <circle cx="12" cy="12" r="10" />
@@ -120,6 +146,8 @@ export default function Toolbar({
   isClickThrough,
   currentWebviewUrl,
   currentTitle,
+  tabs,
+  activeTabId,
   onNavigate,
   onReload,
   onOpacityChange,
@@ -128,13 +156,29 @@ export default function Toolbar({
   onSettings,
   onClose,
   onAddFav,
+  onSwitchTab,
+  onCloseTab,
+  onNewTab,
   t
 }: ToolbarProps) {
   const [inputVal, setInputVal] = useState<string | null>(null);
+  const [tabsOpen, setTabsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setInputVal(null);
   }, [currentWebviewUrl]);
+
+  useEffect(() => {
+    if (!tabsOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (!dropdownRef.current?.contains(e.target as Node)) {
+        setTabsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [tabsOpen]);
 
   const displayUrl = inputVal ?? currentWebviewUrl ?? '';
 
@@ -168,6 +212,54 @@ export default function Toolbar({
         <button title={t('toolbar.reloadBtn')} onClick={onReload}>
           {SVG.reload}
         </button>
+        <div className="tabs-dropdown-wrapper" ref={dropdownRef}>
+          <button
+            className={`icon-btn tabs-btn${tabsOpen ? ' active' : ''}`}
+            title={t('toolbar.tabsTitle')}
+            onClick={() => setTabsOpen(v => !v)}
+          >
+            {SVG.tabs}
+            {tabs.length > 0 && (
+              <span className="tab-count-badge">{tabs.length}</span>
+            )}
+          </button>
+          {tabsOpen && (
+            <div className="tabs-dropdown-panel">
+              <div className="tabs-list">
+                {tabs.length === 0 ? (
+                  <div className="tabs-empty">{t('toolbar.noTabs')}</div>
+                ) : (
+                  tabs.map(tab => (
+                    <div
+                      key={tab.id}
+                      className={`tab-item${tab.id === activeTabId ? ' active' : ''}`}
+                      onClick={() => { onSwitchTab(tab.id); setTabsOpen(false); }}
+                    >
+                      <span className="tab-title">
+                        {tab.title && tab.title !== tab.url ? tab.title : (tab.currentUrl || tab.url || t('toolbar.newTab'))}
+                      </span>
+                      <button
+                        className="tab-close-btn"
+                        title="关闭"
+                        onClick={e => { e.stopPropagation(); onCloseTab(tab.id); }}
+                      >
+                        {SVG.tabClose}
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+              <div className="tabs-footer">
+                <button
+                  className="tabs-new-btn"
+                  onClick={() => { onNewTab(); setTabsOpen(false); }}
+                >
+                  {`+ ${t('toolbar.newTab')}`}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
       <div className="controls">
         <div className="opacity-control" title={t('toolbar.opacityTitle')}>
