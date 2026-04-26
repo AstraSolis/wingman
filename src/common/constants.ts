@@ -63,5 +63,6 @@ export const IPC_CHANNELS = {
   REORDER_DOCK_ITEMS: 'reorder-dock-items',
   UPDATE_DOCK_ITEM: 'update-dock-item',
   WEBVIEW_CONTEXT_MENU: 'webview-context-menu',
-  WEBVIEW_EXEC_ACTION: 'webview-exec-action'
+  WEBVIEW_EXEC_ACTION: 'webview-exec-action',
+  WEBVIEW_SET_BACKGROUND_THROTTLE: 'webview-set-background-throttle'
 } as const;

@@ -3,6 +3,59 @@ import type { TFunction } from '../hooks/useI18n';
 import ContextMenu from './ContextMenu';
 import type { ContextMenuItem } from './ContextMenu';
 
+// 当标签进入后台时注入的全面冻结脚本
+const FREEZE_SCRIPT = `(function(){
+  var s=window.__wingmanFreeze=window.__wingmanFreeze||{};
+  if(s.frozen)return;
+  s.frozen=true;
+  s.paused=[];
+  document.querySelectorAll('video,audio').forEach(function(el){
+    if(!el.paused){try{el.pause();s.paused.push(el);}catch(e){}}
+  });
+  if(!s.origFetch&&window.fetch){
+    s.origFetch=window.fetch;
+    s.pendingFetch=[];
+    window.fetch=function(){var a=arguments;return new Promise(function(r,j){s.pendingFetch.push([a,r,j]);});};
+  }
+  if(!s.origXhrSend&&window.XMLHttpRequest){
+    var p=XMLHttpRequest.prototype;
+    s.origXhrSend=p.send;
+    s.pendingXhr=[];
+    p.send=function(b){var self=this;s.pendingXhr.push(function(){s.origXhrSend.call(self,b);});};
+  }
+  try{document.dispatchEvent(new Event('freeze'));}catch(e){}
+  try{
+    Object.defineProperty(document,'visibilityState',{get:function(){return 'hidden';},configurable:true});
+    Object.defineProperty(document,'hidden',{get:function(){return true;},configurable:true});
+    document.dispatchEvent(new Event('visibilitychange'));
+  }catch(e){}
+})();`;
+
+// 当标签恢复前台时注入的解冻脚本
+const UNFREEZE_SCRIPT = `(function(){
+  var s=window.__wingmanFreeze;
+  if(!s||!s.frozen)return;
+  s.frozen=false;
+  (s.paused||[]).forEach(function(el){try{el.play().catch(function(){});}catch(e){}});
+  s.paused=[];
+  if(s.origFetch){
+    var of=s.origFetch,pf=s.pendingFetch||[];
+    window.fetch=of;s.origFetch=null;s.pendingFetch=[];
+    pf.forEach(function(p){of.apply(window,p[0]).then(p[1]).catch(p[2]);});
+  }
+  if(s.origXhrSend){
+    var os=s.origXhrSend,px=s.pendingXhr||[];
+    XMLHttpRequest.prototype.send=os;s.origXhrSend=null;s.pendingXhr=[];
+    px.forEach(function(fn){try{fn();}catch(e){}});
+  }
+  try{document.dispatchEvent(new Event('resume'));}catch(e){}
+  try{
+    Object.defineProperty(document,'visibilityState',{get:function(){return 'visible';},configurable:true});
+    Object.defineProperty(document,'hidden',{get:function(){return false;},configurable:true});
+    document.dispatchEvent(new Event('visibilitychange'));
+  }catch(e){}
+})();`;
+
 interface WebviewContainerProps {
   url: string;
   visible: boolean;
@@ -39,6 +92,8 @@ export default function WebviewContainer({
   onNavigateRef.current = onNavigate;
   const onTitleChangeRef = useRef(onTitleChange);
   onTitleChangeRef.current = onTitleChange;
+  // 追踪目标冻结状态：dom-ready 前暂存，ready 后立即应用
+  const frozenIntentRef = useRef<boolean>(!visible);
 
   useEffect(() => {
     const wv = webviewRef.current;
@@ -51,6 +106,15 @@ export default function WebviewContainer({
     if (!reloadTrigger) return;
     webviewRef.current?.reload();
   }, [reloadTrigger]);
+
+  // 后台冻结：visible 切换时通知主进程节流 + 音频静音，并向页面注入全面冻结/解冻脚本
+  useEffect(() => {
+    frozenIntentRef.current = !visible;
+    const id = myWebContentsIdRef.current;
+    if (id === null) return;
+    window.wingman.webview.setBackgroundThrottle(id, !visible);
+    webviewRef.current?.executeJavaScript(visible ? UNFREEZE_SCRIPT : FREEZE_SCRIPT).catch(() => {});
+  }, [visible]);
 
   // 订阅主进程发来的 webview 右键菜单事件，按 webContentsId 过滤确保只响应本实例
   useEffect(() => {
@@ -88,6 +152,11 @@ export default function WebviewContainer({
     // dom-ready 时记录本实例的 webContentsId，供右键菜单事件过滤使用
     const onDomReady = () => {
       myWebContentsIdRef.current = wv.getWebContentsId();
+      // 后台打开的标签在 dom-ready 后立即全面冻结
+      if (frozenIntentRef.current) {
+        window.wingman.webview.setBackgroundThrottle(myWebContentsIdRef.current, true);
+        wv.executeJavaScript(FREEZE_SCRIPT).catch(() => {});
+      }
       wv.executeJavaScript(`
         if (!window.__wingmanLinkInterceptor) {
           window.__wingmanLinkInterceptor = true;

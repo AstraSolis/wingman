@@ -69,6 +69,7 @@ interface WingmanWebviewContextParams {
 interface WingmanWebviewAPI {
   onContextMenu: (callback: (params: WingmanWebviewContextParams) => void) => () => void;
   execAction: (action: 'cut' | 'copy' | 'paste', webContentsId?: number) => void;
+  setBackgroundThrottle: (webContentsId: number, throttle: boolean) => void;
 }
 
 interface WingmanWindowAPI {

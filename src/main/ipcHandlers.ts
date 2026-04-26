@@ -186,6 +186,13 @@ export function setup(): void {
     else if (action === 'paste') wc.paste();
   });
 
+  ipcMain.on(IPC_CHANNELS.WEBVIEW_SET_BACKGROUND_THROTTLE, (_event, webContentsId: number, throttle: boolean) => {
+    const wc = webContents.fromId(webContentsId);
+    if (!wc || wc.isDestroyed()) return;
+    wc.setBackgroundThrottling(throttle);
+    wc.setAudioMuted(throttle);
+  });
+
   ipcMain.handle(IPC_CHANNELS.UPDATE_DOCK_ITEM, (_event, item: DockItem) => {
     const items = configManager
       .get('dockItems')

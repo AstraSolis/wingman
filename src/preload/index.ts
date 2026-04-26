@@ -86,7 +86,9 @@ const webviewAPI = {
     return () => ipcRenderer.removeListener('webview-context-menu', listener);
   },
   execAction: (action: 'cut' | 'copy' | 'paste', webContentsId?: number) =>
-    ipcRenderer.send('webview-exec-action', action, webContentsId)
+    ipcRenderer.send('webview-exec-action', action, webContentsId),
+  setBackgroundThrottle: (webContentsId: number, throttle: boolean) =>
+    ipcRenderer.send('webview-set-background-throttle', webContentsId, throttle)
 };
 
 contextBridge.exposeInMainWorld('wingman', {
