@@ -91,6 +91,15 @@ const webviewAPI = {
     ipcRenderer.send('webview-set-background-throttle', webContentsId, throttle)
 };
 
+const logAPI = {
+  log: (
+    level: 'error' | 'warn' | 'info' | 'debug',
+    scope: string,
+    message: string,
+    ...args: unknown[]
+  ) => ipcRenderer.send('log-from-renderer', level, scope, message, ...args)
+};
+
 contextBridge.exposeInMainWorld('wingman', {
   window: windowAPI,
   settings: settingsAPI,
@@ -99,6 +108,7 @@ contextBridge.exposeInMainWorld('wingman', {
   i18n: i18nAPI,
   dock: dockAPI,
   webview: webviewAPI,
+  log: logAPI.log,
 
   // 向后兼容：保留旧的扁平接口，逐步迁移后可移除
   setOpacity: windowAPI.setOpacity,

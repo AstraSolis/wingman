@@ -119,6 +119,13 @@ interface WingmanAPI {
   i18n: WingmanI18nAPI;
   dock: WingmanDockAPI;
   webview: WingmanWebviewAPI;
+  /** 将日志转发至主进程落文件 */
+  log: (
+    level: 'error' | 'warn' | 'info' | 'debug',
+    scope: string,
+    message: string,
+    ...args: unknown[]
+  ) => void;
   // 向后兼容扁平接口
   setOpacity: (opacity: number) => void;
   toggleClickThrough: () => void;

@@ -7,6 +7,9 @@ import * as i18n from './i18n';
 import * as trayManager from './trayManager';
 import * as configManager from './configManager';
 import type { UserDataItem, DockItem } from './configManager';
+import { createLogger, handleRendererLog } from './logger';
+
+const logger = createLogger('IpcHandlers');
 
 const AUTO_START_SUPPORTED_PLATFORMS = new Set(['win32', 'darwin']);
 
@@ -201,5 +204,9 @@ export function setup(): void {
     return items;
   });
 
-  console.log(i18n.t('ipc.ready'));
+  ipcMain.on(IPC_CHANNELS.LOG_FROM_RENDERER, (_event, level, scope, message, ...args) => {
+    handleRendererLog(level, scope, message, ...args);
+  });
+
+  logger.info(i18n.t('ipc.ready'));
 }

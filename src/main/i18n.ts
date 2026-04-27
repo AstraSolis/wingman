@@ -5,6 +5,9 @@ import { createTranslator, type Translator } from '../common/i18nUtils';
 import * as configManager from './configManager';
 import zhCN from '../locales/zh-CN.json';
 import enUS from '../locales/en-US.json';
+import { createLogger } from './logger';
+
+const logger = createLogger('i18n');
 
 type TranslationRecord = Record<string, unknown>;
 
@@ -35,7 +38,7 @@ export function init(locale?: string): void {
 
 export function setLocale(locale: string): void {
   if (!(SUPPORTED_LOCALES as readonly string[]).includes(locale)) {
-    console.error(`[i18n] Unsupported locale: ${locale}`);
+    logger.error(`Unsupported locale: ${locale}`);
     return;
   }
   currentLocale = locale;

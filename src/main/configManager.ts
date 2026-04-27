@@ -10,6 +10,9 @@ import {
   STARTUP_PAGE_TYPES,
   CLOSE_STRATEGIES
 } from '../common/constants';
+import { createLogger } from './logger';
+
+const logger = createLogger('ConfigManager');
 
 export interface WindowBounds {
   x: number;
@@ -74,7 +77,7 @@ export function flush(): void {
     writeFileSync(tempPath, JSON.stringify(currentConfig, null, 2), 'utf-8');
     renameSync(tempPath, configPath);
   } catch (error) {
-    console.error('[ConfigManager] Failed to save config:', error);
+    logger.error('Failed to save config:', error);
   }
 }
 
@@ -101,7 +104,7 @@ export function init(): void {
       debounceSave();
     }
   } catch (error) {
-    console.error('[ConfigManager] Failed to read config, using defaults.', error);
+    logger.error('Failed to read config, using defaults.', error);
     currentConfig = { ...DEFAULT_CONFIG };
   }
 }
