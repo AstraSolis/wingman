@@ -92,6 +92,19 @@ interface WingmanSettingsAPI {
   setRememberWindowBounds: (remember: boolean) => Promise<boolean>;
 }
 
+interface WingmanShortcuts {
+  TOGGLE_CLICK_THROUGH: string;
+  INCREASE_OPACITY: string;
+  DECREASE_OPACITY: string;
+  TOGGLE_WINDOW: string;
+}
+
+interface WingmanShortcutsAPI {
+  getAll: () => Promise<WingmanShortcuts>;
+  set: (action: string, accelerator: string) => Promise<WingmanShortcuts>;
+  reset: (action: string) => Promise<WingmanShortcuts>;
+}
+
 interface WingmanUserDataAPI {
   get: () => Promise<WingmanUserData>;
   saveFavorite: (item: WingmanUserDataItem) => Promise<WingmanUserDataItem[]>;
@@ -114,6 +127,7 @@ interface WingmanI18nAPI {
 interface WingmanAPI {
   window: WingmanWindowAPI;
   settings: WingmanSettingsAPI;
+  shortcuts: WingmanShortcutsAPI;
   userData: WingmanUserDataAPI;
   navigation: WingmanNavigationAPI;
   i18n: WingmanI18nAPI;

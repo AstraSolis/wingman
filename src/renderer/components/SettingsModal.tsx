@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import type { ReactElement } from 'react';
 import { useSettingsPanel } from '../hooks/useSettings';
+import { useShortcuts } from '../hooks/useShortcuts';
 import type { TFunction } from '../hooks/useI18n';
 
 interface DropdownOption {
@@ -41,6 +42,12 @@ const NavIcons: Record<string, ReactElement> = {
       <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
       <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
     </svg>
+  ),
+  shortcuts: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="4" width="20" height="16" rx="2" />
+      <path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M18 12h.01M10 12h4M6 16h12" />
+    </svg>
   )
 };
 
@@ -76,6 +83,87 @@ function Dropdown({ value, options, onChange }: DropdownProps) {
   );
 }
 
+// 快捷键录制组件
+function buildAccelerator(e: KeyboardEvent): string | null {
+  const modifierKeys = ['Control', 'Meta', 'Shift', 'Alt'];
+  if (modifierKeys.includes(e.key)) return null;
+
+  const parts: string[] = [];
+  if (e.ctrlKey || e.metaKey) parts.push('CommandOrControl');
+  if (e.shiftKey) parts.push('Shift');
+  if (e.altKey) parts.push('Alt');
+
+  const keyMap: Record<string, string> = {
+    ArrowUp: 'Up', ArrowDown: 'Down', ArrowLeft: 'Left', ArrowRight: 'Right',
+    ' ': 'Space', Enter: 'Return', Escape: 'Escape', Backspace: 'Backspace',
+    Delete: 'Delete', Insert: 'Insert', Home: 'Home', End: 'End',
+    PageUp: 'PageUp', PageDown: 'PageDown', Tab: 'Tab'
+  };
+  const mappedKey = keyMap[e.key] ?? (e.key.length === 1 ? e.key.toUpperCase() : e.key);
+
+  // 非 F 键必须有修饰键
+  const isFKey = /^F\d{1,2}$/.test(mappedKey);
+  if (parts.length === 0 && !isFKey) return null;
+
+  parts.push(mappedKey);
+  return parts.join('+');
+}
+
+interface ShortcutRecorderProps {
+  value: string;
+  onSave: (accelerator: string) => void;
+  onReset: () => void;
+  t: TFunction;
+}
+
+function ShortcutRecorder({ value, onSave, onReset, t }: ShortcutRecorderProps) {
+  const [recording, setRecording] = useState(false);
+
+  const stopRecording = useCallback(() => setRecording(false), []);
+
+  useEffect(() => {
+    if (!recording) return;
+
+    const handler = (e: KeyboardEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (e.key === 'Escape') {
+        stopRecording();
+        return;
+      }
+
+      const acc = buildAccelerator(e);
+      if (acc) {
+        onSave(acc);
+        stopRecording();
+      }
+    };
+
+    window.addEventListener('keydown', handler, true);
+    return () => window.removeEventListener('keydown', handler, true);
+  }, [recording, onSave, stopRecording]);
+
+  return (
+    <div className="shortcut-recorder">
+      <span className={`shortcut-tag${recording ? ' recording' : ''}`}>
+        {recording ? t('settings.shortcutRecording') : value}
+      </span>
+      <button
+        className={`shortcut-btn${recording ? ' cancel' : ''}`}
+        onClick={() => setRecording((r) => !r)}
+      >
+        {recording ? t('settings.shortcutCancel') : t('settings.shortcutRecord')}
+      </button>
+      {!recording && (
+        <button className="shortcut-btn reset" onClick={onReset}>
+          {t('settings.shortcutReset')}
+        </button>
+      )}
+    </div>
+  );
+}
+
 interface SettingsModalProps {
   onClose: () => void;
   locale: string;
@@ -105,8 +193,11 @@ export default function SettingsModal({ onClose, locale, onLocaleChange, showOSD
     handleClearHistory
   } = useSettingsPanel(locale, onLocaleChange, showOSD, t);
 
+  const { shortcuts, handleSetShortcut, handleResetShortcut } = useShortcuts();
+
   const sections = [
     { key: 'general', label: t('settings.generalGroup') },
+    { key: 'shortcuts', label: t('settings.shortcutsGroup') },
     { key: 'data', label: t('settings.dataGroup') }
   ];
 
@@ -204,6 +295,50 @@ export default function SettingsModal({ onClose, locale, onLocaleChange, showOSD
                     </button>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {activeSection === 'shortcuts' && (
+              <div className="settings-section">
+                <p className="shortcuts-desc">{t('settings.shortcutsDesc')}</p>
+                {shortcuts && [
+                  {
+                    groupKey: 'window',
+                    label: t('settings.shortcutGroupWindow'),
+                    items: [
+                      { action: 'TOGGLE_WINDOW', label: t('settings.shortcutToggleWindow') },
+                      { action: 'TOGGLE_CLICK_THROUGH', label: t('settings.shortcutToggleThrough') }
+                    ]
+                  },
+                  {
+                    groupKey: 'opacity',
+                    label: t('settings.shortcutGroupOpacity'),
+                    items: [
+                      { action: 'INCREASE_OPACITY', label: t('settings.shortcutIncreaseOpacity') },
+                      { action: 'DECREASE_OPACITY', label: t('settings.shortcutDecreaseOpacity') }
+                    ]
+                  }
+                ].map(({ groupKey, label, items }) => (
+                  <div key={groupKey} className="shortcuts-group-block">
+                    <div className="shortcuts-group-title">{label}</div>
+                    <div className="settings-group">
+                      {items.map(({ action, label: itemLabel }, idx) => (
+                        <div
+                          key={action}
+                          className={`setting-item-light${idx === items.length - 1 ? ' border-none' : ''}`}
+                        >
+                          <span className="setting-item-label">{itemLabel}</span>
+                          <ShortcutRecorder
+                            value={shortcuts[action as keyof typeof shortcuts]}
+                            onSave={(acc) => handleSetShortcut(action, acc)}
+                            onReset={() => handleResetShortcut(action)}
+                            t={t}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>

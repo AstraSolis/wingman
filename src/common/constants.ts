@@ -65,5 +65,8 @@ export const IPC_CHANNELS = {
   WEBVIEW_CONTEXT_MENU: 'webview-context-menu',
   WEBVIEW_EXEC_ACTION: 'webview-exec-action',
   WEBVIEW_SET_BACKGROUND_THROTTLE: 'webview-set-background-throttle',
-  LOG_FROM_RENDERER: 'log-from-renderer'
+  LOG_FROM_RENDERER: 'log-from-renderer',
+  GET_SHORTCUTS: 'get-shortcuts',
+  SET_SHORTCUT: 'set-shortcut',
+  RESET_SHORTCUT: 'reset-shortcut'
 } as const;

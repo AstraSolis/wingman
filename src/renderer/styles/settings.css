@@ -105,3 +105,38 @@
 }
 .custom-url-input:focus { background: #fff; border-color: #6c8cff; box-shadow: 0 0 0 3px rgba(108,140,255,0.1); }
 .custom-url-input::placeholder { color: #999; }
+
+/* 快捷键 */
+.shortcuts-desc { font-size: 12px; color: #888; margin: 0 0 4px; line-height: 1.5; }
+.shortcuts-group-block { display: flex; flex-direction: column; gap: 6px; }
+.shortcuts-group-title { font-size: 11px; font-weight: 600; color: #aaa; text-transform: uppercase; letter-spacing: 0.06em; padding: 0 2px; }
+.shortcut-recorder {
+  -webkit-app-region: no-drag;
+  display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+}
+.shortcut-tag {
+  display: inline-flex; align-items: center;
+  background: #f0f0f0; border: 1px solid #e0e0e0; border-radius: 5px;
+  padding: 4px 10px; font-size: 12px; font-family: monospace; color: #333;
+  min-width: 160px; justify-content: center; white-space: nowrap;
+  transition: all 0.2s;
+}
+.shortcut-tag.recording {
+  background: rgba(108,140,255,0.08); border-color: #6c8cff;
+  color: #6c8cff; animation: pulse 1s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+.shortcut-btn {
+  -webkit-app-region: no-drag;
+  padding: 4px 10px; border-radius: 5px; border: 1px solid #e0e0e0;
+  background: #f5f5f5; color: #333; font-size: 12px; cursor: pointer;
+  transition: all 0.2s; white-space: nowrap;
+}
+.shortcut-btn:hover { background: #e8e8e8; }
+.shortcut-btn.cancel { border-color: rgba(255,107,107,0.4); color: #e53e3e; background: rgba(255,107,107,0.06); }
+.shortcut-btn.cancel:hover { background: rgba(255,107,107,0.12); }
+.shortcut-btn.reset { color: #888; }
+.shortcut-btn.reset:hover { color: #333; }

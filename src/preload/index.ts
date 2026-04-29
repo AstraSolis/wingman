@@ -46,6 +46,12 @@ const settingsAPI = {
     ipcRenderer.invoke('set-remember-window-bounds', remember)
 };
 
+const shortcutsAPI = {
+  getAll: () => ipcRenderer.invoke('get-shortcuts'),
+  set: (action: string, accelerator: string) => ipcRenderer.invoke('set-shortcut', action, accelerator),
+  reset: (action: string) => ipcRenderer.invoke('reset-shortcut', action)
+};
+
 const userDataAPI = {
   get: () => ipcRenderer.invoke('get-user-data'),
   saveFavorite: (item: UserDataItem) => ipcRenderer.invoke('save-favorite', item),
@@ -103,6 +109,7 @@ const logAPI = {
 contextBridge.exposeInMainWorld('wingman', {
   window: windowAPI,
   settings: settingsAPI,
+  shortcuts: shortcutsAPI,
   userData: userDataAPI,
   navigation: navigationAPI,
   i18n: i18nAPI,

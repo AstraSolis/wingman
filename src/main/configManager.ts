@@ -46,6 +46,7 @@ export interface AppConfig {
   closeStrategy: string;
   rememberWindowBounds: boolean;
   windowBounds: WindowBounds | null;
+  customShortcuts: Record<string, string>;
 }
 
 const DEFAULT_CONFIG: AppConfig = {
@@ -60,7 +61,8 @@ const DEFAULT_CONFIG: AppConfig = {
   customStartupUrl: '',
   closeStrategy: CLOSE_STRATEGIES.MINIMIZE,
   rememberWindowBounds: true,
-  windowBounds: null
+  windowBounds: null,
+  customShortcuts: {}
 };
 
 let configPath = '';

@@ -6,6 +6,7 @@ import * as windowManager from './windowManager';
 import * as i18n from './i18n';
 import * as trayManager from './trayManager';
 import * as configManager from './configManager';
+import * as shortcutManager from './shortcutManager';
 import type { UserDataItem, DockItem } from './configManager';
 import { createLogger, handleRendererLog } from './logger';
 
@@ -206,6 +207,26 @@ export function setup(): void {
 
   ipcMain.on(IPC_CHANNELS.LOG_FROM_RENDERER, (_event, level, scope, message, ...args) => {
     handleRendererLog(level, scope, message, ...args);
+  });
+
+  ipcMain.handle(IPC_CHANNELS.GET_SHORTCUTS, () => {
+    return shortcutManager.getEffectiveShortcuts();
+  });
+
+  ipcMain.handle(IPC_CHANNELS.SET_SHORTCUT, (_event, action: string, accelerator: string) => {
+    const custom = { ...configManager.get('customShortcuts') };
+    custom[action] = accelerator;
+    configManager.set('customShortcuts', custom);
+    shortcutManager.reload();
+    return shortcutManager.getEffectiveShortcuts();
+  });
+
+  ipcMain.handle(IPC_CHANNELS.RESET_SHORTCUT, (_event, action: string) => {
+    const custom = { ...configManager.get('customShortcuts') };
+    delete custom[action];
+    configManager.set('customShortcuts', custom);
+    shortcutManager.reload();
+    return shortcutManager.getEffectiveShortcuts();
   });
 
   logger.info(i18n.t('ipc.ready'));

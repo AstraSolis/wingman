@@ -83,7 +83,20 @@
     "clearHistoryDesc": "Delete all browsing history",
     "clearBtn": "Clear",
     "historyCleared": "History cleared",
-    "searchPlaceholder": "Search settings..."
+    "searchPlaceholder": "Search settings...",
+    "shortcutsGroup": "Shortcuts",
+    "shortcutsDesc": "Customize global shortcuts. Click \"Record\" then press the key combo.",
+    "shortcutGroupWindow": "Window",
+    "shortcutGroupOpacity": "Opacity",
+    "shortcutToggleThrough": "Toggle click-through",
+    "shortcutIncreaseOpacity": "Increase opacity",
+    "shortcutDecreaseOpacity": "Decrease opacity",
+    "shortcutToggleWindow": "Show/Hide window",
+    "shortcutRecord": "Record",
+    "shortcutRecording": "Press shortcut...",
+    "shortcutCancel": "Cancel",
+    "shortcutReset": "Reset",
+    "shortcutConflict": "This shortcut may already be in use"
   },
   "contextMenu": {
     "reload": "Reload",
