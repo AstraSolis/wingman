@@ -20,6 +20,21 @@ export const SHORTCUTS = {
   TOGGLE_WINDOW: 'CommandOrControl+Shift+H'
 } as const;
 
+export const LOCAL_SHORTCUTS = {
+  RELOAD_PAGE: 'CommandOrControl+R',
+  GO_HOME: 'Alt+Home',
+  FOCUS_ADDRESS_BAR: 'CommandOrControl+L',
+  COPY_URL: 'CommandOrControl+Shift+C',
+  TOGGLE_FAVORITE: 'CommandOrControl+D',
+  NEW_TAB: 'CommandOrControl+T',
+  CLOSE_TAB: 'CommandOrControl+W',
+  NEXT_TAB: 'CommandOrControl+Tab',
+  PREV_TAB: 'CommandOrControl+Shift+Tab',
+  OPEN_FAVORITES: 'CommandOrControl+Shift+B',
+  OPEN_HISTORY: 'CommandOrControl+H',
+  OPEN_SETTINGS: 'CommandOrControl+,'
+} as const;
+
 export const STARTUP_PAGE_TYPES = {
   HOME: 'home',
   LAST_PAGE: 'lastPage',
@@ -68,5 +83,9 @@ export const IPC_CHANNELS = {
   LOG_FROM_RENDERER: 'log-from-renderer',
   GET_SHORTCUTS: 'get-shortcuts',
   SET_SHORTCUT: 'set-shortcut',
-  RESET_SHORTCUT: 'reset-shortcut'
+  RESET_SHORTCUT: 'reset-shortcut',
+  GET_LOCAL_SHORTCUTS: 'get-local-shortcuts',
+  SET_LOCAL_SHORTCUT: 'set-local-shortcut',
+  RESET_LOCAL_SHORTCUT: 'reset-local-shortcut',
+  LOCAL_SHORTCUT_FIRED: 'local-shortcut-fired'
 } as const;

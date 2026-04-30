@@ -8,6 +8,9 @@ import { useStartupPage } from './hooks/useStartupPage';
 import { useUserData, useNavigationEvents } from './hooks/useUserData';
 import { BootStateProvider } from './hooks/useBootState';
 import { useDocumentTitle } from './hooks/useDocumentTitle';
+import { useLocalShortcutsConfig } from './hooks/useShortcuts';
+import { useWindowLocalShortcuts } from './hooks/useWindowLocalShortcuts';
+import { useState, useCallback } from 'react';
 import Toolbar from './components/Toolbar';
 import HomeView from './components/HomeView';
 import WebviewPoolContainer from './components/WebviewPoolContainer';
@@ -45,6 +48,44 @@ function AppContent() {
 
   const { openFavorites, openHistory, handleAddFav } = useUserData(showOSD, navigate, t);
 
+  const { localShortcuts } = useLocalShortcutsConfig();
+
+  const [focusAddressBarTrigger, setFocusAddressBarTrigger] = useState(0);
+
+  const handleCopyUrl = useCallback(() => {
+    if (!currentUrl) return;
+    navigator.clipboard.writeText(currentUrl).then(() => showOSD(t('contextMenu.copied')));
+  }, [currentUrl, showOSD, t]);
+
+  const handleFocusAddressBar = useCallback(() => setFocusAddressBarTrigger(n => n + 1), []);
+
+  const handleOpenFavoritesShortcut = useCallback(() => {
+    openListModal(openFavorites);
+  }, [openListModal, openFavorites]);
+
+  const handleOpenHistoryShortcut = useCallback(() => {
+    openListModal(openHistory);
+  }, [openListModal, openHistory]);
+
+  useWindowLocalShortcuts({
+    localShortcuts,
+    tabs,
+    activeTabId,
+    onReload: reloadActiveTab,
+    onGoHome: goHome,
+    onNewTab: goHome,
+    onCloseTab: closeTab,
+    onSwitchTab: switchTab,
+    onToggleFav: handleAddFav,
+    onFocusAddressBar: handleFocusAddressBar,
+    onCopyUrl: handleCopyUrl,
+    onOpenFavorites: handleOpenFavoritesShortcut,
+    onOpenHistory: handleOpenHistoryShortcut,
+    onOpenSettings: openSettings,
+    currentUrl,
+    currentTitle,
+  });
+
   useStartupPage(navigate, () => openListModal(openFavorites));
   useNavigationEvents(navigate);
   useDocumentTitle(currentTitle, t, ready);
@@ -71,6 +112,7 @@ function AppContent() {
         onSwitchTab={switchTab}
         onCloseTab={closeTab}
         onNewTab={goHome}
+        focusAddressBarTrigger={focusAddressBarTrigger}
         t={t}
       />
 

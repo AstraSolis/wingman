@@ -105,6 +105,28 @@ interface WingmanShortcutsAPI {
   reset: (action: string) => Promise<WingmanShortcuts>;
 }
 
+interface WingmanLocalShortcuts {
+  RELOAD_PAGE: string;
+  GO_HOME: string;
+  FOCUS_ADDRESS_BAR: string;
+  COPY_URL: string;
+  TOGGLE_FAVORITE: string;
+  NEW_TAB: string;
+  CLOSE_TAB: string;
+  NEXT_TAB: string;
+  PREV_TAB: string;
+  OPEN_FAVORITES: string;
+  OPEN_HISTORY: string;
+  OPEN_SETTINGS: string;
+}
+
+interface WingmanLocalShortcutsAPI {
+  getAll: () => Promise<WingmanLocalShortcuts>;
+  set: (action: string, accelerator: string) => Promise<WingmanLocalShortcuts>;
+  reset: (action: string) => Promise<WingmanLocalShortcuts>;
+  onShortcutFired: (callback: (action: string) => void) => () => void;
+}
+
 interface WingmanUserDataAPI {
   get: () => Promise<WingmanUserData>;
   saveFavorite: (item: WingmanUserDataItem) => Promise<WingmanUserDataItem[]>;
@@ -128,6 +150,7 @@ interface WingmanAPI {
   window: WingmanWindowAPI;
   settings: WingmanSettingsAPI;
   shortcuts: WingmanShortcutsAPI;
+  localShortcuts: WingmanLocalShortcutsAPI;
   userData: WingmanUserDataAPI;
   navigation: WingmanNavigationAPI;
   i18n: WingmanI18nAPI;

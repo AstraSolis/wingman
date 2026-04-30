@@ -52,6 +52,17 @@ const shortcutsAPI = {
   reset: (action: string) => ipcRenderer.invoke('reset-shortcut', action)
 };
 
+const localShortcutsAPI = {
+  getAll: () => ipcRenderer.invoke('get-local-shortcuts'),
+  set: (action: string, accelerator: string) => ipcRenderer.invoke('set-local-shortcut', action, accelerator),
+  reset: (action: string) => ipcRenderer.invoke('reset-local-shortcut', action),
+  onShortcutFired: (callback: (action: string) => void): (() => void) => {
+    const listener = (_event: Electron.IpcRendererEvent, action: unknown) => callback(action as string);
+    ipcRenderer.on('local-shortcut-fired', listener);
+    return () => ipcRenderer.removeListener('local-shortcut-fired', listener);
+  }
+};
+
 const userDataAPI = {
   get: () => ipcRenderer.invoke('get-user-data'),
   saveFavorite: (item: UserDataItem) => ipcRenderer.invoke('save-favorite', item),
@@ -110,6 +121,7 @@ contextBridge.exposeInMainWorld('wingman', {
   window: windowAPI,
   settings: settingsAPI,
   shortcuts: shortcutsAPI,
+  localShortcuts: localShortcutsAPI,
   userData: userDataAPI,
   navigation: navigationAPI,
   i18n: i18nAPI,

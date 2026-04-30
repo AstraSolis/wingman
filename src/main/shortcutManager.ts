@@ -1,7 +1,7 @@
 // 全局快捷键管理模块
 
 import { globalShortcut, app } from 'electron';
-import { SHORTCUTS } from '../common/constants';
+import { SHORTCUTS, LOCAL_SHORTCUTS, IPC_CHANNELS } from '../common/constants';
 import * as windowManager from './windowManager';
 import * as configManager from './configManager';
 import * as i18n from './i18n';
@@ -10,6 +10,11 @@ import { createLogger } from './logger';
 const logger = createLogger('ShortcutManager');
 
 type ShortcutAction = keyof typeof SHORTCUTS;
+
+// 标签页相关操作通过 globalShortcut + IPC relay 到渲染进程，以便 webview 内也可触发
+const TAB_GLOBAL_ACTIONS: ReadonlyArray<keyof typeof LOCAL_SHORTCUTS> = [
+  'NEW_TAB', 'CLOSE_TAB', 'NEXT_TAB', 'PREV_TAB'
+];
 
 const ACTION_HANDLERS: Record<ShortcutAction, () => void> = {
   TOGGLE_CLICK_THROUGH: () => windowManager.toggleIgnoreMouse(),
@@ -23,6 +28,11 @@ function getEffectiveShortcut(action: ShortcutAction): string {
   return custom[action] || SHORTCUTS[action];
 }
 
+function getEffectiveLocalShortcut(action: string): string {
+  const custom = configManager.get('customLocalShortcuts');
+  return custom[action] || (LOCAL_SHORTCUTS as Record<string, string>)[action];
+}
+
 function registerAll(): void {
   const actions = Object.keys(ACTION_HANDLERS) as ShortcutAction[];
   for (const action of actions) {
@@ -32,6 +42,20 @@ function registerAll(): void {
       logger.error(i18n.t('shortcut.registerFailed', { key }));
     }
   }
+
+  for (const action of TAB_GLOBAL_ACTIONS) {
+    const key = getEffectiveLocalShortcut(action);
+    const ok = globalShortcut.register(key, () => {
+      const win = windowManager.getWindow();
+      if (win && !win.isDestroyed()) {
+        win.webContents.send(IPC_CHANNELS.LOCAL_SHORTCUT_FIRED, action);
+      }
+    });
+    if (!ok) {
+      logger.error(i18n.t('shortcut.registerFailed', { key }));
+    }
+  }
+
   logger.info(i18n.t('shortcut.allRegistered'));
 }
 

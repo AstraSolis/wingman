@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import type { ReactElement } from 'react';
 import { useSettingsPanel } from '../hooks/useSettings';
-import { useShortcuts } from '../hooks/useShortcuts';
+import { useShortcuts, useLocalShortcutsConfig } from '../hooks/useShortcuts';
+import { buildAccelerator } from '../utils/shortcut';
 import type { TFunction } from '../hooks/useI18n';
 
 interface DropdownOption {
@@ -81,32 +82,6 @@ function Dropdown({ value, options, onChange }: DropdownProps) {
       )}
     </div>
   );
-}
-
-// 快捷键录制组件
-function buildAccelerator(e: KeyboardEvent): string | null {
-  const modifierKeys = ['Control', 'Meta', 'Shift', 'Alt'];
-  if (modifierKeys.includes(e.key)) return null;
-
-  const parts: string[] = [];
-  if (e.ctrlKey || e.metaKey) parts.push('CommandOrControl');
-  if (e.shiftKey) parts.push('Shift');
-  if (e.altKey) parts.push('Alt');
-
-  const keyMap: Record<string, string> = {
-    ArrowUp: 'Up', ArrowDown: 'Down', ArrowLeft: 'Left', ArrowRight: 'Right',
-    ' ': 'Space', Enter: 'Return', Escape: 'Escape', Backspace: 'Backspace',
-    Delete: 'Delete', Insert: 'Insert', Home: 'Home', End: 'End',
-    PageUp: 'PageUp', PageDown: 'PageDown', Tab: 'Tab'
-  };
-  const mappedKey = keyMap[e.key] ?? (e.key.length === 1 ? e.key.toUpperCase() : e.key);
-
-  // 非 F 键必须有修饰键
-  const isFKey = /^F\d{1,2}$/.test(mappedKey);
-  if (parts.length === 0 && !isFKey) return null;
-
-  parts.push(mappedKey);
-  return parts.join('+');
 }
 
 interface ShortcutRecorderProps {
@@ -194,6 +169,7 @@ export default function SettingsModal({ onClose, locale, onLocaleChange, showOSD
   } = useSettingsPanel(locale, onLocaleChange, showOSD, t);
 
   const { shortcuts, handleSetShortcut, handleResetShortcut } = useShortcuts();
+  const { localShortcuts, handleSetLocalShortcut, handleResetLocalShortcut } = useLocalShortcutsConfig();
 
   const sections = [
     { key: 'general', label: t('settings.generalGroup') },
@@ -300,7 +276,12 @@ export default function SettingsModal({ onClose, locale, onLocaleChange, showOSD
 
             {activeSection === 'shortcuts' && (
               <div className="settings-section">
-                <p className="shortcuts-desc">{t('settings.shortcutsDesc')}</p>
+                <div className="shortcuts-section-header">
+                  <span className="shortcuts-section-header-badge global">{t('settings.shortcutsBadgeGlobal')}</span>
+                  <span className="shortcuts-section-header-label">{t('settings.shortcutsGlobalTitle')}</span>
+                  <span className="shortcuts-section-header-line" />
+                </div>
+                <p className="shortcuts-desc">{t('settings.shortcutsGlobalDesc')}</p>
                 {shortcuts && [
                   {
                     groupKey: 'window',
@@ -332,6 +313,65 @@ export default function SettingsModal({ onClose, locale, onLocaleChange, showOSD
                             value={shortcuts[action as keyof typeof shortcuts]}
                             onSave={(acc) => handleSetShortcut(action, acc)}
                             onReset={() => handleResetShortcut(action)}
+                            t={t}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+
+                <div className="shortcuts-section-header shortcuts-section-header-second">
+                  <span className="shortcuts-section-header-badge local">{t('settings.shortcutsBadgeLocal')}</span>
+                  <span className="shortcuts-section-header-label">{t('settings.shortcutsLocalTitle')}</span>
+                  <span className="shortcuts-section-header-line" />
+                </div>
+                <p className="shortcuts-desc shortcuts-local-desc">{t('settings.shortcutsLocalDesc')}</p>
+                {localShortcuts && [
+                  {
+                    groupKey: 'navigation',
+                    label: t('settings.shortcutGroupNavigation'),
+                    items: [
+                      { action: 'RELOAD_PAGE', label: t('settings.shortcutReloadPage') },
+                      { action: 'GO_HOME', label: t('settings.shortcutGoHome') },
+                      { action: 'FOCUS_ADDRESS_BAR', label: t('settings.shortcutFocusAddressBar') },
+                      { action: 'COPY_URL', label: t('settings.shortcutCopyUrl') },
+                      { action: 'TOGGLE_FAVORITE', label: t('settings.shortcutToggleFavorite') }
+                    ]
+                  },
+                  {
+                    groupKey: 'tabs',
+                    label: t('settings.shortcutGroupTabs'),
+                    items: [
+                      { action: 'NEW_TAB', label: t('settings.shortcutNewTab') },
+                      { action: 'CLOSE_TAB', label: t('settings.shortcutCloseTab') },
+                      { action: 'NEXT_TAB', label: t('settings.shortcutNextTab') },
+                      { action: 'PREV_TAB', label: t('settings.shortcutPrevTab') }
+                    ]
+                  },
+                  {
+                    groupKey: 'panels',
+                    label: t('settings.shortcutGroupPanels'),
+                    items: [
+                      { action: 'OPEN_FAVORITES', label: t('settings.shortcutOpenFavorites') },
+                      { action: 'OPEN_HISTORY', label: t('settings.shortcutOpenHistory') },
+                      { action: 'OPEN_SETTINGS', label: t('settings.shortcutOpenSettings') }
+                    ]
+                  }
+                ].map(({ groupKey, label, items }) => (
+                  <div key={groupKey} className="shortcuts-group-block">
+                    <div className="shortcuts-group-title">{label}</div>
+                    <div className="settings-group">
+                      {items.map(({ action, label: itemLabel }, idx) => (
+                        <div
+                          key={action}
+                          className={`setting-item-light${idx === items.length - 1 ? ' border-none' : ''}`}
+                        >
+                          <span className="setting-item-label">{itemLabel}</span>
+                          <ShortcutRecorder
+                            value={localShortcuts[action as keyof typeof localShortcuts]}
+                            onSave={(acc) => handleSetLocalShortcut(action, acc)}
+                            onReset={() => handleResetLocalShortcut(action)}
                             t={t}
                           />
                         </div>

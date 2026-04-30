@@ -1,7 +1,7 @@
 // IPC 消息处理模块
 
 import { app, ipcMain, webContents } from 'electron';
-import { IPC_CHANNELS } from '../common/constants';
+import { IPC_CHANNELS, LOCAL_SHORTCUTS } from '../common/constants';
 import * as windowManager from './windowManager';
 import * as i18n from './i18n';
 import * as trayManager from './trayManager';
@@ -227,6 +227,40 @@ export function setup(): void {
     configManager.set('customShortcuts', custom);
     shortcutManager.reload();
     return shortcutManager.getEffectiveShortcuts();
+  });
+
+  ipcMain.handle(IPC_CHANNELS.GET_LOCAL_SHORTCUTS, () => {
+    const custom = configManager.get('customLocalShortcuts');
+    return Object.fromEntries(
+      (Object.keys(LOCAL_SHORTCUTS) as (keyof typeof LOCAL_SHORTCUTS)[]).map((action) => [
+        action,
+        custom[action] || LOCAL_SHORTCUTS[action]
+      ])
+    );
+  });
+
+  ipcMain.handle(IPC_CHANNELS.SET_LOCAL_SHORTCUT, (_event, action: string, accelerator: string) => {
+    const custom = { ...configManager.get('customLocalShortcuts') };
+    custom[action] = accelerator;
+    configManager.set('customLocalShortcuts', custom);
+    return Object.fromEntries(
+      (Object.keys(LOCAL_SHORTCUTS) as (keyof typeof LOCAL_SHORTCUTS)[]).map((a) => [
+        a,
+        custom[a] || LOCAL_SHORTCUTS[a]
+      ])
+    );
+  });
+
+  ipcMain.handle(IPC_CHANNELS.RESET_LOCAL_SHORTCUT, (_event, action: string) => {
+    const custom = { ...configManager.get('customLocalShortcuts') };
+    delete custom[action];
+    configManager.set('customLocalShortcuts', custom);
+    return Object.fromEntries(
+      (Object.keys(LOCAL_SHORTCUTS) as (keyof typeof LOCAL_SHORTCUTS)[]).map((a) => [
+        a,
+        custom[a] || LOCAL_SHORTCUTS[a]
+      ])
+    );
   });
 
   logger.info(i18n.t('ipc.ready'));

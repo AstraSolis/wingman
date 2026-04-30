@@ -21,6 +21,7 @@ interface ToolbarProps {
   onSwitchTab: (id: string) => void;
   onCloseTab: (id: string) => void;
   onNewTab: () => void;
+  focusAddressBarTrigger: number;
   t: TFunction;
 }
 
@@ -159,15 +160,24 @@ export default function Toolbar({
   onSwitchTab,
   onCloseTab,
   onNewTab,
+  focusAddressBarTrigger,
   t
 }: ToolbarProps) {
   const [inputVal, setInputVal] = useState<string | null>(null);
   const [tabsOpen, setTabsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setInputVal(null);
   }, [currentWebviewUrl]);
+
+  useEffect(() => {
+    if (focusAddressBarTrigger > 0) {
+      inputRef.current?.select();
+      inputRef.current?.focus();
+    }
+  }, [focusAddressBarTrigger]);
 
   useEffect(() => {
     if (!tabsOpen) return;
@@ -196,6 +206,7 @@ export default function Toolbar({
           {SVG.home}
         </button>
         <input
+          ref={inputRef}
           type="text"
           value={displayUrl}
           onChange={(e) => setInputVal(e.target.value)}

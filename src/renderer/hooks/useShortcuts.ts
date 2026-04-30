@@ -28,3 +28,27 @@ export function useShortcuts() {
 
   return { shortcuts, handleSetShortcut, handleResetShortcut };
 }
+
+export type LocalShortcutsState = WingmanLocalShortcuts;
+
+export function useLocalShortcutsConfig() {
+  const [localShortcuts, setLocalShortcuts] = useState<LocalShortcutsState | null>(null);
+
+  useEffect(() => {
+    window.wingman.localShortcuts.getAll().then(setLocalShortcuts).catch(() => {});
+  }, []);
+
+  const handleSetLocalShortcut = useCallback(async (action: string, accelerator: string) => {
+    const updated = await window.wingman.localShortcuts.set(action, accelerator);
+    setLocalShortcuts(updated);
+    return updated;
+  }, []);
+
+  const handleResetLocalShortcut = useCallback(async (action: string) => {
+    const updated = await window.wingman.localShortcuts.reset(action);
+    setLocalShortcuts(updated);
+    return updated;
+  }, []);
+
+  return { localShortcuts, handleSetLocalShortcut, handleResetLocalShortcut };
+}

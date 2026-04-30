@@ -108,6 +108,28 @@
 
 /* 快捷键 */
 .shortcuts-desc { font-size: 12px; color: #888; margin: 0 0 4px; line-height: 1.5; }
+.shortcuts-local-desc { margin-top: 4px; }
+.shortcuts-section-header {
+  display: flex; align-items: center; gap: 10px;
+  margin: 8px 0 4px;
+}
+.shortcuts-section-header-second { margin-top: 20px; }
+.shortcuts-section-header-label {
+  font-size: 13px; font-weight: 600; color: #333; white-space: nowrap;
+}
+.shortcuts-section-header-line {
+  flex: 1; height: 1px; background: #e0e0e0;
+}
+.shortcuts-section-header-badge {
+  font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 10px;
+  letter-spacing: 0.03em; white-space: nowrap;
+}
+.shortcuts-section-header-badge.global {
+  background: rgba(108,140,255,0.12); color: #5b7adf;
+}
+.shortcuts-section-header-badge.local {
+  background: rgba(72,187,120,0.12); color: #2f855a;
+}
 .shortcuts-group-block { display: flex; flex-direction: column; gap: 6px; }
 .shortcuts-group-title { font-size: 11px; font-weight: 600; color: #aaa; text-transform: uppercase; letter-spacing: 0.06em; padding: 0 2px; }
 .shortcut-recorder {
