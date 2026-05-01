@@ -125,8 +125,8 @@ function AppContent() {
       {view === 'home' && (
         <HomeView
           onNavigate={navigate}
-          onFavorites={() => openListModal(openFavorites)}
-          onHistory={() => openListModal(openHistory)}
+          onFavorites={handleOpenFavoritesShortcut}
+          onHistory={handleOpenHistoryShortcut}
           onSettings={openSettings}
           showOSD={showOSD}
           t={t}

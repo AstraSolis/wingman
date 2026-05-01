@@ -2,7 +2,7 @@
 // 监听 renderer 层 keydown 事件，与配置的本地快捷键匹配后触发对应动作
 // 标签页相关动作同时通过 IPC relay（globalShortcut 注册）触发，以便 webview 内也可使用
 
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 import type { Tab } from './useTabsPool';
 import { buildAccelerator } from '../utils/shortcut';
 import { TAB_RELAY_ACTIONS } from '../../common/constants';
@@ -50,8 +50,22 @@ export function useWindowLocalShortcuts({
   currentUrl,
   currentTitle,
 }: LocalShortcutHandlers) {
+  // 用 ref 持有高频更新的值，避免 fireAction 因这些值变化而频繁重建
+  const tabsRef = useRef(tabs);
+  tabsRef.current = tabs;
+  const activeTabIdRef = useRef(activeTabId);
+  activeTabIdRef.current = activeTabId;
+  const currentUrlRef = useRef(currentUrl);
+  currentUrlRef.current = currentUrl;
+  const currentTitleRef = useRef(currentTitle);
+  currentTitleRef.current = currentTitle;
+
   // 根据 action 字符串触发对应操作（供 keydown 和 IPC relay 共用）
   const fireAction = useCallback((action: string) => {
+    const tabs = tabsRef.current;
+    const activeTabId = activeTabIdRef.current;
+    const currentUrl = currentUrlRef.current;
+    const currentTitle = currentTitleRef.current;
     switch (action) {
       case 'RELOAD_PAGE':
         onReload();
@@ -129,7 +143,8 @@ export function useWindowLocalShortcuts({
         break;
     }
   }, [
-    tabs, activeTabId, currentUrl, currentTitle,
+    // tabs/activeTabId/currentUrl/currentTitle 通过 ref 读取，不放入依赖数组，
+    // 避免每次导航/切换标签都重建 fireAction 并重新订阅 IPC relay
     onReload, onGoHome, onNewTab, onCloseTab, onSwitchTab,
     onToggleFav, onFocusAddressBar, onCopyUrl,
     onOpenFavorites, onOpenHistory, onOpenSettings, onMediaAction,

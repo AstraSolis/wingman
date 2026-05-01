@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useMemo, memo } from 'react';
 import type { TFunction } from '../hooks/useI18n';
 import ContextMenu from './ContextMenu';
 import type { ContextMenuItem } from './ContextMenu';
@@ -128,7 +128,7 @@ interface WebviewContainerProps {
   t: TFunction;
 }
 
-export default function WebviewContainer({
+function WebviewContainer({
   url,
   visible,
   reloadTrigger,
@@ -349,6 +349,10 @@ export default function WebviewContainer({
     return items;
   };
 
+  // 只在右键菜单参数变化时重新构建菜单项，避免每次渲染都重新生成
+  // webviewRef 是稳定 ref，无需加入依赖数组
+  const menuItems = useMemo(buildMenuItems, [ctxParams, t, onAddFav, onOpenInBackground, showOSD]);
+
   return (
     <div className="webview-container" style={{ display: visible ? undefined : 'none' }}>
       <webview ref={webviewRef} style={{ width: '100%', height: '100%' }} allowpopups={true} />
@@ -391,10 +395,12 @@ export default function WebviewContainer({
         <ContextMenu
           x={ctxParams.x}
           y={ctxParams.adjustedY}
-          items={buildMenuItems()}
+          items={menuItems}
           onClose={() => setCtxParams(null)}
         />
       )}
     </div>
   );
 }
+
+export default memo(WebviewContainer);
