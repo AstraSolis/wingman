@@ -29,6 +29,7 @@
     "closeTitle": "Close window",
     "tabsTitle": "Manage Tabs",
     "newTab": "New Tab",
+    "homeTab": "Home",
     "noTabs": "No open tabs"
   },
   "home": {

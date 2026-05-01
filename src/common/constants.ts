@@ -35,6 +35,12 @@ export const LOCAL_SHORTCUTS = {
   OPEN_SETTINGS: 'CommandOrControl+,'
 } as const;
 
+// 通过 globalShortcut + IPC relay 触发的标签页动作，在 webview 内也能响应
+// keydown handler 中须跳过这些动作，避免窗口有焦点时双重触发
+export const TAB_RELAY_ACTIONS: ReadonlySet<keyof typeof LOCAL_SHORTCUTS> = new Set([
+  'NEW_TAB', 'CLOSE_TAB', 'NEXT_TAB', 'PREV_TAB'
+]);
+
 export const STARTUP_PAGE_TYPES = {
   HOME: 'home',
   LAST_PAGE: 'lastPage',

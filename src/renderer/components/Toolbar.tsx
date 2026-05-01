@@ -230,35 +230,36 @@ export default function Toolbar({
             onClick={() => setTabsOpen(v => !v)}
           >
             {SVG.tabs}
-            {tabs.length > 0 && (
-              <span className="tab-count-badge">{tabs.length}</span>
-            )}
+            <span className="tab-count-badge">{tabs.length + 1}</span>
           </button>
           {tabsOpen && (
             <div className="tabs-dropdown-panel">
               <div className="tabs-list">
-                {tabs.length === 0 ? (
-                  <div className="tabs-empty">{t('toolbar.noTabs')}</div>
-                ) : (
-                  tabs.map(tab => (
-                    <div
-                      key={tab.id}
-                      className={`tab-item${tab.id === activeTabId ? ' active' : ''}`}
-                      onClick={() => { onSwitchTab(tab.id); setTabsOpen(false); }}
+                {/* 主页始终作为第一个标签 */}
+                <div
+                  className={`tab-item${activeTabId === null ? ' active' : ''}`}
+                  onClick={() => { onHome(); setTabsOpen(false); }}
+                >
+                  <span className="tab-title">{t('toolbar.homeTab')}</span>
+                </div>
+                {tabs.map(tab => (
+                  <div
+                    key={tab.id}
+                    className={`tab-item${tab.id === activeTabId ? ' active' : ''}`}
+                    onClick={() => { onSwitchTab(tab.id); setTabsOpen(false); }}
+                  >
+                    <span className="tab-title">
+                      {tab.title && tab.title !== tab.url ? tab.title : (tab.currentUrl || tab.url || t('toolbar.newTab'))}
+                    </span>
+                    <button
+                      className="tab-close-btn"
+                      title="关闭"
+                      onClick={e => { e.stopPropagation(); onCloseTab(tab.id); }}
                     >
-                      <span className="tab-title">
-                        {tab.title && tab.title !== tab.url ? tab.title : (tab.currentUrl || tab.url || t('toolbar.newTab'))}
-                      </span>
-                      <button
-                        className="tab-close-btn"
-                        title="关闭"
-                        onClick={e => { e.stopPropagation(); onCloseTab(tab.id); }}
-                      >
-                        {SVG.tabClose}
-                      </button>
-                    </div>
-                  ))
-                )}
+                      {SVG.tabClose}
+                    </button>
+                  </div>
+                ))}
               </div>
               <div className="tabs-footer">
                 <button

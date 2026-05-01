@@ -1,7 +1,7 @@
 // 全局快捷键管理模块
 
 import { globalShortcut, app } from 'electron';
-import { SHORTCUTS, LOCAL_SHORTCUTS, IPC_CHANNELS } from '../common/constants';
+import { SHORTCUTS, LOCAL_SHORTCUTS, TAB_RELAY_ACTIONS, IPC_CHANNELS } from '../common/constants';
 import * as windowManager from './windowManager';
 import * as configManager from './configManager';
 import * as i18n from './i18n';
@@ -10,11 +10,6 @@ import { createLogger } from './logger';
 const logger = createLogger('ShortcutManager');
 
 type ShortcutAction = keyof typeof SHORTCUTS;
-
-// 标签页相关操作通过 globalShortcut + IPC relay 到渲染进程，以便 webview 内也可触发
-const TAB_GLOBAL_ACTIONS: ReadonlyArray<keyof typeof LOCAL_SHORTCUTS> = [
-  'NEW_TAB', 'CLOSE_TAB', 'NEXT_TAB', 'PREV_TAB'
-];
 
 const ACTION_HANDLERS: Record<ShortcutAction, () => void> = {
   TOGGLE_CLICK_THROUGH: () => windowManager.toggleIgnoreMouse(),
@@ -43,7 +38,8 @@ function registerAll(): void {
     }
   }
 
-  for (const action of TAB_GLOBAL_ACTIONS) {
+  // 标签页动作通过 globalShortcut + IPC relay 到渲染进程，webview 内也可触发
+  for (const action of TAB_RELAY_ACTIONS) {
     const key = getEffectiveLocalShortcut(action);
     const ok = globalShortcut.register(key, () => {
       const win = windowManager.getWindow();

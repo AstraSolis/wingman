@@ -5,6 +5,8 @@
 import { useEffect, useCallback } from 'react';
 import type { Tab } from './useTabsPool';
 import { buildAccelerator } from '../utils/shortcut';
+import { TAB_RELAY_ACTIONS } from '../../common/constants';
+import type { LOCAL_SHORTCUTS } from '../../common/constants';
 
 // 允许在 input/textarea 内触发的快捷键动作
 const ALLOWED_IN_INPUT = new Set(['FOCUS_ADDRESS_BAR']);
@@ -71,15 +73,37 @@ export function useWindowLocalShortcuts({
         if (activeTabId) onCloseTab(activeTabId);
         break;
       case 'NEXT_TAB': {
-        if (tabs.length < 2 || !activeTabId) break;
-        const idx = tabs.findIndex(t => t.id === activeTabId);
-        if (idx !== -1) onSwitchTab(tabs[(idx + 1) % tabs.length].id);
+        if (tabs.length === 0) break;
+        if (!activeTabId) {
+          // 当前在主页，切换到第一个标签
+          onSwitchTab(tabs[0].id);
+        } else {
+          const idx = tabs.findIndex(t => t.id === activeTabId);
+          if (idx === -1) break;
+          if (idx === tabs.length - 1) {
+            // 最后一个标签，回到主页
+            onGoHome();
+          } else {
+            onSwitchTab(tabs[idx + 1].id);
+          }
+        }
         break;
       }
       case 'PREV_TAB': {
-        if (tabs.length < 2 || !activeTabId) break;
-        const idx = tabs.findIndex(t => t.id === activeTabId);
-        if (idx !== -1) onSwitchTab(tabs[(idx - 1 + tabs.length) % tabs.length].id);
+        if (tabs.length === 0) break;
+        if (!activeTabId) {
+          // 当前在主页，切换到最后一个标签
+          onSwitchTab(tabs[tabs.length - 1].id);
+        } else {
+          const idx = tabs.findIndex(t => t.id === activeTabId);
+          if (idx === -1) break;
+          if (idx === 0) {
+            // 第一个标签，回到主页
+            onGoHome();
+          } else {
+            onSwitchTab(tabs[idx - 1].id);
+          }
+        }
         break;
       }
       case 'OPEN_FAVORITES':
@@ -123,6 +147,8 @@ export function useWindowLocalShortcuts({
       for (const [action, shortcut] of shortcutEntries) {
         if (shortcut !== acc) continue;
         if (isTyping && !ALLOWED_IN_INPUT.has(action)) continue;
+        // 标签页动作由 IPC relay 处理，跳过以避免窗口聚焦时双重触发
+        if (TAB_RELAY_ACTIONS.has(action as keyof typeof LOCAL_SHORTCUTS)) continue;
 
         e.preventDefault();
         e.stopPropagation();
