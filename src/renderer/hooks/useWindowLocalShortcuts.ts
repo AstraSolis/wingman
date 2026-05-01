@@ -26,6 +26,7 @@ export interface LocalShortcutHandlers {
   onOpenFavorites: () => void;
   onOpenHistory: () => void;
   onOpenSettings: () => void;
+  onMediaAction: (action: string) => void;
   currentUrl: string;
   currentTitle: string;
 }
@@ -45,6 +46,7 @@ export function useWindowLocalShortcuts({
   onOpenFavorites,
   onOpenHistory,
   onOpenSettings,
+  onMediaAction,
   currentUrl,
   currentTitle,
 }: LocalShortcutHandlers) {
@@ -115,12 +117,22 @@ export function useWindowLocalShortcuts({
       case 'OPEN_SETTINGS':
         onOpenSettings();
         break;
+      case 'MEDIA_PLAY_PAUSE':
+      case 'MEDIA_NEXT_TRACK':
+      case 'MEDIA_PREV_TRACK':
+      case 'MEDIA_MUTE':
+      case 'MEDIA_SEEK_FORWARD':
+      case 'MEDIA_SEEK_BACKWARD':
+      case 'MEDIA_VOLUME_UP':
+      case 'MEDIA_VOLUME_DOWN':
+        onMediaAction(action);
+        break;
     }
   }, [
     tabs, activeTabId, currentUrl, currentTitle,
     onReload, onGoHome, onNewTab, onCloseTab, onSwitchTab,
     onToggleFav, onFocusAddressBar, onCopyUrl,
-    onOpenFavorites, onOpenHistory, onOpenSettings,
+    onOpenFavorites, onOpenHistory, onOpenSettings, onMediaAction,
   ]);
 
   // IPC relay：标签页快捷键从主进程发来（globalShortcut 注册，webview 内也能触发）

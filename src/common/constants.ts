@@ -32,13 +32,23 @@ export const LOCAL_SHORTCUTS = {
   PREV_TAB: 'CommandOrControl+Shift+Tab',
   OPEN_FAVORITES: 'CommandOrControl+Shift+B',
   OPEN_HISTORY: 'CommandOrControl+H',
-  OPEN_SETTINGS: 'CommandOrControl+,'
+  OPEN_SETTINGS: 'CommandOrControl+,',
+  MEDIA_PLAY_PAUSE: 'CommandOrControl+Alt+P',
+  MEDIA_PREV_TRACK: 'CommandOrControl+Alt+Shift+Left',
+  MEDIA_NEXT_TRACK: 'CommandOrControl+Alt+Shift+Right',
+  MEDIA_SEEK_BACKWARD: 'CommandOrControl+Alt+Shift+Down',
+  MEDIA_SEEK_FORWARD: 'CommandOrControl+Alt+Shift+Up',
+  MEDIA_VOLUME_DOWN: 'CommandOrControl+Alt+[',
+  MEDIA_VOLUME_UP: 'CommandOrControl+Alt+]',
+  MEDIA_MUTE: 'CommandOrControl+Alt+M'
 } as const;
 
 // 通过 globalShortcut + IPC relay 触发的标签页动作，在 webview 内也能响应
 // keydown handler 中须跳过这些动作，避免窗口有焦点时双重触发
 export const TAB_RELAY_ACTIONS: ReadonlySet<keyof typeof LOCAL_SHORTCUTS> = new Set([
-  'NEW_TAB', 'CLOSE_TAB', 'NEXT_TAB', 'PREV_TAB'
+  'NEW_TAB', 'CLOSE_TAB', 'NEXT_TAB', 'PREV_TAB',
+  'MEDIA_PLAY_PAUSE', 'MEDIA_NEXT_TRACK', 'MEDIA_PREV_TRACK', 'MEDIA_MUTE',
+  'MEDIA_SEEK_FORWARD', 'MEDIA_SEEK_BACKWARD', 'MEDIA_VOLUME_UP', 'MEDIA_VOLUME_DOWN'
 ]);
 
 export const STARTUP_PAGE_TYPES = {

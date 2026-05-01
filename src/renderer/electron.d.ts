@@ -118,6 +118,14 @@ interface WingmanLocalShortcuts {
   OPEN_FAVORITES: string;
   OPEN_HISTORY: string;
   OPEN_SETTINGS: string;
+  MEDIA_PLAY_PAUSE: string;
+  MEDIA_NEXT_TRACK: string;
+  MEDIA_PREV_TRACK: string;
+  MEDIA_MUTE: string;
+  MEDIA_SEEK_FORWARD: string;
+  MEDIA_SEEK_BACKWARD: string;
+  MEDIA_VOLUME_UP: string;
+  MEDIA_VOLUME_DOWN: string;
 }
 
 interface WingmanLocalShortcutsAPI {

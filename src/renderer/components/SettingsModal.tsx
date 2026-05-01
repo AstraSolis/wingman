@@ -349,6 +349,39 @@ export default function SettingsModal({ onClose, locale, onLocaleChange, showOSD
                     </div>
                   );
                 })()}
+                {localShortcuts && (() => {
+                  const mediaItems = [
+                    { action: 'MEDIA_PLAY_PAUSE', label: t('settings.shortcutMediaPlayPause') },
+                    { action: 'MEDIA_PREV_TRACK', label: t('settings.shortcutMediaPrevTrack') },
+                    { action: 'MEDIA_NEXT_TRACK', label: t('settings.shortcutMediaNextTrack') },
+                    { action: 'MEDIA_SEEK_BACKWARD', label: t('settings.shortcutMediaSeekBackward') },
+                    { action: 'MEDIA_SEEK_FORWARD', label: t('settings.shortcutMediaSeekForward') },
+                    { action: 'MEDIA_VOLUME_DOWN', label: t('settings.shortcutMediaVolumeDown') },
+                    { action: 'MEDIA_VOLUME_UP', label: t('settings.shortcutMediaVolumeUp') },
+                    { action: 'MEDIA_MUTE', label: t('settings.shortcutMediaMute') }
+                  ];
+                  return (
+                    <div className="shortcuts-group-block">
+                      <div className="shortcuts-group-title">{t('settings.shortcutGroupMedia')}</div>
+                      <div className="settings-group">
+                        {mediaItems.map(({ action, label: itemLabel }, idx) => (
+                          <div
+                            key={action}
+                            className={`setting-item-light${idx === mediaItems.length - 1 ? ' border-none' : ''}`}
+                          >
+                            <span className="setting-item-label">{itemLabel}</span>
+                            <ShortcutRecorder
+                              value={localShortcuts[action as keyof typeof localShortcuts]}
+                              onSave={(acc) => handleSetLocalShortcut(action, acc)}
+                              onReset={() => handleResetLocalShortcut(action)}
+                              t={t}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
 
                 <div className="shortcuts-section-header shortcuts-section-header-second">
                   <span className="shortcuts-section-header-badge local">{t('settings.shortcutsBadgeLocal')}</span>

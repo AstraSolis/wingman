@@ -7,6 +7,7 @@ interface WebviewPoolContainerProps {
   activeTabId: string | null;
   warmIds: string[];
   visible: boolean;
+  mediaTrigger?: { action: string; seq: number } | null;
   onNavigate: (id: string, url: string, title?: string) => void;
   onTitleChange: (id: string, title: string) => void;
   onOpenInBackground: (url: string) => void;
@@ -24,6 +25,7 @@ export default function WebviewPoolContainer({
   activeTabId,
   warmIds,
   visible,
+  mediaTrigger,
   onNavigate,
   onTitleChange,
   onOpenInBackground,
@@ -42,6 +44,7 @@ export default function WebviewPoolContainer({
           url={tab.url}
           visible={tab.id === activeTabId}
           reloadTrigger={tab.reloadTrigger}
+          mediaTrigger={tab.id === activeTabId ? mediaTrigger : null}
           onNavigate={(url, title) => onNavigate(tab.id, url, title)}
           onTitleChange={title => onTitleChange(tab.id, title)}
           onOpenInBackground={onOpenInBackground}

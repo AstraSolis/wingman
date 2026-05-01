@@ -41,6 +41,7 @@ function registerAll(): void {
   // 标签页动作通过 globalShortcut + IPC relay 到渲染进程，webview 内也可触发
   for (const action of TAB_RELAY_ACTIONS) {
     const key = getEffectiveLocalShortcut(action);
+    if (!key) continue; // 未配置默认键（如媒体快进/后退），跳过注册
     const ok = globalShortcut.register(key, () => {
       const win = windowManager.getWindow();
       if (win && !win.isDestroyed()) {

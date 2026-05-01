@@ -243,6 +243,7 @@ export function setup(): void {
     const custom = { ...configManager.get('customLocalShortcuts') };
     custom[action] = accelerator;
     configManager.set('customLocalShortcuts', custom);
+    shortcutManager.reload();
     return Object.fromEntries(
       (Object.keys(LOCAL_SHORTCUTS) as (keyof typeof LOCAL_SHORTCUTS)[]).map((a) => [
         a,
@@ -255,6 +256,7 @@ export function setup(): void {
     const custom = { ...configManager.get('customLocalShortcuts') };
     delete custom[action];
     configManager.set('customLocalShortcuts', custom);
+    shortcutManager.reload();
     return Object.fromEntries(
       (Object.keys(LOCAL_SHORTCUTS) as (keyof typeof LOCAL_SHORTCUTS)[]).map((a) => [
         a,

@@ -56,6 +56,65 @@ const UNFREEZE_SCRIPT = `(function(){
   }catch(e){}
 })();`;
 
+// 递归穿透 Shadow DOM 收集所有 video/audio 元素，并选出最佳活跃元素
+// gb 优先级：正在播放且有有效时长 > 有有效时长且已加载 > 任意已加载 > ms[0]
+const FM = `\
+function fm(r){var a=[].slice.call(r.querySelectorAll?r.querySelectorAll('video,audio'):[]);\
+[].slice.call(r.querySelectorAll?r.querySelectorAll('*'):[]).forEach(function(el){if(el.shadowRoot)a=a.concat(fm(el.shadowRoot));});return a;}\
+function gb(ms){return ms.find(function(m){return !m.paused&&!m.ended&&m.duration>0;})\
+||ms.find(function(m){return m.duration>0&&m.readyState>=2;})\
+||ms.find(function(m){return m.readyState>=1;})\
+||ms[0];}`;
+
+// 媒体控制脚本映射
+const MEDIA_SCRIPTS: Record<string, string> = {
+  MEDIA_PLAY_PAUSE: `(function(){${FM}
+    var ms=fm(document);
+    if(!ms.length)return;
+    var playing=ms.filter(function(m){return !m.paused&&!m.ended&&m.duration>0;});
+    if(!playing.length)playing=ms.filter(function(m){return !m.paused&&!m.ended;});
+    if(playing.length>0){playing.forEach(function(m){m.pause();});}
+    else{var m=gb(ms);m.play().catch(function(){});}
+  })();`,
+  MEDIA_NEXT_TRACK: `(function(){${FM}
+    var ms=fm(document);if(!ms.length)return;
+    var m=gb(ms);
+    m.currentTime=Math.min(m.currentTime+10,isFinite(m.duration)&&m.duration>0?m.duration:m.currentTime);
+  })();`,
+  MEDIA_PREV_TRACK: `(function(){${FM}
+    var ms=fm(document);if(!ms.length)return;
+    var m=gb(ms);
+    m.currentTime=Math.max(m.currentTime-10,0);
+  })();`,
+  MEDIA_MUTE: `(function(){${FM}
+    var ms=fm(document);if(!ms.length)return;
+    var muted=ms.some(function(m){return !m.muted;});
+    ms.forEach(function(m){m.muted=muted;});
+  })();`,
+  MEDIA_SEEK_FORWARD: `(function(){${FM}
+    var ms=fm(document);if(!ms.length)return;
+    var m=gb(ms);
+    m.currentTime=Math.min(m.currentTime+30,isFinite(m.duration)&&m.duration>0?m.duration:m.currentTime);
+  })();`,
+  MEDIA_SEEK_BACKWARD: `(function(){${FM}
+    var ms=fm(document);if(!ms.length)return;
+    var m=gb(ms);
+    m.currentTime=Math.max(m.currentTime-30,0);
+  })();`,
+  MEDIA_VOLUME_UP: `(function(){${FM}
+    var ms=fm(document);if(!ms.length)return;
+    var m=gb(ms);
+    var v=Math.min(+(m.volume+0.1).toFixed(2),1);
+    m.volume=v;
+  })();`,
+  MEDIA_VOLUME_DOWN: `(function(){${FM}
+    var ms=fm(document);if(!ms.length)return;
+    var m=gb(ms);
+    var v=Math.max(+(m.volume-0.1).toFixed(2),0);
+    m.volume=v;
+  })();`,
+};
+
 interface WebviewContainerProps {
   url: string;
   visible: boolean;
@@ -64,6 +123,7 @@ interface WebviewContainerProps {
   onTitleChange: (title: string) => void;
   onAddFav?: (url: string, title: string) => void;
   onOpenInBackground?: (url: string) => void;
+  mediaTrigger?: { action: string; seq: number } | null;
   showOSD?: (msg: string) => void;
   t: TFunction;
 }
@@ -76,6 +136,7 @@ export default function WebviewContainer({
   onTitleChange,
   onAddFav,
   onOpenInBackground,
+  mediaTrigger,
   showOSD,
   t
 }: WebviewContainerProps) {
@@ -115,6 +176,14 @@ export default function WebviewContainer({
     window.wingman.webview.setBackgroundThrottle(id, !visible);
     webviewRef.current?.executeJavaScript(visible ? UNFREEZE_SCRIPT : FREEZE_SCRIPT).catch(() => {});
   }, [visible]);
+
+  // 媒体控制：active 标签收到触发时向页面注入对应 JS 脚本
+  useEffect(() => {
+    if (!mediaTrigger) return;
+    const script = MEDIA_SCRIPTS[mediaTrigger.action];
+    if (script) webviewRef.current?.executeJavaScript(script).catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mediaTrigger]);
 
   // 订阅主进程发来的 webview 右键菜单事件，按 webContentsId 过滤确保只响应本实例
   useEffect(() => {

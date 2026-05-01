@@ -51,6 +51,11 @@ function AppContent() {
   const { localShortcuts } = useLocalShortcutsConfig();
 
   const [focusAddressBarTrigger, setFocusAddressBarTrigger] = useState(0);
+  const [mediaTrigger, setMediaTrigger] = useState<{ action: string; seq: number } | null>(null);
+
+  const handleMediaAction = useCallback((action: string) => {
+    setMediaTrigger({ action, seq: Date.now() });
+  }, []);
 
   const handleCopyUrl = useCallback(() => {
     if (!currentUrl) return;
@@ -82,6 +87,7 @@ function AppContent() {
     onOpenFavorites: handleOpenFavoritesShortcut,
     onOpenHistory: handleOpenHistoryShortcut,
     onOpenSettings: openSettings,
+    onMediaAction: handleMediaAction,
     currentUrl,
     currentTitle,
   });
@@ -132,6 +138,7 @@ function AppContent() {
         activeTabId={activeTabId}
         warmIds={warmIds}
         visible={view === 'webview'}
+        mediaTrigger={mediaTrigger}
         onNavigate={handleTabNavigate}
         onTitleChange={handleTabTitleChange}
         onOpenInBackground={openInBackground}
