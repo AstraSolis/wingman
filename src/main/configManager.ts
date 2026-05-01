@@ -94,9 +94,8 @@ function debounceSave(): void {
   }, 1000);
 }
 
-export function init(): void {
-  const userDataPath = app.getPath('userData');
-  configPath = join(userDataPath, 'config.json');
+export function init(overrideConfigPath?: string): void {
+  configPath = overrideConfigPath ?? join(app.getPath('userData'), 'config.json');
 
   try {
     if (existsSync(configPath)) {

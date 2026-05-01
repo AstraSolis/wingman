@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import type { TFunction } from '../hooks/useI18n';
 import ContextMenu from './ContextMenu';
 

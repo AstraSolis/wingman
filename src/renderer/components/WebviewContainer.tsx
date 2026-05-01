@@ -182,7 +182,6 @@ export default function WebviewContainer({
     if (!mediaTrigger) return;
     const script = MEDIA_SCRIPTS[mediaTrigger.action];
     if (script) webviewRef.current?.executeJavaScript(script).catch(() => {});
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mediaTrigger]);
 
   // 订阅主进程发来的 webview 右键菜单事件，按 webContentsId 过滤确保只响应本实例

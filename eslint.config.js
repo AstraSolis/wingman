@@ -1,5 +1,6 @@
 const js = require('@eslint/js');
 const react = require('eslint-plugin-react');
+const reactHooks = require('eslint-plugin-react-hooks');
 const globals = require('globals');
 
 const tsParser = require('@typescript-eslint/parser');
@@ -11,6 +12,7 @@ module.exports = [
     files: ['**/*.{ts,tsx}'],
     plugins: {
       react,
+      'react-hooks': reactHooks,
       '@typescript-eslint': tsPlugin
     },
     languageOptions: {
@@ -26,6 +28,7 @@ module.exports = [
       }
     },
     rules: {
+      'no-undef': 'off',
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': [
         'warn',
@@ -35,7 +38,9 @@ module.exports = [
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
       'react/jsx-uses-react': 'off',
-      'react/jsx-uses-vars': 'error'
+      'react/jsx-uses-vars': 'error',
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn'
     },
     settings: {
       react: { version: 'detect' }
