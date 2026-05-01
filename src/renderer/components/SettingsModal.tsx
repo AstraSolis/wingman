@@ -320,6 +320,35 @@ export default function SettingsModal({ onClose, locale, onLocaleChange, showOSD
                     </div>
                   </div>
                 ))}
+                {localShortcuts && (() => {
+                  const tabItems = [
+                    { action: 'NEW_TAB', label: t('settings.shortcutNewTab') },
+                    { action: 'CLOSE_TAB', label: t('settings.shortcutCloseTab') },
+                    { action: 'NEXT_TAB', label: t('settings.shortcutNextTab') },
+                    { action: 'PREV_TAB', label: t('settings.shortcutPrevTab') }
+                  ];
+                  return (
+                    <div className="shortcuts-group-block">
+                      <div className="shortcuts-group-title">{t('settings.shortcutGroupTabs')}</div>
+                      <div className="settings-group">
+                        {tabItems.map(({ action, label: itemLabel }, idx) => (
+                          <div
+                            key={action}
+                            className={`setting-item-light${idx === tabItems.length - 1 ? ' border-none' : ''}`}
+                          >
+                            <span className="setting-item-label">{itemLabel}</span>
+                            <ShortcutRecorder
+                              value={localShortcuts[action as keyof typeof localShortcuts]}
+                              onSave={(acc) => handleSetLocalShortcut(action, acc)}
+                              onReset={() => handleResetLocalShortcut(action)}
+                              t={t}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
 
                 <div className="shortcuts-section-header shortcuts-section-header-second">
                   <span className="shortcuts-section-header-badge local">{t('settings.shortcutsBadgeLocal')}</span>
@@ -337,16 +366,6 @@ export default function SettingsModal({ onClose, locale, onLocaleChange, showOSD
                       { action: 'FOCUS_ADDRESS_BAR', label: t('settings.shortcutFocusAddressBar') },
                       { action: 'COPY_URL', label: t('settings.shortcutCopyUrl') },
                       { action: 'TOGGLE_FAVORITE', label: t('settings.shortcutToggleFavorite') }
-                    ]
-                  },
-                  {
-                    groupKey: 'tabs',
-                    label: t('settings.shortcutGroupTabs'),
-                    items: [
-                      { action: 'NEW_TAB', label: t('settings.shortcutNewTab') },
-                      { action: 'CLOSE_TAB', label: t('settings.shortcutCloseTab') },
-                      { action: 'NEXT_TAB', label: t('settings.shortcutNextTab') },
-                      { action: 'PREV_TAB', label: t('settings.shortcutPrevTab') }
                     ]
                   },
                   {
