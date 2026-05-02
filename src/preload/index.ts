@@ -24,14 +24,14 @@ const windowAPI = {
   close: () => ipcRenderer.send('close-window'),
   getInitialState: () => ipcRenderer.invoke('get-initial-state'),
   onOpacityUpdated: (callback: (opacity: number) => void): (() => void) => {
-    ipcRenderer.removeAllListeners('opacity-updated');
-    ipcRenderer.on('opacity-updated', (_event, opacity) => callback(opacity as number));
-    return () => ipcRenderer.removeAllListeners('opacity-updated');
+    const listener = (_event: Electron.IpcRendererEvent, opacity: unknown) => callback(opacity as number);
+    ipcRenderer.on('opacity-updated', listener);
+    return () => ipcRenderer.removeListener('opacity-updated', listener);
   },
   onClickThroughUpdated: (callback: (isEnabled: boolean) => void): (() => void) => {
-    ipcRenderer.removeAllListeners('click-through-updated');
-    ipcRenderer.on('click-through-updated', (_event, isEnabled) => callback(isEnabled as boolean));
-    return () => ipcRenderer.removeAllListeners('click-through-updated');
+    const listener = (_event: Electron.IpcRendererEvent, isEnabled: unknown) => callback(isEnabled as boolean);
+    ipcRenderer.on('click-through-updated', listener);
+    return () => ipcRenderer.removeListener('click-through-updated', listener);
   }
 };
 
@@ -75,9 +75,9 @@ const userDataAPI = {
 const navigationAPI = {
   loadUrl: (url: string) => ipcRenderer.send('load-url', url),
   onNavigateUrl: (callback: (url: string) => void): (() => void) => {
-    ipcRenderer.removeAllListeners('navigate-url');
-    ipcRenderer.on('navigate-url', (_event, url) => callback(url as string));
-    return () => ipcRenderer.removeAllListeners('navigate-url');
+    const listener = (_event: Electron.IpcRendererEvent, url: unknown) => callback(url as string);
+    ipcRenderer.on('navigate-url', listener);
+    return () => ipcRenderer.removeListener('navigate-url', listener);
   }
 };
 

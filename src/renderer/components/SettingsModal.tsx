@@ -103,7 +103,7 @@ function ShortcutRecorder({ value, onSave, onReset, t }: ShortcutRecorderProps) 
       e.preventDefault();
       e.stopPropagation();
 
-      if (e.key === 'Escape') {
+      if (e.key === 'Escape' && !e.ctrlKey && !e.altKey && !e.metaKey && !e.shiftKey) {
         stopRecording();
         return;
       }

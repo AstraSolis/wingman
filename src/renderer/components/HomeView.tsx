@@ -127,8 +127,12 @@ export default function HomeView({ onNavigate, onFavorites, onHistory, onSetting
     const [moved] = newItems.splice(draggedIndex, 1);
     newItems.splice(targetIndex, 0, moved);
     setDockItems(newItems);
-    const updated = await window.wingman.dock.reorderItems(newItems.map((it) => it.id));
-    setDockItems(updated);
+    try {
+      const updated = await window.wingman.dock.reorderItems(newItems.map((it) => it.id));
+      setDockItems(updated);
+    } catch {
+      setDockItems(dockItems);
+    }
     setDraggedIndex(null);
     setDragOverIndex(null);
   };
