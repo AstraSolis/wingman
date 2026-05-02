@@ -1,0 +1,53 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            platform: win
+            artifact_path: dist/*.exe
+          - os: macos-latest
+            platform: mac
+            artifact_path: dist/*.dmg
+          - os: ubuntu-latest
+            platform: linux
+            artifact_path: dist/*.AppImage
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 配置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: 构建
+        run: npm run build
+
+      - name: 打包安装包
+        run: npx electron-builder --${{ matrix.platform }} --publish never
+
+      - name: 上传构建产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: wingman-${{ matrix.platform }}
+          path: ${{ matrix.artifact_path }}
+          if-no-files-found: warn

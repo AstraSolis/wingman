@@ -15,7 +15,7 @@
     "typecheck": "tsc --noEmit",
     "check": "npm run format && npm run lint && npm run typecheck"
   },
-  "author": "",
+  "author": "wingman",
   "license": "MIT",
   "devDependencies": {
     "@eslint/js": "^9.17.0",
@@ -42,7 +42,9 @@
     "typescript": "^5.9.3",
     "vite": "^7.3.2",
     "vitest": "^3.2.4",
-    "wait-on": "^9.0.5"
+    "wait-on": "^9.0.5",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5"
   },
   "build": {
     "appId": "com.wingman.app",
@@ -67,8 +69,7 @@
       "icon": "src/assets/icon.png"
     },
     "files": [
-      "out/**/*",
-      "src/assets/**/*"
+      "out/**/*"
     ],
     "extraResources": [
       {
@@ -78,8 +79,6 @@
     ]
   },
   "dependencies": {
-    "electron-log": "^5.4.3",
-    "react": "^19.2.5",
-    "react-dom": "^19.2.5"
+    "electron-log": "^5.4.3"
   }
 }
