@@ -20,6 +20,74 @@ let currentOpacity = DEFAULT_OPACITY;
 let isClickThrough = false;
 let activeGuestContents: Electron.WebContents | null = null;
 
+// 伪全屏 CSS：将带有标记属性的元素充满 webview 视口
+const PSEUDO_FS_CSS = `
+[data-wingman-pseudo-fs]{
+  position:fixed!important;inset:0!important;
+  width:100%!important;height:100%!important;
+  z-index:2147483647!important;
+  background:#000!important;
+  transform:none!important;margin:0!important;
+  border:none!important;max-width:none!important;max-height:none!important;
+}
+[data-wingman-pseudo-fs] video,
+[data-wingman-pseudo-fs] iframe{
+  width:100%!important;height:100%!important;
+  max-width:none!important;max-height:none!important;
+  object-fit:contain!important;
+}
+`;
+
+// 伪全屏 JS：覆盖 requestFullscreen 防止 OS 全屏
+// enter 时将元素移到 body 直属子级，突破嵌套 stacking context（父级 transform/opacity 会隔离 z-index）
+// leave 时用保存的 parentNode/nextSibling 精确恢复 DOM 位置
+const PSEUDO_FS_JS = `(function(){
+if(window.__wingmanPsFs)return;window.__wingmanPsFs=true;
+var el=null,elParent=null,elNext=null,prevHtmlOverflow='',prevBodyOverflow='';
+function fire(e){
+  try{document.dispatchEvent(new Event('fullscreenchange'));}catch(x){}
+  try{e.dispatchEvent(new Event('fullscreenchange',{bubbles:true}));}catch(x){}
+  try{document.dispatchEvent(new Event('webkitfullscreenchange'));}catch(x){}
+}
+function enter(e){
+  if(el)leave();el=e;
+  elParent=e.parentNode;elNext=e.nextSibling;
+  prevHtmlOverflow=document.documentElement.style.overflow;
+  prevBodyOverflow=document.body.style.overflow;
+  document.documentElement.style.overflow='hidden';
+  document.body.style.overflow='hidden';
+  document.body.appendChild(e);
+  e.setAttribute('data-wingman-pseudo-fs','');
+  try{Object.defineProperty(document,'fullscreenElement',{get:function(){return el;},configurable:true});}catch(x){}
+  try{Object.defineProperty(document,'webkitFullscreenElement',{get:function(){return el;},configurable:true});}catch(x){}
+  fire(e);
+}
+function leave(){
+  if(!el)return;var p=el;var pp=elParent;var pn=elNext;
+  el=null;elParent=null;elNext=null;
+  document.documentElement.style.overflow=prevHtmlOverflow;
+  document.body.style.overflow=prevBodyOverflow;
+  p.removeAttribute('data-wingman-pseudo-fs');
+  try{
+    if(pp){
+      if(pn&&pn.parentNode===pp){pp.insertBefore(p,pn);}
+      else{pp.appendChild(p);}
+    }
+  }catch(x){}
+  try{Object.defineProperty(document,'fullscreenElement',{get:function(){return null;},configurable:true});}catch(x){}
+  try{Object.defineProperty(document,'webkitFullscreenElement',{get:function(){return null;},configurable:true});}catch(x){}
+  fire(p);
+}
+HTMLElement.prototype.requestFullscreen=function(){enter(this);return Promise.resolve();};
+if(HTMLElement.prototype.webkitRequestFullscreen!==undefined)HTMLElement.prototype.webkitRequestFullscreen=function(){enter(this);return Promise.resolve();};
+if(HTMLElement.prototype.webkitRequestFullScreen!==undefined)HTMLElement.prototype.webkitRequestFullScreen=function(){enter(this);};
+Document.prototype.exitFullscreen=function(){leave();return Promise.resolve();};
+if(Document.prototype.webkitExitFullscreen!==undefined)Document.prototype.webkitExitFullscreen=function(){leave();};
+try{Object.defineProperty(document,'fullscreenEnabled',{get:function(){return true;},configurable:true});}catch(x){}
+try{Object.defineProperty(document,'webkitFullscreenEnabled',{get:function(){return true;},configurable:true});}catch(x){}
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&el){e.stopImmediatePropagation();leave();}},true);
+})();`;
+
 export function getGuestWebContents(): Electron.WebContents | null {
   return activeGuestContents;
 }
@@ -62,7 +130,7 @@ export function createWindow(): BrowserWindow {
     }
   };
 
-  if (rememberBounds && savedBounds) {
+  if (rememberBounds && savedBounds && savedBounds.width > 0 && savedBounds.height > 0) {
     windowOptions.x = savedBounds.x;
     windowOptions.y = savedBounds.y;
     windowOptions.width = savedBounds.width;
@@ -83,6 +151,12 @@ export function createWindow(): BrowserWindow {
       }
       mainWindow?.webContents.send(IPC_CHANNELS.NAVIGATE_URL, url);
       return { action: 'deny' };
+    });
+
+    // dom-ready 时注入伪全屏逻辑，拦截 requestFullscreen 防止 OS 全屏
+    guestContents.on('dom-ready', () => {
+      guestContents.insertCSS(PSEUDO_FS_CSS).catch(() => {});
+      guestContents.executeJavaScript(PSEUDO_FS_JS).catch(() => {});
     });
 
     guestContents.on('context-menu', (_e, params) => {
