@@ -63,6 +63,16 @@ export const CLOSE_STRATEGIES = {
   MINIMIZE: 'minimize'
 } as const;
 
+export const SEARCH_ENGINES = {
+  BING: 'bing',
+  GOOGLE: 'google',
+  BAIDU: 'baidu',
+  CUSTOM: 'custom'
+} as const;
+
+export const DEFAULT_SEARCH_ENGINE = SEARCH_ENGINES.BING;
+export const DEFAULT_CUSTOM_SEARCH_URL = 'https://www.bing.com/search?q={query}';
+
 export const IPC_CHANNELS = {
   SET_OPACITY: 'set-opacity',
   TOGGLE_CLICK_THROUGH: 'toggle-click-through',
@@ -103,5 +113,7 @@ export const IPC_CHANNELS = {
   GET_LOCAL_SHORTCUTS: 'get-local-shortcuts',
   SET_LOCAL_SHORTCUT: 'set-local-shortcut',
   RESET_LOCAL_SHORTCUT: 'reset-local-shortcut',
-  LOCAL_SHORTCUT_FIRED: 'local-shortcut-fired'
+  LOCAL_SHORTCUT_FIRED: 'local-shortcut-fired',
+  SET_SEARCH_ENGINE: 'set-search-engine',
+  SET_CUSTOM_SEARCH_URL: 'set-custom-search-url'
 } as const;

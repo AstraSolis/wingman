@@ -6,8 +6,8 @@ import { renderHook } from '@testing-library/react';
 import { useWingman } from '../../src/renderer/hooks/useWingman';
 
 describe('useWingman - loadUrl', () => {
-  function getLoadUrl() {
-    const { result } = renderHook(() => useWingman());
+  function getLoadUrl(engine?: string, customUrl?: string) {
+    const { result } = renderHook(() => useWingman(engine, customUrl));
     return result.current.loadUrl;
   }
 
@@ -55,5 +55,25 @@ describe('useWingman - loadUrl', () => {
     const result = loadUrl('我的世界攻略');
     expect(result).toContain('bing.com/search?q=');
     expect(result).toContain(encodeURIComponent('我的世界攻略'));
+  });
+
+  it('Google 引擎应生成 google.com 搜索链接', () => {
+    const loadUrl = getLoadUrl('google');
+    expect(loadUrl('minecraft')).toBe('https://www.google.com/search?q=minecraft');
+  });
+
+  it('百度引擎应生成 baidu.com 搜索链接', () => {
+    const loadUrl = getLoadUrl('baidu');
+    expect(loadUrl('我的世界')).toContain('baidu.com/s?wd=');
+  });
+
+  it('自定义引擎应将 {query} 替换为编码后的搜索词', () => {
+    const loadUrl = getLoadUrl('custom', 'https://search.example.com/?q={query}');
+    expect(loadUrl('test search')).toBe('https://search.example.com/?q=test%20search');
+  });
+
+  it('自定义引擎无 {query} 时追加在末尾', () => {
+    const loadUrl = getLoadUrl('custom', 'https://search.example.com/?q=');
+    expect(loadUrl('hello')).toBe('https://search.example.com/?q=hello');
   });
 });

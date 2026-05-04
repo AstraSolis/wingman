@@ -4,25 +4,20 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 
-// mock useBootState，直接提供预设的启动数据
-vi.mock('../../src/renderer/hooks/useBootState', () => ({
-  useBootState: vi.fn().mockReturnValue({
-    windowState: { opacity: 0.85, isClickThrough: false },
-    startupConfig: {
-      startupPage: 'lastPage',
-      customStartupUrl: 'https://custom.com',
-      closeStrategy: 'minimize',
-      rememberWindowBounds: true
-    },
-    autoStart: true
-  })
-}));
-
 import { useSettingsPanel } from '../../src/renderer/hooks/useSettings';
 
 const mockShowOSD = vi.fn();
 const mockOnLocaleChange = vi.fn().mockResolvedValue(undefined);
 const mockT = vi.fn((key: string) => key);
+
+const mockStartupConfig = {
+  startupPage: 'lastPage',
+  customStartupUrl: 'https://custom.com',
+  closeStrategy: 'minimize',
+  rememberWindowBounds: true,
+  searchEngine: 'bing',
+  customSearchUrl: 'https://www.bing.com/search?q={query}'
+};
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -30,11 +25,15 @@ beforeEach(() => {
   Object.defineProperty(window, 'wingman', {
     value: {
       settings: {
+        getStartupConfig: vi.fn().mockResolvedValue(mockStartupConfig),
+        getAutoStart: vi.fn().mockResolvedValue(true),
         setAutoStart: vi.fn().mockResolvedValue(undefined),
         setStartupPage: vi.fn().mockResolvedValue(undefined),
         setCustomStartupUrl: vi.fn().mockResolvedValue(undefined),
         setCloseStrategy: vi.fn().mockResolvedValue(undefined),
-        setRememberWindowBounds: vi.fn().mockResolvedValue(undefined)
+        setRememberWindowBounds: vi.fn().mockResolvedValue(undefined),
+        setSearchEngine: vi.fn().mockResolvedValue(undefined),
+        setCustomSearchUrl: vi.fn().mockResolvedValue(undefined)
       },
       userData: {
         clearHistory: vi.fn().mockResolvedValue([])
@@ -76,6 +75,8 @@ describe('useSettingsPanel - 操作', () => {
       useSettingsPanel('zh-CN', mockOnLocaleChange, mockShowOSD, mockT as never)
     );
 
+    await waitFor(() => expect(result.current.autoStart).toBe(true));
+
     await act(async () => {
       await result.current.handleAutoStartChange(false);
     });
@@ -88,6 +89,8 @@ describe('useSettingsPanel - 操作', () => {
     const { result } = renderHook(() =>
       useSettingsPanel('zh-CN', mockOnLocaleChange, mockShowOSD, mockT as never)
     );
+
+    await waitFor(() => expect(result.current.startupPage).toBe('lastPage'));
 
     await act(async () => {
       await result.current.handleStartupPageChange('home');
@@ -102,6 +105,8 @@ describe('useSettingsPanel - 操作', () => {
       useSettingsPanel('zh-CN', mockOnLocaleChange, mockShowOSD, mockT as never)
     );
 
+    await waitFor(() => expect(result.current.closeStrategy).toBe('minimize'));
+
     await act(async () => {
       await result.current.handleCloseStrategyChange('quit');
     });
@@ -114,6 +119,8 @@ describe('useSettingsPanel - 操作', () => {
     const { result } = renderHook(() =>
       useSettingsPanel('zh-CN', mockOnLocaleChange, mockShowOSD, mockT as never)
     );
+
+    await waitFor(() => expect(result.current.rememberBounds).toBe(true));
 
     await act(async () => {
       await result.current.handleRememberBoundsChange(false);

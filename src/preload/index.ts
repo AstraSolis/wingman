@@ -43,7 +43,9 @@ const settingsAPI = {
   setCustomStartupUrl: (url: string) => ipcRenderer.invoke('set-custom-startup-url', url),
   setCloseStrategy: (strategy: string) => ipcRenderer.invoke('set-close-strategy', strategy),
   setRememberWindowBounds: (remember: boolean) =>
-    ipcRenderer.invoke('set-remember-window-bounds', remember)
+    ipcRenderer.invoke('set-remember-window-bounds', remember),
+  setSearchEngine: (engine: string) => ipcRenderer.invoke('set-search-engine', engine),
+  setCustomSearchUrl: (url: string) => ipcRenderer.invoke('set-custom-search-url', url)
 };
 
 const shortcutsAPI = {

@@ -118,7 +118,9 @@ export function setup(): void {
       startupPage: configManager.get('startupPage'),
       customStartupUrl: configManager.get('customStartupUrl'),
       closeStrategy: configManager.get('closeStrategy'),
-      rememberWindowBounds: configManager.get('rememberWindowBounds')
+      rememberWindowBounds: configManager.get('rememberWindowBounds'),
+      searchEngine: configManager.get('searchEngine'),
+      customSearchUrl: configManager.get('customSearchUrl')
     };
   });
 
@@ -140,6 +142,16 @@ export function setup(): void {
   ipcMain.handle(IPC_CHANNELS.SET_REMEMBER_WINDOW_BOUNDS, (_event, remember: boolean) => {
     configManager.set('rememberWindowBounds', remember);
     return remember;
+  });
+
+  ipcMain.handle(IPC_CHANNELS.SET_SEARCH_ENGINE, (_event, engine: string) => {
+    configManager.set('searchEngine', engine);
+    return engine;
+  });
+
+  ipcMain.handle(IPC_CHANNELS.SET_CUSTOM_SEARCH_URL, (_event, url: string) => {
+    configManager.set('customSearchUrl', url);
+    return url;
   });
 
   ipcMain.handle(IPC_CHANNELS.GET_DOCK_ITEMS, () => {

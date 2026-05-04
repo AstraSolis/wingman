@@ -19,6 +19,8 @@ interface WingmanStartupConfig {
   customStartupUrl: string;
   closeStrategy: string;
   rememberWindowBounds: boolean;
+  searchEngine: string;
+  customSearchUrl: string;
 }
 
 interface WingmanI18nData {
@@ -90,6 +92,8 @@ interface WingmanSettingsAPI {
   setCustomStartupUrl: (url: string) => Promise<string>;
   setCloseStrategy: (strategy: string) => Promise<string>;
   setRememberWindowBounds: (remember: boolean) => Promise<boolean>;
+  setSearchEngine: (engine: string) => Promise<string>;
+  setCustomSearchUrl: (url: string) => Promise<string>;
 }
 
 interface WingmanShortcuts {

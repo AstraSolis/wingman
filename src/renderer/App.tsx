@@ -6,11 +6,12 @@ import { useWindowState } from './hooks/useWindowState';
 import { useModals } from './hooks/useModals';
 import { useStartupPage } from './hooks/useStartupPage';
 import { useUserData, useNavigationEvents } from './hooks/useUserData';
-import { BootStateProvider } from './hooks/useBootState';
+import { BootStateProvider, useBootState } from './hooks/useBootState';
 import { useDocumentTitle } from './hooks/useDocumentTitle';
 import { useLocalShortcutsConfig } from './hooks/useShortcuts';
 import { useWindowLocalShortcuts } from './hooks/useWindowLocalShortcuts';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { DEFAULT_SEARCH_ENGINE, DEFAULT_CUSTOM_SEARCH_URL } from '../common/constants';
 import Toolbar from './components/Toolbar';
 import HomeView from './components/HomeView';
 import WebviewPoolContainer from './components/WebviewPoolContainer';
@@ -20,7 +21,23 @@ import OSD from './components/OSD';
 
 function AppContent() {
   const { locale, t, setLocale, ready } = useI18n();
-  const { loadUrl } = useWingman();
+  const bootState = useBootState();
+  const [searchEngine, setSearchEngine] = useState(DEFAULT_SEARCH_ENGINE);
+  const [customSearchUrl, setCustomSearchUrl] = useState(DEFAULT_CUSTOM_SEARCH_URL);
+
+  useEffect(() => {
+    if (bootState?.startupConfig) {
+      setSearchEngine(bootState.startupConfig.searchEngine || DEFAULT_SEARCH_ENGINE);
+      setCustomSearchUrl(bootState.startupConfig.customSearchUrl || DEFAULT_CUSTOM_SEARCH_URL);
+    }
+  }, [bootState]);
+
+  const handleSearchEngineChange = useCallback((engine: string, customUrl: string) => {
+    setSearchEngine(engine);
+    setCustomSearchUrl(customUrl);
+  }, []);
+
+  const { loadUrl } = useWingman(searchEngine, customSearchUrl);
   const { osdMessage, showOSD } = useOSD();
 
   const {
@@ -152,6 +169,7 @@ function AppContent() {
           onClose={closeSettings}
           locale={locale}
           onLocaleChange={setLocale}
+          onSearchEngineChange={handleSearchEngineChange}
           showOSD={showOSD}
           t={t}
         />

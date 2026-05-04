@@ -8,7 +8,9 @@ import {
   DEFAULT_OPACITY,
   DEFAULT_URL,
   STARTUP_PAGE_TYPES,
-  CLOSE_STRATEGIES
+  CLOSE_STRATEGIES,
+  DEFAULT_SEARCH_ENGINE,
+  DEFAULT_CUSTOM_SEARCH_URL
 } from '../common/constants';
 import { createLogger } from './logger';
 
@@ -48,6 +50,8 @@ export interface AppConfig {
   windowBounds: WindowBounds | null;
   customShortcuts: Record<string, string>;
   customLocalShortcuts: Record<string, string>;
+  searchEngine: string;
+  customSearchUrl: string;
 }
 
 const DEFAULT_CONFIG: AppConfig = {
@@ -64,7 +68,9 @@ const DEFAULT_CONFIG: AppConfig = {
   rememberWindowBounds: true,
   windowBounds: null,
   customShortcuts: {},
-  customLocalShortcuts: {}
+  customLocalShortcuts: {},
+  searchEngine: DEFAULT_SEARCH_ENGINE,
+  customSearchUrl: DEFAULT_CUSTOM_SEARCH_URL
 };
 
 let configPath = '';

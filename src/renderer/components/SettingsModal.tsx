@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import type { ReactElement } from 'react';
+import type { ReactElement, CSSProperties } from 'react';
 import { useSettingsPanel } from '../hooks/useSettings';
 import { useShortcuts, useLocalShortcutsConfig } from '../hooks/useShortcuts';
 import { buildAccelerator } from '../utils/shortcut';
@@ -54,6 +54,7 @@ const NavIcons: Record<string, ReactElement> = {
 
 function Dropdown({ value, options, onChange }: DropdownProps) {
   const [open, setOpen] = useState(false);
+  const [menuStyle, setMenuStyle] = useState<CSSProperties>({});
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -64,15 +65,30 @@ function Dropdown({ value, options, onChange }: DropdownProps) {
     return () => document.removeEventListener('click', handler);
   }, []);
 
+  const handleToggle = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (ref.current) {
+      const rect = ref.current.getBoundingClientRect();
+      setMenuStyle({
+        position: 'fixed',
+        top: rect.bottom + 4,
+        right: window.innerWidth - rect.right,
+        left: 'auto',
+        margin: 0
+      });
+    }
+    setOpen((o) => !o);
+  }, []);
+
   const current = options.find((o) => o.value === value);
   return (
     <div className="custom-dropdown" ref={ref}>
-      <div className="dropdown-selected" onClick={(e) => { e.stopPropagation(); setOpen((o) => !o); }}>
+      <div className="dropdown-selected" onClick={handleToggle}>
         <span>{current?.label}</span>
         {chevron}
       </div>
       {open && (
-        <div className="dropdown-menu" onClick={(e) => e.stopPropagation()}>
+        <div className="dropdown-menu" style={menuStyle} onClick={(e) => e.stopPropagation()}>
           {options.map((o) => (
             <div key={o.value} className="dropdown-item" onClick={() => { onChange(o.value); setOpen(false); }}>
               {o.label}
@@ -143,11 +159,12 @@ interface SettingsModalProps {
   onClose: () => void;
   locale: string;
   onLocaleChange: (locale: string) => Promise<void>;
+  onSearchEngineChange: (engine: string, customUrl: string) => void;
   showOSD: (msg: string) => void;
   t: TFunction;
 }
 
-export default function SettingsModal({ onClose, locale, onLocaleChange, showOSD, t }: SettingsModalProps) {
+export default function SettingsModal({ onClose, locale, onLocaleChange, onSearchEngineChange, showOSD, t }: SettingsModalProps) {
   const [activeSection, setActiveSection] = useState('general');
 
   const {
@@ -156,17 +173,22 @@ export default function SettingsModal({ onClose, locale, onLocaleChange, showOSD
     customUrl,
     closeStrategy,
     rememberBounds,
+    searchEngine,
+    customSearchUrl,
     langOptions,
     startupOptions,
     closeOptions,
+    searchEngineOptions,
     handleLocaleChange,
     handleAutoStartChange,
     handleStartupPageChange,
     handleCustomUrlChange,
     handleCloseStrategyChange,
     handleRememberBoundsChange,
-    handleClearHistory
-  } = useSettingsPanel(locale, onLocaleChange, showOSD, t);
+    handleClearHistory,
+    handleSearchEngineChange,
+    handleCustomSearchUrlChange
+  } = useSettingsPanel(locale, onLocaleChange, showOSD, t, onSearchEngineChange);
 
   const { shortcuts, handleSetShortcut, handleResetShortcut } = useShortcuts();
   const { localShortcuts, handleSetLocalShortcut, handleResetLocalShortcut } = useLocalShortcutsConfig();
@@ -254,6 +276,26 @@ export default function SettingsModal({ onClose, locale, onLocaleChange, showOSD
                       <span className="slider-light round" />
                     </label>
                   </div>
+                  <div className="setting-item-light">
+                    <div className="setting-item-info">
+                      <span className="setting-item-label">{t('settings.searchEngine')}</span>
+                    </div>
+                    <Dropdown value={searchEngine} options={searchEngineOptions} onChange={handleSearchEngineChange} />
+                  </div>
+                  {searchEngine === 'custom' && (
+                    <div className="setting-item-light custom-url-item border-none">
+                      <div className="custom-url-wrapper">
+                        <label>{t('settings.customSearchUrl')}</label>
+                        <input
+                          type="text"
+                          className="custom-url-input"
+                          value={customSearchUrl}
+                          placeholder={t('settings.customSearchUrlPlaceholder')}
+                          onChange={(e) => handleCustomSearchUrlChange(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
