@@ -139,55 +139,57 @@ function AppContent() {
         t={t}
       />
 
-      {view === 'home' && (
-        <HomeView
-          onNavigate={navigate}
-          onFavorites={handleOpenFavoritesShortcut}
-          onHistory={handleOpenHistoryShortcut}
-          onSettings={openSettings}
+      <div className="content-area">
+        {view === 'home' && (
+          <HomeView
+            onNavigate={navigate}
+            onFavorites={handleOpenFavoritesShortcut}
+            onHistory={handleOpenHistoryShortcut}
+            onSettings={openSettings}
+            showOSD={showOSD}
+            t={t}
+          />
+        )}
+
+        <WebviewPoolContainer
+          tabs={tabs}
+          activeTabId={activeTabId}
+          warmIds={warmIds}
+          visible={view === 'webview'}
+          mediaTrigger={mediaTrigger}
+          onNavigate={handleTabNavigate}
+          onTitleChange={handleTabTitleChange}
+          onOpenInBackground={openInBackground}
+          onAddFav={handleAddFav}
           showOSD={showOSD}
           t={t}
         />
-      )}
 
-      <WebviewPoolContainer
-        tabs={tabs}
-        activeTabId={activeTabId}
-        warmIds={warmIds}
-        visible={view === 'webview'}
-        mediaTrigger={mediaTrigger}
-        onNavigate={handleTabNavigate}
-        onTitleChange={handleTabTitleChange}
-        onOpenInBackground={openInBackground}
-        onAddFav={handleAddFav}
-        showOSD={showOSD}
-        t={t}
-      />
+        {showSettings && (
+          <SettingsModal
+            onClose={closeSettings}
+            locale={locale}
+            onLocaleChange={setLocale}
+            onSearchEngineChange={handleSearchEngineChange}
+            showOSD={showOSD}
+            t={t}
+          />
+        )}
 
-      {showSettings && (
-        <SettingsModal
-          onClose={closeSettings}
-          locale={locale}
-          onLocaleChange={setLocale}
-          onSearchEngineChange={handleSearchEngineChange}
-          showOSD={showOSD}
-          t={t}
-        />
-      )}
+        {listModal && (
+          <ListModal
+            title={listModal.title}
+            items={listModal.items}
+            type={listModal.type}
+            onSelect={listModal.onSelect}
+            onDelete={listModal.onDelete}
+            onClose={closeListModal}
+            t={t}
+          />
+        )}
 
-      {listModal && (
-        <ListModal
-          title={listModal.title}
-          items={listModal.items}
-          type={listModal.type}
-          onSelect={listModal.onSelect}
-          onDelete={listModal.onDelete}
-          onClose={closeListModal}
-          t={t}
-        />
-      )}
-
-      <OSD message={osdMessage} />
+        <OSD message={osdMessage} />
+      </div>
     </>
   );
 }
