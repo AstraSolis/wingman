@@ -22,7 +22,7 @@ import OSD from './components/OSD';
 function AppContent() {
   const { locale, t, setLocale, ready } = useI18n();
   const bootState = useBootState();
-  const [searchEngine, setSearchEngine] = useState(DEFAULT_SEARCH_ENGINE);
+  const [searchEngine, setSearchEngine] = useState<string>(DEFAULT_SEARCH_ENGINE);
   const [customSearchUrl, setCustomSearchUrl] = useState(DEFAULT_CUSTOM_SEARCH_URL);
 
   useEffect(() => {

@@ -162,3 +162,26 @@
 .shortcut-btn.cancel:hover { background: rgba(255,107,107,0.12); }
 .shortcut-btn.reset { color: #888; }
 .shortcut-btn.reset:hover { color: #333; }
+
+/* 关于页 */
+.about-hero {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 24px 16px 20px; background: #fff; border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06); gap: 6px; text-align: center;
+}
+.about-app-icon {
+  width: 72px; height: 72px; border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12); margin-bottom: 4px;
+}
+.about-app-name { font-size: 20px; font-weight: 700; color: #111; letter-spacing: -0.3px; }
+.about-app-version { font-size: 12px; color: #888; font-family: monospace; }
+.about-app-desc { font-size: 13px; color: #666; line-height: 1.5; max-width: 320px; margin-top: 2px; }
+.about-info-value { font-size: 13px; color: #555; }
+.about-link-btn {
+  -webkit-app-region: no-drag;
+  display: inline-flex; align-items: center;
+  padding: 5px 12px; border-radius: 6px; border: 1px solid #e0e0e0;
+  background: #f5f5f5; color: #333; font-size: 13px; cursor: pointer;
+  transition: all 0.2s; text-decoration: none;
+}
+.about-link-btn:hover { background: #e8e8e8; border-color: #ccc; }

@@ -34,7 +34,7 @@ export function useSettingsPanel(
   const [customUrl, setCustomUrl] = useState('');
   const [closeStrategy, setCloseStrategy] = useState('minimize');
   const [rememberBounds, setRememberBounds] = useState(true);
-  const [searchEngine, setSearchEngine] = useState(DEFAULT_SEARCH_ENGINE);
+  const [searchEngine, setSearchEngine] = useState<string>(DEFAULT_SEARCH_ENGINE);
   const [customSearchUrl, setCustomSearchUrl] = useState(DEFAULT_CUSTOM_SEARCH_URL);
 
   useEffect(() => {

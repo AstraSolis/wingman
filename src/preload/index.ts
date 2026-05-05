@@ -23,6 +23,8 @@ const windowAPI = {
   hide: () => ipcRenderer.send('hide-window'),
   close: () => ipcRenderer.send('close-window'),
   getInitialState: () => ipcRenderer.invoke('get-initial-state'),
+  openExternal: (url: string) => ipcRenderer.send('open-external', url),
+  getAppVersion: () => ipcRenderer.invoke('get-app-version'),
   onOpacityUpdated: (callback: (opacity: number) => void): (() => void) => {
     const listener = (_event: Electron.IpcRendererEvent, opacity: unknown) => callback(opacity as number);
     ipcRenderer.on('opacity-updated', listener);

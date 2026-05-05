@@ -115,5 +115,7 @@ export const IPC_CHANNELS = {
   RESET_LOCAL_SHORTCUT: 'reset-local-shortcut',
   LOCAL_SHORTCUT_FIRED: 'local-shortcut-fired',
   SET_SEARCH_ENGINE: 'set-search-engine',
-  SET_CUSTOM_SEARCH_URL: 'set-custom-search-url'
+  SET_CUSTOM_SEARCH_URL: 'set-custom-search-url',
+  OPEN_EXTERNAL: 'open-external',
+  GET_APP_VERSION: 'get-app-version'
 } as const;

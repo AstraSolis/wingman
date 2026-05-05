@@ -4,6 +4,11 @@ import { useSettingsPanel } from '../hooks/useSettings';
 import { useShortcuts, useLocalShortcutsConfig } from '../hooks/useShortcuts';
 import { buildAccelerator } from '../utils/shortcut';
 import type { TFunction } from '../hooks/useI18n';
+import appIcon from '../../assets/icon.png';
+
+const APP_AUTHOR = 'AstraSolis';
+const APP_LICENSE = 'MIT';
+const APP_REPO_URL = 'https://github.com/AstraSolis/wingman';
 
 interface DropdownOption {
   value: string;
@@ -48,6 +53,13 @@ const NavIcons: Record<string, ReactElement> = {
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <rect x="2" y="4" width="20" height="16" rx="2" />
       <path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M18 12h.01M10 12h4M6 16h12" />
+    </svg>
+  ),
+  about: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="8" x2="12" y2="8" />
+      <line x1="12" y1="12" x2="12" y2="16" />
     </svg>
   )
 };
@@ -166,6 +178,11 @@ interface SettingsModalProps {
 
 export default function SettingsModal({ onClose, locale, onLocaleChange, onSearchEngineChange, showOSD, t }: SettingsModalProps) {
   const [activeSection, setActiveSection] = useState('general');
+  const [appVersion, setAppVersion] = useState('');
+
+  useEffect(() => {
+    window.wingman?.window?.getAppVersion().then((v) => setAppVersion(v)).catch(() => {});
+  }, []);
 
   const {
     autoStart,
@@ -196,7 +213,8 @@ export default function SettingsModal({ onClose, locale, onLocaleChange, onSearc
   const sections = [
     { key: 'general', label: t('settings.generalGroup') },
     { key: 'shortcuts', label: t('settings.shortcutsGroup') },
-    { key: 'data', label: t('settings.dataGroup') }
+    { key: 'data', label: t('settings.dataGroup') },
+    { key: 'about', label: t('settings.aboutGroup') }
   ];
 
   return (
@@ -310,6 +328,42 @@ export default function SettingsModal({ onClose, locale, onLocaleChange, onSearc
                     </div>
                     <button className="settings-btn-light danger" onClick={handleClearHistory}>
                       {t('settings.clearBtn')}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeSection === 'about' && (
+              <div className="settings-section">
+                <div className="about-hero">
+                  <img src={appIcon} className="about-app-icon" alt="Wingman" />
+                  <div className="about-app-name">Wingman</div>
+                  <div className="about-app-version">{t('settings.aboutVersion')} {appVersion}</div>
+                  <div className="about-app-desc">{t('settings.aboutAppDesc')}</div>
+                </div>
+
+                <div className="settings-group">
+                  <div className="setting-item-light">
+                    <span className="setting-item-label">{t('settings.aboutAuthor')}</span>
+                    <span className="about-info-value">{APP_AUTHOR}</span>
+                  </div>
+                  <div className="setting-item-light">
+                    <span className="setting-item-label">{t('settings.aboutLicense')}</span>
+                    <span className="about-info-value">{APP_LICENSE}</span>
+                  </div>
+                  <div className="setting-item-light border-none">
+                    <span className="setting-item-label">{t('settings.aboutProjectUrl')}</span>
+                    <button
+                      className="about-link-btn"
+                      onClick={() => window.wingman?.window?.openExternal(APP_REPO_URL)}
+                    >
+                      GitHub
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: 4 }}>
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                        <polyline points="15 3 21 3 21 9" />
+                        <line x1="10" y1="14" x2="21" y2="3" />
+                      </svg>
                     </button>
                   </div>
                 </div>

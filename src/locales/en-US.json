@@ -133,7 +133,14 @@
     "shortcutRecording": "Press shortcut...",
     "shortcutCancel": "Cancel",
     "shortcutReset": "Reset",
-    "shortcutConflict": "This shortcut may already be in use"
+    "shortcutConflict": "This shortcut may already be in use",
+    "aboutGroup": "About",
+    "aboutVersion": "Version",
+    "aboutLicense": "License",
+    "aboutAuthor": "Author",
+    "aboutProjectUrl": "Project URL",
+    "aboutAppDesc": "Game Guide Overlay - A stay-on-top transparent window for PC gamers",
+    "aboutOpenRepo": "Open in browser"
   },
   "contextMenu": {
     "reload": "Reload",

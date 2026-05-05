@@ -133,7 +133,14 @@
     "shortcutRecording": "按下快捷键...",
     "shortcutCancel": "取消",
     "shortcutReset": "重置",
-    "shortcutConflict": "该快捷键可能已被占用"
+    "shortcutConflict": "该快捷键可能已被占用",
+    "aboutGroup": "关于",
+    "aboutVersion": "版本",
+    "aboutLicense": "许可证",
+    "aboutAuthor": "作者",
+    "aboutProjectUrl": "项目地址",
+    "aboutAppDesc": "游戏攻略悬浮窗助手 - 为 PC 游戏玩家设计的置顶透明攻略窗口",
+    "aboutOpenRepo": "在浏览器中打开"
   },
   "contextMenu": {
     "reload": "刷新页面",

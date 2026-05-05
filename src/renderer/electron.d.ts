@@ -80,6 +80,8 @@ interface WingmanWindowAPI {
   hide: () => void;
   close: () => void;
   getInitialState: () => Promise<WingmanWindowState>;
+  openExternal: (url: string) => void;
+  getAppVersion: () => Promise<string>;
   onOpacityUpdated: (callback: (opacity: number) => void) => () => void;
   onClickThroughUpdated: (callback: (isEnabled: boolean) => void) => () => void;
 }

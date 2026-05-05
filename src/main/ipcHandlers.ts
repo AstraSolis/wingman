@@ -1,6 +1,6 @@
 // IPC 消息处理模块
 
-import { app, ipcMain, webContents } from 'electron';
+import { app, ipcMain, shell, webContents } from 'electron';
 import { IPC_CHANNELS, LOCAL_SHORTCUTS } from '../common/constants';
 import * as windowManager from './windowManager';
 import * as i18n from './i18n';
@@ -220,6 +220,14 @@ export function setup(): void {
   ipcMain.on(IPC_CHANNELS.LOG_FROM_RENDERER, (_event, level, scope, message, ...args) => {
     handleRendererLog(level, scope, message, ...args);
   });
+
+  ipcMain.on(IPC_CHANNELS.OPEN_EXTERNAL, (_event, url: string) => {
+    if (typeof url === 'string' && (url.startsWith('https://') || url.startsWith('http://'))) {
+      shell.openExternal(url);
+    }
+  });
+
+  ipcMain.handle(IPC_CHANNELS.GET_APP_VERSION, () => app.getVersion());
 
   ipcMain.handle(IPC_CHANNELS.GET_SHORTCUTS, () => {
     return shortcutManager.getEffectiveShortcuts();
