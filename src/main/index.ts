@@ -3,6 +3,7 @@
 import { app } from 'electron';
 import * as i18n from './i18n';
 import * as windowManager from './windowManager';
+import * as windowTracker from './windowTracker';
 import * as shortcutManager from './shortcutManager';
 import * as trayManager from './trayManager';
 import * as ipcHandlers from './ipcHandlers';
@@ -18,6 +19,7 @@ app.whenReady().then(() => {
   shortcutManager.init();
   trayManager.createTray();
   ipcHandlers.setup();
+  windowTracker.init();
   logger.info(i18n.t('app.started'));
 });
 
@@ -34,5 +36,6 @@ app.on('activate', () => {
 });
 
 app.on('before-quit', () => {
+  windowTracker.cleanup();
   configManager.flush();
 });

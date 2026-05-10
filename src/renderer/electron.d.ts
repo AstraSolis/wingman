@@ -160,6 +160,12 @@ interface WingmanI18nAPI {
   setLocale: (locale: string) => Promise<WingmanI18nData>;
 }
 
+interface WingmanWindowTrackerAPI {
+  getWindowList: () => Promise<string[]>;
+  getBoundWindows: () => Promise<string[]>;
+  setBoundWindows: (titles: string[]) => Promise<string[]>;
+}
+
 interface WingmanAPI {
   window: WingmanWindowAPI;
   settings: WingmanSettingsAPI;
@@ -170,6 +176,7 @@ interface WingmanAPI {
   i18n: WingmanI18nAPI;
   dock: WingmanDockAPI;
   webview: WingmanWebviewAPI;
+  windowTracker: WingmanWindowTrackerAPI;
   /** 将日志转发至主进程落文件 */
   log: (
     level: 'error' | 'warn' | 'info' | 'debug',

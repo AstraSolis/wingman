@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import type { ReactElement } from 'react';
 import type { TFunction } from '../hooks/useI18n';
 import type { Tab } from '../hooks/useTabsPool';
@@ -22,6 +22,8 @@ interface ToolbarProps {
   onCloseTab: (id: string) => void;
   onNewTab: () => void;
   focusAddressBarTrigger: number;
+  boundWindows: string[];
+  onSetBindings: (titles: string[]) => void;
   t: TFunction;
 }
 
@@ -139,6 +141,22 @@ const SVG: Record<string, ReactElement> = {
     <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" opacity="0.6">
       <circle cx="12" cy="12" r="10" />
     </svg>
+  ),
+  bindWindow: (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect x="2" y="4" width="20" height="14" rx="2" />
+      <path d="M10 13a3 3 0 0 0 4.24.53l2-2a3 3 0 0 0-4.24-4.24l-1.13 1.13" />
+      <path d="M14 11a3 3 0 0 0-4.24-.53l-2 2a3 3 0 0 0 4.24 4.24l1.12-1.12" />
+    </svg>
   )
 };
 
@@ -161,12 +179,28 @@ export default function Toolbar({
   onCloseTab,
   onNewTab,
   focusAddressBarTrigger,
+  boundWindows,
+  onSetBindings,
   t
 }: ToolbarProps) {
   const [inputVal, setInputVal] = useState<string | null>(null);
   const [tabsOpen, setTabsOpen] = useState(false);
+  const [bindOpen, setBindOpen] = useState(false);
+  const [windowList, setWindowList] = useState<string[]>([]);
+  const [loadingWindows, setLoadingWindows] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const bindDropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const fetchWindowList = useCallback(async () => {
+    setLoadingWindows(true);
+    try {
+      const list = await window.wingman.windowTracker.getWindowList();
+      setWindowList(list);
+    } finally {
+      setLoadingWindows(false);
+    }
+  }, []);
 
   useEffect(() => {
     setInputVal(null);
@@ -189,6 +223,33 @@ export default function Toolbar({
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, [tabsOpen]);
+
+  useEffect(() => {
+    if (!bindOpen) return;
+    fetchWindowList();
+    const handler = (e: MouseEvent) => {
+      if (!bindDropdownRef.current?.contains(e.target as Node)) {
+        setBindOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [bindOpen, fetchWindowList]);
+
+  const toggleBoundWindow = useCallback(
+    (title: string) => {
+      const next = boundWindows.includes(title)
+        ? boundWindows.filter((t) => t !== title)
+        : [...boundWindows, title];
+      onSetBindings(next);
+    },
+    [boundWindows, onSetBindings]
+  );
+
+  // 合并列表：始终显示已绑定窗口 + 当前枚举到的窗口
+  const mergedList = Array.from(
+    new Set([...boundWindows, ...windowList])
+  );
 
   const displayUrl = inputVal ?? currentWebviewUrl ?? '';
 
@@ -293,6 +354,63 @@ export default function Toolbar({
         >
           {SVG.cursor}
         </button>
+        <div className="bind-window-wrapper" ref={bindDropdownRef}>
+          <button
+            className={`icon-btn bind-window-btn${boundWindows.length > 0 ? ' active' : ''}`}
+            title={t('toolbar.bindWindowTitle')}
+            onClick={() => setBindOpen((v) => !v)}
+          >
+            {SVG.bindWindow}
+            {boundWindows.length > 0 && (
+              <span className="bind-window-badge">{boundWindows.length}</span>
+            )}
+          </button>
+          {bindOpen && (
+            <div className="bind-window-panel">
+              <div className="bind-window-header">
+                <span className="bind-window-header-text">{t('toolbar.bindWindowTitle')}</span>
+                <button
+                  className="bind-window-refresh-btn"
+                  onClick={fetchWindowList}
+                  disabled={loadingWindows}
+                  title={t('toolbar.bindWindowRefresh')}
+                >
+                  {loadingWindows ? '…' : t('toolbar.bindWindowRefresh')}
+                </button>
+              </div>
+              <div className="bind-window-list">
+                {mergedList.length === 0 ? (
+                  <div className="bind-window-empty">
+                    {loadingWindows ? t('toolbar.bindWindowLoading') : t('toolbar.bindWindowEmpty')}
+                  </div>
+                ) : (
+                  mergedList.map((title) => (
+                    <label key={title} className="bind-window-item">
+                      <input
+                        type="checkbox"
+                        checked={boundWindows.includes(title)}
+                        onChange={() => toggleBoundWindow(title)}
+                      />
+                      <span className="bind-window-item-title" title={title}>
+                        {title}
+                      </span>
+                    </label>
+                  ))
+                )}
+              </div>
+              {boundWindows.length > 0 && (
+                <div className="bind-window-footer">
+                  <button
+                    className="bind-window-clear-btn"
+                    onClick={() => onSetBindings([])}
+                  >
+                    {t('toolbar.bindWindowClear')}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
         <button className="icon-btn" title={t('toolbar.settingsTitle')} onClick={onSettings}>
           {SVG.settings}
         </button>

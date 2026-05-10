@@ -117,5 +117,8 @@ export const IPC_CHANNELS = {
   SET_SEARCH_ENGINE: 'set-search-engine',
   SET_CUSTOM_SEARCH_URL: 'set-custom-search-url',
   OPEN_EXTERNAL: 'open-external',
-  GET_APP_VERSION: 'get-app-version'
+  GET_APP_VERSION: 'get-app-version',
+  GET_WINDOW_LIST: 'get-window-list',
+  SET_BOUND_WINDOWS: 'set-bound-windows',
+  GET_BOUND_WINDOWS: 'get-bound-windows'
 } as const;

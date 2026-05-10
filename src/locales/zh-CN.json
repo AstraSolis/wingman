@@ -30,7 +30,12 @@
     "tabsTitle": "管理标签页",
     "newTab": "新标签页",
     "homeTab": "主页",
-    "noTabs": "暂无已打开标签页"
+    "noTabs": "暂无已打开标签页",
+    "bindWindowTitle": "绑定窗口",
+    "bindWindowRefresh": "刷新",
+    "bindWindowEmpty": "未找到可绑定窗口",
+    "bindWindowLoading": "正在获取窗口列表...",
+    "bindWindowClear": "清除所有绑定"
   },
   "home": {
     "searchPlaceholder": "输入网址或搜索内容...",

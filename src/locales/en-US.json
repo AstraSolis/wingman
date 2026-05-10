@@ -30,7 +30,12 @@
     "tabsTitle": "Manage Tabs",
     "newTab": "New Tab",
     "homeTab": "Home",
-    "noTabs": "No open tabs"
+    "noTabs": "No open tabs",
+    "bindWindowTitle": "Bind Window",
+    "bindWindowRefresh": "Refresh",
+    "bindWindowEmpty": "No windows found",
+    "bindWindowLoading": "Loading windows...",
+    "bindWindowClear": "Clear All Bindings"
   },
   "home": {
     "searchPlaceholder": "Enter URL or search...",

@@ -121,6 +121,13 @@ const logAPI = {
   ) => ipcRenderer.send('log-from-renderer', level, scope, message, ...args)
 };
 
+const windowTrackerAPI = {
+  getWindowList: (): Promise<string[]> => ipcRenderer.invoke('get-window-list'),
+  getBoundWindows: (): Promise<string[]> => ipcRenderer.invoke('get-bound-windows'),
+  setBoundWindows: (titles: string[]): Promise<string[]> =>
+    ipcRenderer.invoke('set-bound-windows', titles)
+};
+
 contextBridge.exposeInMainWorld('wingman', {
   window: windowAPI,
   settings: settingsAPI,
@@ -132,6 +139,7 @@ contextBridge.exposeInMainWorld('wingman', {
   dock: dockAPI,
   webview: webviewAPI,
   log: logAPI.log,
+  windowTracker: windowTrackerAPI,
 
   // 向后兼容：保留旧的扁平接口，逐步迁移后可移除
   setOpacity: windowAPI.setOpacity,

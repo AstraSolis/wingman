@@ -10,6 +10,7 @@ import { BootStateProvider, useBootState } from './hooks/useBootState';
 import { useDocumentTitle } from './hooks/useDocumentTitle';
 import { useLocalShortcutsConfig } from './hooks/useShortcuts';
 import { useWindowLocalShortcuts } from './hooks/useWindowLocalShortcuts';
+import { useWindowBind } from './hooks/useWindowBind';
 import { useState, useCallback, useEffect } from 'react';
 import { DEFAULT_SEARCH_ENGINE, DEFAULT_CUSTOM_SEARCH_URL } from '../common/constants';
 import Toolbar from './components/Toolbar';
@@ -66,6 +67,7 @@ function AppContent() {
   const { openFavorites, openHistory, handleAddFav } = useUserData(showOSD, navigate, t);
 
   const { localShortcuts } = useLocalShortcutsConfig();
+  const { boundWindows, setBindings } = useWindowBind();
 
   const [focusAddressBarTrigger, setFocusAddressBarTrigger] = useState(0);
   const [mediaTrigger, setMediaTrigger] = useState<{ action: string; seq: number } | null>(null);
@@ -136,6 +138,8 @@ function AppContent() {
         onCloseTab={closeTab}
         onNewTab={goHome}
         focusAddressBarTrigger={focusAddressBarTrigger}
+        boundWindows={boundWindows}
+        onSetBindings={setBindings}
         t={t}
       />
 

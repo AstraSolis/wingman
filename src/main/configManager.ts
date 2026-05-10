@@ -52,6 +52,7 @@ export interface AppConfig {
   customLocalShortcuts: Record<string, string>;
   searchEngine: string;
   customSearchUrl: string;
+  boundWindows: string[];
 }
 
 const DEFAULT_CONFIG: AppConfig = {
@@ -70,7 +71,8 @@ const DEFAULT_CONFIG: AppConfig = {
   customShortcuts: {},
   customLocalShortcuts: {},
   searchEngine: DEFAULT_SEARCH_ENGINE,
-  customSearchUrl: DEFAULT_CUSTOM_SEARCH_URL
+  customSearchUrl: DEFAULT_CUSTOM_SEARCH_URL,
+  boundWindows: []
 };
 
 let configPath = '';

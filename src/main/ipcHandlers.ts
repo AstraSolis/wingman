@@ -3,6 +3,7 @@
 import { app, ipcMain, shell, webContents } from 'electron';
 import { IPC_CHANNELS, LOCAL_SHORTCUTS } from '../common/constants';
 import * as windowManager from './windowManager';
+import * as windowTracker from './windowTracker';
 import * as i18n from './i18n';
 import * as trayManager from './trayManager';
 import * as configManager from './configManager';
@@ -228,6 +229,19 @@ export function setup(): void {
   });
 
   ipcMain.handle(IPC_CHANNELS.GET_APP_VERSION, () => app.getVersion());
+
+  ipcMain.handle(IPC_CHANNELS.GET_WINDOW_LIST, () => {
+    return windowTracker.getWindowList();
+  });
+
+  ipcMain.handle(IPC_CHANNELS.GET_BOUND_WINDOWS, () => {
+    return windowTracker.getBoundWindows();
+  });
+
+  ipcMain.handle(IPC_CHANNELS.SET_BOUND_WINDOWS, (_event, titles: string[]) => {
+    windowTracker.setBoundWindows(titles);
+    return windowTracker.getBoundWindows();
+  });
 
   ipcMain.handle(IPC_CHANNELS.GET_SHORTCUTS, () => {
     return shortcutManager.getEffectiveShortcuts();
