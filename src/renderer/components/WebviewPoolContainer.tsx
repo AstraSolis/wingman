@@ -9,6 +9,7 @@ interface WebviewPoolContainerProps {
   warmIds: string[];
   visible: boolean;
   mediaTrigger?: { action: string; seq: number } | null;
+  findTrigger?: number;
   onNavigate: (id: string, url: string, title?: string) => void;
   onTitleChange: (id: string, title: string) => void;
   onOpenInBackground: (url: string) => void;
@@ -21,6 +22,7 @@ interface WebviewItemProps {
   tab: Tab;
   activeTabId: string | null;
   mediaTrigger: { action: string; seq: number } | null;
+  findTrigger: number;
   onNavigate: (id: string, url: string, title?: string) => void;
   onTitleChange: (id: string, title: string) => void;
   onOpenInBackground: (url: string) => void;
@@ -37,6 +39,7 @@ const WebviewItem = memo(function WebviewItem({
   tab,
   activeTabId,
   mediaTrigger,
+  findTrigger,
   onNavigate,
   onTitleChange,
   onOpenInBackground,
@@ -59,6 +62,7 @@ const WebviewItem = memo(function WebviewItem({
       visible={tab.id === activeTabId}
       reloadTrigger={tab.reloadTrigger}
       mediaTrigger={tab.id === activeTabId ? mediaTrigger : null}
+      findTrigger={tab.id === activeTabId ? findTrigger : 0}
       onNavigate={handleNavigate}
       onTitleChange={handleTitleChange}
       onOpenInBackground={onOpenInBackground}
@@ -79,6 +83,7 @@ export default function WebviewPoolContainer({
   warmIds,
   visible,
   mediaTrigger,
+  findTrigger,
   onNavigate,
   onTitleChange,
   onOpenInBackground,
@@ -99,6 +104,7 @@ export default function WebviewPoolContainer({
           tab={tab}
           activeTabId={activeTabId}
           mediaTrigger={mediaTrigger ?? null}
+          findTrigger={findTrigger ?? 0}
           onNavigate={onNavigate}
           onTitleChange={onTitleChange}
           onOpenInBackground={onOpenInBackground}

@@ -68,10 +68,20 @@ interface WingmanWebviewContextParams {
   webContentsId: number;
 }
 
+interface WingmanFindResult {
+  requestId: number;
+  activeMatchOrdinal: number;
+  matches: number;
+  finalUpdate: boolean;
+}
+
 interface WingmanWebviewAPI {
   onContextMenu: (callback: (params: WingmanWebviewContextParams) => void) => () => void;
   execAction: (action: 'cut' | 'copy' | 'paste', webContentsId?: number) => void;
   setBackgroundThrottle: (webContentsId: number, throttle: boolean) => void;
+  findInPage: (webContentsId: number, text: string, options?: { forward?: boolean; findNext?: boolean; matchCase?: boolean }) => void;
+  stopFindInPage: (webContentsId: number) => void;
+  onFindResult: (callback: (result: WingmanFindResult) => void) => () => void;
 }
 
 interface WingmanWindowAPI {
@@ -132,6 +142,7 @@ interface WingmanLocalShortcuts {
   MEDIA_SEEK_BACKWARD: string;
   MEDIA_VOLUME_UP: string;
   MEDIA_VOLUME_DOWN: string;
+  FIND_IN_PAGE: string;
 }
 
 interface WingmanLocalShortcutsAPI {

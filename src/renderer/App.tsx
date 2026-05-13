@@ -70,6 +70,7 @@ function AppContent() {
   const { boundWindows, setBindings } = useWindowBind();
 
   const [focusAddressBarTrigger, setFocusAddressBarTrigger] = useState(0);
+  const [findTrigger, setFindTrigger] = useState(0);
   const [mediaTrigger, setMediaTrigger] = useState<{ action: string; seq: number } | null>(null);
 
   const handleMediaAction = useCallback((action: string) => {
@@ -82,6 +83,7 @@ function AppContent() {
   }, [currentUrl, showOSD, t]);
 
   const handleFocusAddressBar = useCallback(() => setFocusAddressBarTrigger(n => n + 1), []);
+  const handleFindInPage = useCallback(() => setFindTrigger(n => n + 1), []);
 
   const handleOpenFavoritesShortcut = useCallback(() => {
     openListModal(openFavorites);
@@ -102,6 +104,7 @@ function AppContent() {
     onSwitchTab: switchTab,
     onToggleFav: handleAddFav,
     onFocusAddressBar: handleFocusAddressBar,
+    onFindInPage: handleFindInPage,
     onCopyUrl: handleCopyUrl,
     onOpenFavorites: handleOpenFavoritesShortcut,
     onOpenHistory: handleOpenHistoryShortcut,
@@ -138,6 +141,7 @@ function AppContent() {
         onCloseTab={closeTab}
         onNewTab={goHome}
         focusAddressBarTrigger={focusAddressBarTrigger}
+        onFindInPage={handleFindInPage}
         boundWindows={boundWindows}
         onSetBindings={setBindings}
         t={t}
@@ -161,6 +165,7 @@ function AppContent() {
           warmIds={warmIds}
           visible={view === 'webview'}
           mediaTrigger={mediaTrigger}
+          findTrigger={findTrigger}
           onNavigate={handleTabNavigate}
           onTitleChange={handleTabTitleChange}
           onOpenInBackground={openInBackground}

@@ -109,7 +109,22 @@ const webviewAPI = {
   execAction: (action: 'cut' | 'copy' | 'paste', webContentsId?: number) =>
     ipcRenderer.send('webview-exec-action', action, webContentsId),
   setBackgroundThrottle: (webContentsId: number, throttle: boolean) =>
-    ipcRenderer.send('webview-set-background-throttle', webContentsId, throttle)
+    ipcRenderer.send('webview-set-background-throttle', webContentsId, throttle),
+  findInPage: (
+    webContentsId: number,
+    text: string,
+    options?: { forward?: boolean; findNext?: boolean; matchCase?: boolean }
+  ) => ipcRenderer.send('find-in-page', webContentsId, text, options),
+  stopFindInPage: (webContentsId: number) =>
+    ipcRenderer.send('stop-find-in-page', webContentsId),
+  onFindResult: (
+    callback: (result: { requestId: number; activeMatchOrdinal: number; matches: number; finalUpdate: boolean }) => void
+  ): (() => void) => {
+    const listener = (_event: Electron.IpcRendererEvent, result: unknown) =>
+      callback(result as { requestId: number; activeMatchOrdinal: number; matches: number; finalUpdate: boolean });
+    ipcRenderer.on('find-in-page-result', listener);
+    return () => ipcRenderer.removeListener('find-in-page-result', listener);
+  }
 };
 
 const logAPI = {

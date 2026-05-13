@@ -35,7 +35,8 @@
     "bindWindowRefresh": "刷新",
     "bindWindowEmpty": "未找到可绑定窗口",
     "bindWindowLoading": "正在获取窗口列表...",
-    "bindWindowClear": "清除所有绑定"
+    "bindWindowClear": "清除所有绑定",
+    "findTitle": "页内搜索 (Ctrl+F)"
   },
   "home": {
     "searchPlaceholder": "输入网址或搜索内容...",
@@ -61,6 +62,13 @@
     "loadFailed": "网页加载失败",
     "loadError": "加载失败: {description} ({code})",
     "retry": "重试"
+  },
+  "findBar": {
+    "placeholder": "在页面中查找...",
+    "noResults": "无匹配",
+    "prev": "上一个 (Shift+Enter)",
+    "next": "下一个 (Enter)",
+    "close": "关闭搜索"
   },
   "osd": {
     "opacity": "透明度: {value}%",
@@ -116,6 +124,7 @@
     "shortcutReloadPage": "刷新页面",
     "shortcutGoHome": "返回主页",
     "shortcutFocusAddressBar": "聚焦地址栏",
+    "shortcutFindInPage": "页内搜索",
     "shortcutCopyUrl": "复制当前页地址",
     "shortcutToggleFavorite": "收藏/取消收藏",
     "shortcutNewTab": "新建标签页",

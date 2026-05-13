@@ -40,7 +40,8 @@ export const LOCAL_SHORTCUTS = {
   MEDIA_SEEK_FORWARD: 'CommandOrControl+Alt+Shift+Up',
   MEDIA_VOLUME_DOWN: 'CommandOrControl+Alt+[',
   MEDIA_VOLUME_UP: 'CommandOrControl+Alt+]',
-  MEDIA_MUTE: 'CommandOrControl+Alt+M'
+  MEDIA_MUTE: 'CommandOrControl+Alt+M',
+  FIND_IN_PAGE: 'CommandOrControl+F'
 } as const;
 
 // 通过 globalShortcut + IPC relay 触发的标签页动作，在 webview 内也能响应
@@ -48,7 +49,8 @@ export const LOCAL_SHORTCUTS = {
 export const TAB_RELAY_ACTIONS: ReadonlySet<keyof typeof LOCAL_SHORTCUTS> = new Set([
   'NEW_TAB', 'CLOSE_TAB', 'NEXT_TAB', 'PREV_TAB',
   'MEDIA_PLAY_PAUSE', 'MEDIA_NEXT_TRACK', 'MEDIA_PREV_TRACK', 'MEDIA_MUTE',
-  'MEDIA_SEEK_FORWARD', 'MEDIA_SEEK_BACKWARD', 'MEDIA_VOLUME_UP', 'MEDIA_VOLUME_DOWN'
+  'MEDIA_SEEK_FORWARD', 'MEDIA_SEEK_BACKWARD', 'MEDIA_VOLUME_UP', 'MEDIA_VOLUME_DOWN',
+  'FIND_IN_PAGE'
 ]);
 
 export const STARTUP_PAGE_TYPES = {
@@ -120,5 +122,8 @@ export const IPC_CHANNELS = {
   GET_APP_VERSION: 'get-app-version',
   GET_WINDOW_LIST: 'get-window-list',
   SET_BOUND_WINDOWS: 'set-bound-windows',
-  GET_BOUND_WINDOWS: 'get-bound-windows'
+  GET_BOUND_WINDOWS: 'get-bound-windows',
+  FIND_IN_PAGE: 'find-in-page',
+  STOP_FIND_IN_PAGE: 'stop-find-in-page',
+  FIND_IN_PAGE_RESULT: 'find-in-page-result'
 } as const;

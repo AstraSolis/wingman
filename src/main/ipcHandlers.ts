@@ -186,6 +186,44 @@ export function setup(): void {
     return reordered;
   });
 
+  // 页内搜索：按 webContentsId 追踪 found-in-page 中继监听，避免重复注册
+  const findListeners = new Map<number, () => void>();
+
+  ipcMain.on(IPC_CHANNELS.FIND_IN_PAGE, (_event, webContentsId: number, text: string, options?: Electron.FindInPageOptions) => {
+    const wc = webContents.fromId(webContentsId);
+    if (!wc || wc.isDestroyed()) return;
+    if (!text) return;
+
+    if (!findListeners.has(webContentsId)) {
+      const handler = (_e: Electron.Event, result: Electron.Result) => {
+        const win = windowManager.getWindow();
+        if (win && !win.isDestroyed()) {
+          win.webContents.send(IPC_CHANNELS.FIND_IN_PAGE_RESULT, result);
+        }
+      };
+      wc.on('found-in-page', handler);
+      const cleanup = () => wc.removeListener('found-in-page', handler);
+      findListeners.set(webContentsId, cleanup);
+      wc.once('destroyed', () => {
+        findListeners.delete(webContentsId);
+      });
+    }
+
+    wc.findInPage(text, options);
+  });
+
+  ipcMain.on(IPC_CHANNELS.STOP_FIND_IN_PAGE, (_event, webContentsId: number) => {
+    const wc = webContents.fromId(webContentsId);
+    if (wc && !wc.isDestroyed()) {
+      wc.stopFindInPage('clearSelection');
+    }
+    const cleanup = findListeners.get(webContentsId);
+    if (cleanup) {
+      cleanup();
+      findListeners.delete(webContentsId);
+    }
+  });
+
   ipcMain.on(IPC_CHANNELS.CLOSE_WINDOW, () => {
     const strategy = configManager.get('closeStrategy');
     if (strategy === 'quit') {

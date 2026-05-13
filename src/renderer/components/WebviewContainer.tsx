@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, useMemo, memo } from 'react';
+import { useRef, useEffect, useState, useMemo, useCallback, memo } from 'react';
 import type { TFunction } from '../hooks/useI18n';
 import ContextMenu from './ContextMenu';
 import type { ContextMenuItem } from './ContextMenu';
@@ -119,6 +119,7 @@ interface WebviewContainerProps {
   url: string;
   visible: boolean;
   reloadTrigger?: number;
+  findTrigger?: number;
   onNavigate: (url: string, title?: string) => void;
   onTitleChange: (title: string) => void;
   onAddFav?: (url: string, title: string) => void;
@@ -132,6 +133,7 @@ function WebviewContainer({
   url,
   visible,
   reloadTrigger,
+  findTrigger,
   onNavigate,
   onTitleChange,
   onAddFav,
@@ -144,6 +146,10 @@ function WebviewContainer({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [ctxParams, setCtxParams] = useState<(WingmanWebviewContextParams & { adjustedY: number }) | null>(null);
+  const [showFind, setShowFind] = useState(false);
+  const [findQuery, setFindQuery] = useState('');
+  const [findResult, setFindResult] = useState<{ activeMatchOrdinal: number; matches: number } | null>(null);
+  const findInputRef = useRef<HTMLInputElement>(null);
   // 只记录我们主动加载过的 URL，did-navigate（内部链接跳转）不更新它
   const loadedUrlRef = useRef('');
   // 当前 webview 实例的 webContentsId，dom-ready 后设置，用于过滤其他 webview 的右键菜单事件
@@ -183,6 +189,76 @@ function WebviewContainer({
     const script = MEDIA_SCRIPTS[mediaTrigger.action];
     if (script) webviewRef.current?.executeJavaScript(script).catch(() => {});
   }, [mediaTrigger]);
+
+  // 页内搜索：findTrigger 变化时打开搜索栏并聚焦输入框
+  useEffect(() => {
+    if (!findTrigger) return;
+    if (!showFind) {
+      // 搜索栏未打开：先打开，focus 由下方 showFind effect 处理
+      setShowFind(true);
+    } else {
+      // 搜索栏已打开：直接聚焦
+      findInputRef.current?.focus();
+    }
+  }, [findTrigger, showFind]);
+
+  // 搜索栏首次打开时聚焦输入框
+  useEffect(() => {
+    if (showFind) findInputRef.current?.focus();
+  }, [showFind]);
+
+  // 标签切换到后台时关闭搜索栏并停止搜索
+  useEffect(() => {
+    if (visible || !showFind) return;
+    setShowFind(false);
+    setFindQuery('');
+    setFindResult(null);
+    const id = myWebContentsIdRef.current;
+    if (id !== null) window.wingman.webview.stopFindInPage(id);
+  }, [visible, showFind]);
+
+  // 搜索栏打开时订阅主进程返回的搜索结果
+  useEffect(() => {
+    if (!showFind) return;
+    const unsub = window.wingman.webview.onFindResult((result) => {
+      if (result.finalUpdate) {
+        setFindResult({ activeMatchOrdinal: result.activeMatchOrdinal, matches: result.matches });
+      }
+    });
+    return unsub;
+  }, [showFind]);
+
+  const handleFindInput = useCallback((text: string) => {
+    setFindQuery(text);
+    setFindResult(null);
+    const id = myWebContentsIdRef.current;
+    if (id === null) return;
+    if (text) {
+      window.wingman.webview.findInPage(id, text);
+    } else {
+      window.wingman.webview.stopFindInPage(id);
+    }
+  }, []);
+
+  const handleFindNext = useCallback(() => {
+    const id = myWebContentsIdRef.current;
+    if (id === null || !findQuery) return;
+    window.wingman.webview.findInPage(id, findQuery, { forward: true, findNext: true });
+  }, [findQuery]);
+
+  const handleFindPrev = useCallback(() => {
+    const id = myWebContentsIdRef.current;
+    if (id === null || !findQuery) return;
+    window.wingman.webview.findInPage(id, findQuery, { forward: false, findNext: true });
+  }, [findQuery]);
+
+  const handleCloseFind = useCallback(() => {
+    setShowFind(false);
+    setFindQuery('');
+    setFindResult(null);
+    const id = myWebContentsIdRef.current;
+    if (id !== null) window.wingman.webview.stopFindInPage(id);
+  }, []);
 
   // 订阅主进程发来的 webview 右键菜单事件，按 webContentsId 过滤确保只响应本实例
   useEffect(() => {
@@ -398,6 +474,63 @@ function WebviewContainer({
           items={menuItems}
           onClose={() => setCtxParams(null)}
         />
+      )}
+      {showFind && (
+        <div className="find-bar">
+          <input
+            ref={findInputRef}
+            type="text"
+            className="find-bar-input"
+            value={findQuery}
+            onChange={(e) => handleFindInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.shiftKey ? handleFindPrev() : handleFindNext();
+              } else if (e.key === 'Escape') {
+                handleCloseFind();
+              }
+            }}
+            placeholder={t('findBar.placeholder')}
+            spellCheck={false}
+          />
+          <span className="find-bar-count">
+            {findResult
+              ? findResult.matches > 0
+                ? `${findResult.activeMatchOrdinal}/${findResult.matches}`
+                : t('findBar.noResults')
+              : ''}
+          </span>
+          <button
+            className="find-bar-btn"
+            title={t('findBar.prev')}
+            onClick={handleFindPrev}
+            disabled={!findQuery}
+          >
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="18 15 12 9 6 15" />
+            </svg>
+          </button>
+          <button
+            className="find-bar-btn"
+            title={t('findBar.next')}
+            onClick={handleFindNext}
+            disabled={!findQuery}
+          >
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </button>
+          <button
+            className="find-bar-btn find-bar-close"
+            title={t('findBar.close')}
+            onClick={handleCloseFind}
+          >
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
       )}
     </div>
   );

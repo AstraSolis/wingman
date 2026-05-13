@@ -48,5 +48,76 @@ webview { -webkit-app-region: no-drag; width: 100%; height: 100%; border: none; 
   color: var(--text-primary); font-size: 12px; font-weight: 500;
   cursor: pointer; transition: all 0.15s ease;
 }
+
+/* 页内搜索栏 */
+.find-bar {
+  -webkit-app-region: no-drag;
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px;
+  background: var(--bg-secondary, rgba(28,28,36,0.95));
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  animation: slideDown 0.2s ease;
+}
+
+.find-bar-input {
+  -webkit-app-region: no-drag;
+  width: 160px;
+  padding: 3px 8px;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 4px;
+  color: var(--text-primary, #e8e8f0);
+  font-size: 12px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+.find-bar-input:focus {
+  border-color: var(--accent, #6c8cff);
+}
+
+.find-bar-count {
+  font-size: 11px;
+  color: var(--text-secondary, rgba(232,232,240,0.5));
+  min-width: 48px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.find-bar-btn {
+  -webkit-app-region: no-drag;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: var(--text-secondary, rgba(232,232,240,0.6));
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.find-bar-btn:hover:not(:disabled) {
+  background: rgba(255,255,255,0.08);
+  color: var(--text-primary, #e8e8f0);
+  border-color: rgba(255,255,255,0.1);
+}
+.find-bar-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.find-bar-close {
+  margin-left: 2px;
+}
 .retry-btn:hover { background: var(--btn-hover); border-color: var(--accent); }
 .retry-btn:active { transform: scale(0.96); }

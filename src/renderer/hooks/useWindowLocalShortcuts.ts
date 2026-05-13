@@ -22,6 +22,7 @@ export interface LocalShortcutHandlers {
   onSwitchTab: (id: string) => void;
   onToggleFav: (url: string, title: string) => void;
   onFocusAddressBar: () => void;
+  onFindInPage: () => void;
   onCopyUrl: () => void;
   onOpenFavorites: () => void;
   onOpenHistory: () => void;
@@ -42,6 +43,7 @@ export function useWindowLocalShortcuts({
   onSwitchTab,
   onToggleFav,
   onFocusAddressBar,
+  onFindInPage,
   onCopyUrl,
   onOpenFavorites,
   onOpenHistory,
@@ -75,6 +77,9 @@ export function useWindowLocalShortcuts({
         break;
       case 'FOCUS_ADDRESS_BAR':
         onFocusAddressBar();
+        break;
+      case 'FIND_IN_PAGE':
+        onFindInPage();
         break;
       case 'COPY_URL':
         onCopyUrl();
@@ -146,7 +151,7 @@ export function useWindowLocalShortcuts({
     // tabs/activeTabId/currentUrl/currentTitle 通过 ref 读取，不放入依赖数组，
     // 避免每次导航/切换标签都重建 fireAction 并重新订阅 IPC relay
     onReload, onGoHome, onNewTab, onCloseTab, onSwitchTab,
-    onToggleFav, onFocusAddressBar, onCopyUrl,
+    onToggleFav, onFocusAddressBar, onFindInPage, onCopyUrl,
     onOpenFavorites, onOpenHistory, onOpenSettings, onMediaAction,
   ]);
 

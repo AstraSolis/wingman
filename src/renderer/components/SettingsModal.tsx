@@ -493,6 +493,7 @@ export default function SettingsModal({ onClose, locale, onLocaleChange, onSearc
                       { action: 'RELOAD_PAGE', label: t('settings.shortcutReloadPage') },
                       { action: 'GO_HOME', label: t('settings.shortcutGoHome') },
                       { action: 'FOCUS_ADDRESS_BAR', label: t('settings.shortcutFocusAddressBar') },
+                      { action: 'FIND_IN_PAGE', label: t('settings.shortcutFindInPage') },
                       { action: 'COPY_URL', label: t('settings.shortcutCopyUrl') },
                       { action: 'TOGGLE_FAVORITE', label: t('settings.shortcutToggleFavorite') }
                     ]

@@ -35,7 +35,8 @@
     "bindWindowRefresh": "Refresh",
     "bindWindowEmpty": "No windows found",
     "bindWindowLoading": "Loading windows...",
-    "bindWindowClear": "Clear All Bindings"
+    "bindWindowClear": "Clear All Bindings",
+    "findTitle": "Find in Page (Ctrl+F)"
   },
   "home": {
     "searchPlaceholder": "Enter URL or search...",
@@ -61,6 +62,13 @@
     "loadFailed": "Page failed to load",
     "loadError": "Load failed: {description} ({code})",
     "retry": "Retry"
+  },
+  "findBar": {
+    "placeholder": "Find in page...",
+    "noResults": "No results",
+    "prev": "Previous (Shift+Enter)",
+    "next": "Next (Enter)",
+    "close": "Close"
   },
   "osd": {
     "opacity": "Opacity: {value}%",
@@ -116,6 +124,7 @@
     "shortcutReloadPage": "Reload page",
     "shortcutGoHome": "Go to home",
     "shortcutFocusAddressBar": "Focus address bar",
+    "shortcutFindInPage": "Find in page",
     "shortcutCopyUrl": "Copy current URL",
     "shortcutToggleFavorite": "Toggle favorite",
     "shortcutNewTab": "New tab",
